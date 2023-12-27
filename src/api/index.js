@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import 'dotenv/config'
+// import 'dotenv/config'
 
 // env variables
 const { 
@@ -29,4 +29,4 @@ export const exerciseApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetExerciseQuery } = exerciseApi
+export const { useGetExerciseQuery } = exerciseApi;

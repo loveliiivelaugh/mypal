@@ -13,6 +13,7 @@ import { useGetExerciseQuery } from './api';
 
 // Styles
 import './App.css';
+import SimpleBottomNavigation from './components/BottomNavigation';
 
 // Constants
 const muscles = [
@@ -59,8 +60,9 @@ function App() {
   const [state, setState] = React.useState({
     exerciseName: '',
     skip: true,
+    tab: 0,
   });
-  const { exerciseName, skip } = state;
+  const { exerciseName, skip, tab } = state;
   
   // Api
   // const { data, isLoading, isError } = useGetExerciseQuery({ exerciseName }, { skip })
@@ -223,7 +225,13 @@ function App() {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={12}>
+        </Grid>
+      </header>
+      <SimpleBottomNavigation 
+        tab={tab}
+        setTab={value => setState({ ...state, tab: value  })}
+        extraContent={
+          <Grid item xs={12} sm={12} sx={{ p: 2}}>
             <form onSubmit={handleSubmit}>
               <Autocomplete
                 freeSolo
@@ -235,17 +243,19 @@ function App() {
                       type="text"
                       {...params.inputProps}
                       value={state.exerciseName}
+                      placeholder="Search for a food"
                       onChange={handleChange}
+                      style={{ width: "100%", padding: "10px", height: "10px", borderRadius: "24px"  }}
                     />
                   </div>
                 )}
               />
-              <button type="submit">Submit</button>
+              {/* <button type="submit">Submit</button> */}
             </form>
           </Grid>
-
-        </Grid>
-      </header>
+        }
+        // ...props
+      />
     </div>
   );
 }
