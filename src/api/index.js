@@ -8,8 +8,7 @@ export const exerciseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://exerciseapi3.p.rapidapi.com/exercise/name',
     prepareHeaders(headers) {
-      headers.set('X-RapidAPI-Key', 'ac72153c36mshd1814c8f1af20f3p1518fbjsnabee85184908')
-      headers.set('X-RapidAPI-Host', 'exerciseapi3.p.rapidapi.com')
+      // ...
       return headers
     },
   }),
