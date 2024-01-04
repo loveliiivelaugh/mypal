@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
 
 // API
-import { exerciseApi } from '../api'
+import { exerciseApi, foodApi } from '../api'
 
 // Reducers
 import { exerciseSlice } from './features'
@@ -11,20 +11,18 @@ import { exerciseSlice } from './features'
 const store = configureStore({
   reducer: {
     exercise: exerciseSlice,
-    // shop: shopSlice,
-    // alerts: alertSlice,
-    // system: systemSlice,
-    // auth: authSlice,
-    // pos: posSlice,
+    // food: foodSlice,
 
     // Add the generated reducer as a specific top-level slice
     [exerciseApi.reducerPath]: exerciseApi.reducer,
+    [foodApi.reducerPath]: foodApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false })
-      .concat(exerciseApi.middleware),
+      .concat(exerciseApi.middleware)
+      .concat(foodApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 
 })
