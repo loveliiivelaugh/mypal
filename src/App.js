@@ -2,21 +2,27 @@
 import React from 'react';
 import { 
   AppBar,
-  Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemText, IconButton, Stack, TextField, Toolbar, Typography, Paper, ListItemButton 
+  Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
+  List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
+  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs 
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-
-import LineChart from './components/charts/LineCharts';
-import TwoLevelPieChart from './components/charts/TwoLevelPie';
+import { Attachment } from '@mui/icons-material';
+import { useQuery } from '@tanstack/react-query'
+// Components
+import BasicDatePicker from './components/BasicDatePicker';
 import CustomShapeBarChart from './components/charts/CustomShapeBar';
-import SimpleBottomNavigation from './components/BottomNavigation';
+import LineChart from './components/charts/LineCharts';
 import Login from './components/Login';
+import SimpleBottomNavigation from './components/BottomNavigation';
+import TwoLevelPieChart from './components/charts/TwoLevelPie';
 
 // Services
-import { useGetExerciseQuery, useGetFoodQuery } from './api';
+import { useGetExerciseQuery, useGetFoodQuery, dbApi } from './api';
 
 // Styles
 import './App.css';
+
 
 // Constants
 const muscles = [
@@ -45,6 +51,76 @@ const muscles = [
   "Upper Back"
 ];
 
+const tabs = [
+  "History",
+  "My Exercises",
+  "All Exercises",
+];
+
+// dummy data
+const exerciseHistory = {
+  data: [
+    {
+      date: "2021-10-01",
+      exercise: "Incline Bench Press",
+      sets: [
+        {
+          set: 1,
+          reps: 10,
+          weight: 135,
+        },
+        {
+          set: 2,
+          reps: 10,
+          weight: 135,
+        },
+        {
+          set: 3,
+          reps: 10,
+          weight: 135,
+        },
+      ],
+    },
+    {
+      date: "2021-10-02",
+      exercise: "Decline Bench Press",
+      sets: [
+        {
+          set: 1,
+          reps: 10,
+          weight: 135,
+        },
+        {
+          set: 2,
+          reps: 10,
+          weight: 135,
+        },
+        {
+          set: 3,
+          reps: 10,
+          weight: 135,
+        },
+      ],
+    },
+  ],
+  formatSetsArrayToString: (sets) => {
+    // find average
+    const getAverage = (arr) => arr.reduce((acc, set) => acc + set, 0) / arr.length;
+    // find average reps and weight
+    const [
+      averageReps,
+      averageWeight,
+    ] = ['reps', 'weight'].map((key) => getAverage(sets.map(set => set[key])));
+    // return string
+    return `${sets.length} sets, ${averageReps} reps, ${averageWeight} lbs`;
+  },
+};
+
+// Utilities
+const cap_first = (str) => (typeof(str) ==="string") 
+  ? str.charAt(0).toUpperCase() + str.slice(1)
+  : "Error: Not a string. Argument must be a string."
+
 const tryCatchHandler = async (promise, final) => {
   try { 
     const result = await promise();
@@ -54,38 +130,106 @@ const tryCatchHandler = async (promise, final) => {
     return [null, error]; 
   } 
   finally { 
-    final(); 
+    final && final(); 
   }
+};
+
+const initialState = {
+  exerciseName: '',
+  skip: true,
+  tab: 0,
+  open: {},
+  getOpenSection: function() {
+    const openKeys = Object.keys(this.open);
+    return openKeys.length 
+      ? openKeys.find(section => this.open[section])
+      : null;
+  },
 };
 
 function App() {
   // State / Hooks
-  const [state, setState] = React.useState({
-    exerciseName: '',
-    skip: true,
-    tab: 0,
-  });
-  const { exerciseName, skip, tab } = state;
+  const [state, setState] = React.useState(initialState);
+  const { exerciseName, open, skip, tab } = state;
   
   // Api
-  // const { data, isLoading, isError } = useGetExerciseQuery({ exerciseName }, { skip })
+  const { data, isLoading, isError } = useGetExerciseQuery({ exerciseName }, { skip });
+  
+  // Helpers
+  const getOpenSection = () => Object.keys(open).find(section => open[section]);
 
-  // console.log("State: ", state, data, isLoading, isError)
+  // Queries
+  const weightQuery = useQuery({ queryKey: ["weight"], queryFn: () => dbApi.getAll("weight") });
+  const exerciseQuery = useQuery({ queryKey: ["exercises"], queryFn: () => dbApi.getAll("exercises") });
+  const foodQuery = useQuery({ queryKey: ["foods"], queryFn: () => dbApi.getAll("foods") });
+  console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
+
   // Handlers
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // setState({ ...state, skip: false })
-    // console.log("handleSubmit: ", state, data, isLoading, isError)
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const { weight, date, reps, sets, foodName, calories } = state;
+    // Get/define payload from payload definitions
+    const payload = {
+      weight: { weight, date },
+      exercise: { name: exerciseName, reps, sets, date },
+      food: { name: foodName, calories, date },
+      // weight: {
+      //   weight: state.weight,
+      //   date: state.date,
+      // },
+      // exercise: {
+      //   name: exerciseName,
+      //   reps: state.reps,
+      //   sets: state.sets,
+      //   date: state.date,
+      // },
+      // food: {
+      //   name: state.foodName,
+      //   calories: state.calories,
+      //   date: state.date,
+      // },
+    }[getOpenSection()] || {};
+
+    // Send payload to db
+    const [response, error] = await tryCatchHandler(
+      // try
+      () => dbApi.add(getOpenSection(), [payload]), 
+      // finally
+      () => {}
+    );
+
+    console.log("Database request result: ", response);
+    // 
+    setState({ ...state, skip: true });
+
+    // Clear payload values from state
+    Object.keys(payload).forEach(key => state[key] = "");
+
+    // Close open drawer
+    setState({ ...state, open: { ...open, [getOpenSection()]: false } });
   };
 
-  const handleChange = (e) => {
-    setState({ ...state, exerciseName: e.target.value })
+  const handleChange = (event) => {
+    if (event?.target) setState({ ...state, [event.target.id]: event.target.value });
+    if (event?.date) setState({ ...state, date: new Date(event).toLocaleDateString() });
+  };
+
+  const handleDrawers = (direction, section, action) => {
+    if (direction && action.includes('open')) setState({ ...state, open: { ...open, [section]: direction } });
+    else setState({ ...state, open: { ...open, [section]: false } });
+  };
+
+  const tabProps = { 
+    dashboard: { handleDrawers, data: { weight: weightQuery.data }},
+    logFood: { handleChange, handleSubmit, data: { food: foodQuery.data }},
+    newsFeed: { handleChange, handleSubmit, data: { exercise: exerciseQuery.data }},
   };
 
   const renderTab = (tab) => ({
-    0: <Dashboard />,
-    1: <LogFood />,
-    2: <NewsFeed />,
+    0: <Dashboard {...tabProps.dashboard} />,
+    1: <LogFood {...tabProps.logFood} />,
+    2: <NewsFeed {...tabProps.newsFeed} />,
     3: <Plans />,
     4: <Profile />,
   }[tab]);
@@ -100,6 +244,99 @@ function App() {
           {renderTab(tab)}
         </Grid>
       </header>
+
+      <Drawer
+        anchor="bottom"
+        open={getOpenSection() || false}
+        onClose={() => handleDrawers(false, getOpenSection(), 'close')}
+        sx={{
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
+
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button onClick={() => handleDrawers(false, getOpenSection(), 'close')}>X</Button>
+            <Typography variant="h6" component="p" gutterBottom>
+              {`Add ${cap_first(getOpenSection())}`}
+            </Typography>
+            <Button type="submit">✔️</Button>
+          </Box>
+          {{
+            weight: (
+              <>
+                <Box sx={{ width: "100%", display: "flex" }}>
+                  <TextField
+                    id="weight"
+                    label="Weight"
+                    variant="outlined"
+                    type="float"
+                    fullWidth
+                    onChange={handleChange}
+                    InputProps={{ inputProps: { min: 0, max: 1000 } }}
+
+                  />
+                </Box>
+                <Box sx={{ width: "100%", display: "flex" }}>
+                  <BasicDatePicker id="date" label="Date" value={state["date"]} handleChange={handleChange} /> 
+                </Box>
+                <Box sx={{ width: "100%", display: "flex", border: "1px solid rgba(33,33,33,0.2)", borderRadius: 1, justifyContent: "space-between", my: 1, py: 1 }}>
+                  <Typography id="demo-simple-select-label" variant="body1">Progress Photo</Typography>
+                  <IconButton p={1}>
+                    <Attachment />
+                  </IconButton>
+                </Box>
+              </>
+            ),
+            food: "Add Food",
+            exercise: (
+              <>
+                <Box component="form" onSubmit={handleSubmit} sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
+                  <Autocomplete
+                    id="exerciseName"
+                    options={data?.exercises || []}
+                    fullWidth
+                    sx={{ ml: 4 }}
+                    renderInput={(params) => (
+                      <Box component="div" ref={params.InputProps.ref}>
+                        <TextField
+                          type="text"
+                          {...params.inputProps}
+                          value={state.exerciseName}
+                          placeholder="Search for an exercise"
+                          onChange={handleChange}
+                          fullWidth
+                        />
+                        <IconButton type="submit" p={1} onClick={handleSubmit}>
+                          <SearchIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+                  />
+                </Box>
+                <Grid id="exercise-history-container" container>
+                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <Tabs>
+                      {tabs.map(tab => <Tab key={`${tab}_tab`} label={tab} />)}
+                    </Tabs>
+                  </Grid>
+                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <List id="exercise-history-list">
+                      {exerciseHistory.data.map(({ date, exercise, sets }) => (
+                        <ListItem key={`${date}_${exercise}`}>
+                          <ListItemText primary={exercise} secondary={exerciseHistory.formatSetsArrayToString(sets)} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Grid>
+                </Grid>
+              </>
+            ),
+          }[getOpenSection()]}
+        </Box>
+      </Drawer>
 
       <SimpleBottomNavigation 
         tab={tab}
@@ -140,7 +377,7 @@ function App() {
   );
 }
 
-const Dashboard = () => {
+const Dashboard = (props) => {
   return (
     <>
      {/* Page Header */}
@@ -221,7 +458,7 @@ const Dashboard = () => {
                     <Typography variant="h5" component="p" gutterBottom>
                       Exercise
                     </Typography>
-                    <Button variant="text">+</Button>
+                    <Button variant="text" onClick={() => props.handleDrawers('bottom', 'exercise', 'open')}>+</Button>
                   </Box>
                   <Typography variant="body1" component="p" gutterBottom>
                     0 cal
@@ -248,7 +485,7 @@ const Dashboard = () => {
                         Last 90 days
                       </Typography>
                     </Stack>
-                    <Button variant="text">+</Button>
+                    <Button variant="text" onClick={() => props.handleDrawers('bottom', 'weight', 'open')}>+</Button>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} sx={{ height: "400px" }}>

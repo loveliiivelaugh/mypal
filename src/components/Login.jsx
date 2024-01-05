@@ -1,13 +1,9 @@
 // Packages
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-
-// Constants
-const { REACT_APP_SUPABASE_URL: url, REACT_APP_SUPABASE_KEY: key } = process.env;
-const supabase = createClient(url, key)
+import { supabase } from '../db'
 
 
 export default function Login() {
@@ -30,7 +26,7 @@ export default function Login() {
 
   }, [])
 
-  console.log({ session })
+  // console.log({ session })
 
   // Render
   if (!session) return (

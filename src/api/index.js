@@ -1,6 +1,9 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+import { supabase } from '../db'
+
+
 // env variables
 const { 
   REACT_APP_RAPID_API_KEY: key, 
@@ -49,3 +52,32 @@ export const foodApi = createApi({
 // auto-generated based on the defined endpoints
 export const { useGetExerciseQuery } = exerciseApi;
 export const { useGetFoodQuery } = foodApi;
+
+
+export const dbApi = {
+  
+  add: async (table, payload) => await supabase
+    .from(table)
+    .insert(payload)
+    .select(),
+
+  get: async (table, id) => await supabase
+    .from(table)
+    .select()
+    .eq('id', id),
+
+  getAll: async (table) => await supabase
+    .from(table)
+    .select(),
+
+  update: async (table, id, payload) => await supabase
+    .from(table)
+    .update(payload)
+    .eq('id', id),
+
+  delete: async (table, id) => await supabase
+    .from(table)
+    .delete()
+    .eq('id', id),
+
+}
