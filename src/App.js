@@ -1,7 +1,7 @@
 // Packages
 import React from 'react';
 import { 
-  AppBar,
+  AppBar, InputAdornment,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
   TextField, Toolbar, Typography, ListItemButton, Tab, Tabs 
@@ -158,12 +158,6 @@ function App() {
   // Helpers
   const getOpenSection = () => Object.keys(open).find(section => open[section]);
 
-  // Queries
-  const weightQuery = useQuery({ queryKey: ["weight"], queryFn: () => dbApi.getAll("weight") });
-  const exerciseQuery = useQuery({ queryKey: ["exercises"], queryFn: () => dbApi.getAll("exercises") });
-  const foodQuery = useQuery({ queryKey: ["foods"], queryFn: () => dbApi.getAll("foods") });
-  console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
-
   // Handlers
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -221,15 +215,13 @@ function App() {
   };
 
   const tabProps = { 
-    dashboard: { handleDrawers, data: { weight: weightQuery.data }},
-    logFood: { handleChange, handleSubmit, data: { food: foodQuery.data }},
-    newsFeed: { handleChange, handleSubmit, data: { exercise: exerciseQuery.data }},
+    dashboard: { handleDrawers },
   };
 
   const renderTab = (tab) => ({
     0: <Dashboard {...tabProps.dashboard} />,
-    1: <LogFood {...tabProps.logFood} />,
-    2: <NewsFeed {...tabProps.newsFeed} />,
+    1: <LogFood />,
+    2: <NewsFeed />,
     3: <Plans />,
     4: <Profile />,
   }[tab]);
@@ -308,10 +300,16 @@ function App() {
                           placeholder="Search for an exercise"
                           onChange={handleChange}
                           fullWidth
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <IconButton type="submit" p={1} onClick={handleSubmit}>
+                                  <SearchIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
                         />
-                        <IconButton type="submit" p={1} onClick={handleSubmit}>
-                          <SearchIcon />
-                        </IconButton>
                       </Box>
                     )}
                   />
@@ -330,6 +328,11 @@ function App() {
                         </ListItem>
                       ))}
                     </List>
+                  </Grid>
+                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <Button variant="outlined" fullWidth onClick={() => handleDrawers("right", getOpenSection(), 'open')}>
+                      Create a New Exercise
+                    </Button>
                   </Grid>
                 </Grid>
               </>
@@ -378,6 +381,11 @@ function App() {
 }
 
 const Dashboard = (props) => {
+  // Queries
+  const weightQuery = useQuery({ queryKey: ["weight"], queryFn: () => dbApi.getAll("weight") });
+  const exerciseQuery = useQuery({ queryKey: ["exercises"], queryFn: () => dbApi.getAll("exercises") });
+  const foodQuery = useQuery({ queryKey: ["foods"], queryFn: () => dbApi.getAll("foods") });
+  // console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
   return (
     <>
      {/* Page Header */}
@@ -489,7 +497,7 @@ const Dashboard = (props) => {
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                  <LineChart />
+                  <LineChart data={weightQuery?.data?.data} />
                 </Grid>
               </Grid>
             </Card>
