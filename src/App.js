@@ -7,6 +7,7 @@ import {
   TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, InputLabel 
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 import { Attachment } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query'
 // Components
@@ -21,7 +22,7 @@ import TwoLevelPieChart from './components/charts/TwoLevelPie';
 import { useGetExerciseQuery, useGetFoodQuery, dbApi } from './api';
 
 // Constants
-import { exerciseHistory, mock_exercises, muscles, tabs } from './utilities/constants';
+import { exerciseHistory, foodHistory, mock_exercises, mock_recentFoods, tabs } from './utilities/constants';
 
 // Utilities
 import { cap_first, tryCatchHandler } from './utilities/helpers'
@@ -98,6 +99,15 @@ function App() {
     else setState({ ...state, open: { ...open, [section]: false } });
   };
 
+  const handleFoodChange = event => {
+    console.log("handleFoodChange(): ", event);
+  };
+
+  const handleFoodFocus = event => {
+    console.log("handleFoodFocus(): ", event );
+    setState({...state, open: {...open, food: "bottom" }})
+  }
+
   const tabProps = { 
     dashboard: { handleDrawers },
   };
@@ -114,7 +124,7 @@ function App() {
 
   // Render
   return (
-    <div className="App">
+    <>
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
@@ -140,6 +150,7 @@ function App() {
             </Typography>
             <Button type="submit">✔️</Button>
           </Box>
+          <Toolbar />
           {{
             weight: (
               <>
@@ -166,7 +177,88 @@ function App() {
                 </Box>
               </>
             ),
-            food: "Add Food",
+            food: (
+              <>
+                <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
+                  <Autocomplete
+                    id="exerciseName"
+                    options={mock_exercises || data || []}
+                    fullWidth
+                    onLoadedData={() => setState({...state, skip: true })}
+                    loading={isLoading}
+                    sx={{ ml: 4 }}
+                    getOptionLabel={(option) => {
+                      console.log("getOptionLabel: ", option, option?.name)
+                      return option?.name
+                    }}
+                    renderOption={(props, option) => {
+                      console.log("renderOption: ", props, option)
+                      // return option
+                      return (
+                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={e => setState({ ...state, exerciseSelected: option })}>
+                          <>{option?.name}{` `}</>
+                          <Chip size="small" label={option?.muscle} />
+                          <Chip variant="outlined" size="small" label={option?.type} />
+                        </Stack>
+                      )
+                    }}
+                    onClick={e => console.log("click!!", e)}
+                    renderInput={(params) => (
+                      <Box ref={params.InputProps.ref}>
+                        <TextField
+                          type="text"
+                          {...params.inputProps}
+                          value={state.foodName}
+                          placeholder="Search for a food"
+                          onChange={handleChange}
+                          fullWidth
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <IconButton p={1} onClick={() => setState({...state, skip: false })}>
+                                  <SearchIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton p={1} onClick={() => setState({...state, foodName: "" })}>
+                                  <CloseIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      </Box>
+                    )}
+                  />
+                </Box>
+                <Grid id="food-history-container" container>
+                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <Tabs>
+                      {["All", "My Meals", "My Recipes", "My Foods"].map((tab, i) => <Tab key={`${tab}_tab`} label={tab} value={i} />)}
+                    </Tabs>
+                  </Grid>
+
+                  {/* TODO: Quick Add Buttons Section goes here */}
+                  
+                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Typography variant="subtitle1">History</Typography>
+                      <Chip component={Button} variant="outlined" label="Most Recent"/>
+                    </Box>
+                    <List id="food-history-list">
+                      {foodHistory.data.map((food, i) => (
+                        <ListItem key={`${food.date}_${food.name}`}>
+                          <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Grid>
+                  
+                </Grid>
+              </>
+            ),
             exercise: (
               <>
                 <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
@@ -260,6 +352,12 @@ function App() {
                   </Grid>
                   
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Typography variant="body1">History</Typography>
+                      <Chip component={Button} variant="outlined">
+                        <Typography variant="subtitle1">Most Recent</Typography>
+                      </Chip>
+                    </Box>
                     <List id="exercise-history-list">
                       {exerciseHistory.data.map(({ date, exercise, sets }) => (
                         <ListItem key={`${date}_${exercise}`}>
@@ -288,23 +386,23 @@ function App() {
           <Grid item xs={12} sm={12} sx={{ p: 2}}>
             <Login />
           </Grid>
-          <Grid item xs={12} sm={12} sx={{ p: 2}}>
+          <Grid item xs={12} sm={12} sx={{ p: 2, mb: 6 }}>
             <form onSubmit={handleSubmit}>
               <Autocomplete
-                freeSolo
-                disableClearable
-                options={muscles}
+                options={mock_recentFoods}
+                onChange={handleFoodChange}
+                onFocus={handleFoodFocus}
                 renderInput={(params) => (
-                  <div ref={params.InputProps.ref}>
-                    <input
+                  <Box ref={params.InputProps.ref}>
+                    <TextField
                       type="text"
                       {...params.inputProps}
                       value={state.exerciseName}
                       placeholder="Search for a food"
                       onChange={handleChange}
-                      style={{ width: "100%", padding: "10px", height: "10px", borderRadius: "24px"  }}
+                      fullWidth
                     />
-                  </div>
+                  </Box>
                 )}
               />
               {/* <button type="submit">Submit</button> */}
@@ -314,8 +412,7 @@ function App() {
         }
         // ...props
       />
-
-    </div>
+    </>
   );
 }
 
@@ -408,9 +505,11 @@ const Dashboard = (props) => {
                     <Button variant="text" onClick={() => props.handleDrawers('bottom', 'exercise', 'open')}>+</Button>
                   </Box>
                   <Typography variant="body1" component="p" gutterBottom>
+                  {/* TODO: Need to research into how to calculate calories burned per exercise */}
                     0 cal
                   </Typography>
                   <Typography variant="body1" component="p" gutterBottom>
+                  {/* TODO: Need to add a function that will calculate total time of daily exercise */}
                     00:00 hr
                   </Typography>
                 </Grid>

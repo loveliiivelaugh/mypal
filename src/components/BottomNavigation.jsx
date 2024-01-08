@@ -17,7 +17,7 @@ const items = {
 
 export default function SimpleBottomNavigation(props) {
   return (
-    <Box sx={{ width: 500 }}>
+    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
       {props?.extraContent && props.extraContent}
       <BottomNavigation
         showLabels

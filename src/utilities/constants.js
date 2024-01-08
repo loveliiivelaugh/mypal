@@ -91,6 +91,13 @@ const exerciseHistory = {
   },
 };
 
+const foodHistory = {
+  data: [],
+  formatFoodObjectToString: food => {
+    return `0 cal(calories), 5.2 gram(amount), (full name)`
+  }
+};
+
 const mock_exercises = [
   {
       "name": "Front Squats With Two Kettlebells",
@@ -142,9 +149,15 @@ const mock_exercises = [
   }
 ]
 
+const mock_recentFoods = [
+
+]
+
 export {
   exerciseHistory,
+  foodHistory,
   mock_exercises,
+  mock_recentFoods,
   muscles, 
   tabs, 
 }
