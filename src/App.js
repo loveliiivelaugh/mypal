@@ -4,11 +4,11 @@ import {
   AppBar, Chip, InputAdornment,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
-  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, InputLabel 
+  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, InputLabel, Avatar, Select, MenuItem 
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import { Attachment } from '@mui/icons-material';
+import { ArrowBack, Attachment, Check } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query'
 // Components
 import BasicDatePicker from './components/BasicDatePicker';
@@ -20,6 +20,7 @@ import TwoLevelPieChart from './components/charts/TwoLevelPie';
 
 // Services
 import { useGetExerciseQuery, useGetFoodQuery, dbApi } from './api';
+import foodRepoData from './api/food_repo.data';
 
 // Constants
 import { exerciseHistory, foodHistory, mock_exercises, mock_recentFoods, tabs } from './utilities/constants';
@@ -49,10 +50,16 @@ function App() {
   // State / Hooks
   const [state, setState] = React.useState(initialState);
   const { exerciseName, open, skip, tab } = state;
+  
   // Api
   const { data, isLoading, isError } = useGetExerciseQuery({ name: exerciseName }, { skip });
-  console.log({ data , isLoading, isError })
-
+  
+  // Queries
+  const weightQuery = useQuery({ queryKey: ["weight", dbApi.getAll], queryFn: () => dbApi.getAll("weight") });
+  const exerciseQuery = useQuery({ queryKey: ["exercise"], queryFn: () => dbApi.getAll("exercise") });
+  const foodQuery = useQuery({ queryKey: ["food"], queryFn: () => dbApi.getAll("food") });
+  console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
+  
   // Helpers
   const getOpenSection = () => Object.keys(open).find(section => open[section]);
 
@@ -60,26 +67,29 @@ function App() {
   const handleSubmit = async (event) => {
     event?.preventDefault();
 
-    const { weight, date, reps, sets, foodName, calories } = state;
+    let { weight, date, reps, sets, foodName, calories, time } = state;
+    if (!date) date = new Date().toLocaleDateString();
+    if (!time) time = new Date().toLocaleTimeString();
     // Get/define payload from payload definitions
     const payload = {
       weight: { weight, date },
       exercise: { name: state?.exerciseSelected?.name, reps, sets, date },
-      food: { name: foodName, calories, date }
+      food: { 
+        name: state.foodSelected?.name_translations["en"], 
+        calories: state.foodSelected?.nutrients?.energy_calories_kcal?.per_portion,
+        nutrients: state.foodSelected?.nutrients,
+        date, time,
+      }
     }[getOpenSection()] || {};
 
     console.log("handleSubmit(): ", payload)
 
     // Send payload to db
-    const [response, error] = await tryCatchHandler(
-      // try
-      () => dbApi.add(getOpenSection(), [payload]), 
-      // finally
-      () => {}
-    );
+    const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
 
+    // if (error) dispatch(alertActions.createAlert({ type: "error", message: `${error}` }))
     console.log("Database request result: ", response);
-    // 
+
     setState({ ...state, skip: true });
 
     // Clear payload values from state
@@ -90,27 +100,21 @@ function App() {
   };
 
   const handleChange = (event) => {
+    // if input type is text field
     if (event?.target) setState({ ...state, [event.target.id]: event.target.value });
+    // if input type is date field
     if (event?.date) setState({ ...state, date: new Date(event).toLocaleDateString() });
   };
 
   const handleDrawers = (direction, section, action) => {
+    // dynamically open drawers
     if (direction && action.includes('open')) setState({ ...state, open: { ...open, [section]: direction } });
+    // dynamically close drawers
     else setState({ ...state, open: { ...open, [section]: false } });
   };
 
-  const handleFoodChange = event => {
-    console.log("handleFoodChange(): ", event);
-  };
-
-  const handleFoodFocus = event => {
-    console.log("handleFoodFocus(): ", event );
-    setState({...state, open: {...open, food: "bottom" }})
-  }
-
-  const tabProps = { 
-    dashboard: { handleDrawers },
-  };
+  // Render
+  const tabProps = { dashboard: { handleDrawers, queries: {weightQuery, exerciseQuery, foodQuery} }};
 
   const renderTab = (tab) => ({
     0: <Dashboard {...tabProps.dashboard} />,
@@ -130,6 +134,57 @@ function App() {
           {renderTab(tab)}
         </Grid>
       </header>
+
+      <Drawer
+        anchor="right"
+        open={open?.["food"] === "right"}
+        onClose={() => handleDrawers("bottom", getOpenSection(), "open")}
+        sx={{
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: "40vw" },
+        }}
+      >
+        <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
+          {console.log("in right drawer: ", state)}
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <IconButton onClick={() => setState({...state, open: {...open, food: "bottom" }})}><ArrowBack /></IconButton>
+            <Typography variant="h6" textAlign="center">Add Food</Typography>
+            <IconButton type="submit"><Check /></IconButton>
+          </Toolbar>
+          <List>
+            <ListItem sx={{ justifyContent: "space-between" }}>
+              <ListItemText primary={state?.foodSelected?.display_name_translations["en"]} secondary={state?.foodSelected?.display_name_translations["en"]} />
+            </ListItem>
+            <ListItem sx={{ justifyContent: "space-between" }}>
+              <InputLabel>Serving Size</InputLabel>
+              <TextField id="serving_size" value={state?.serving_size} onChange={handleChange} placeholder="4oz" />
+            </ListItem>
+            <ListItem sx={{ justifyContent: "space-between" }}>
+              <InputLabel>Number of Servings</InputLabel>
+              <TextField id="num_servings" value={state?.num_servings} onChange={handleChange} placeholder={1} />
+            </ListItem>
+            <ListItem sx={{ justifyContent: "space-between" }}>
+              <InputLabel>Time</InputLabel>
+              <TextField id="serving_time" value={state?.serving_time} onChange={handleChange} placeholder={new Date().toLocaleString()} />
+            </ListItem>
+            <ListItem sx={{ justifyContent: "space-between" }}>
+              <InputLabel>Meal</InputLabel>
+              <Select id="meal" value={state?.meal || "Breakfast"} onChange={handleChange} placeholder="Select a Meal">
+                <MenuItem value={"Breakfast"}>Breakfast</MenuItem>
+                <MenuItem value={"Lunch"}>Lunch</MenuItem>
+                <MenuItem value={"Dinner"}>Dinner</MenuItem>
+                <MenuItem value={"Snack"}>Snack</MenuItem>
+              </Select>
+            </ListItem>
+            <ListItem>
+              <Stack variant="row">
+
+              </Stack>
+            </ListItem>
+
+          </List>
+        </Box>
+      </Drawer>
 
       <Drawer
         anchor="bottom"
@@ -181,28 +236,28 @@ function App() {
               <>
                 <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
                   <Autocomplete
-                    id="exerciseName"
-                    options={mock_exercises || data || []}
+                    id="food"
+                    options={foodRepoData?.data || []}
                     fullWidth
                     onLoadedData={() => setState({...state, skip: true })}
                     loading={isLoading}
                     sx={{ ml: 4 }}
                     getOptionLabel={(option) => {
-                      console.log("getOptionLabel: ", option, option?.name)
-                      return option?.name
+                      // console.log("getOptionLabel: ", option, option?.name)
+                      return option?.display_name_translations["en"]
                     }}
                     renderOption={(props, option) => {
-                      console.log("renderOption: ", props, option)
                       // return option
+                      const image = option.images.find(({categories}) => categories.includes("Front"))?.thumb;
+                      // console.log("renderOption: ", props, option, image)
                       return (
-                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={e => setState({ ...state, exerciseSelected: option })}>
-                          <>{option?.name}{` `}</>
-                          <Chip size="small" label={option?.muscle} />
-                          <Chip variant="outlined" size="small" label={option?.type} />
+                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() => setState({...state, foodSelected: option, open: {...open, food: "right" }})}>
+                          <Avatar src={image} />
+                          <Typography variant="h6">{option?.display_name_translations["en"]}</Typography>
+                          <Chip size="small" label={option?.country} />
                         </Stack>
                       )
                     }}
-                    onClick={e => console.log("click!!", e)}
                     renderInput={(params) => (
                       <Box ref={params.InputProps.ref}>
                         <TextField
@@ -248,7 +303,7 @@ function App() {
                       <Chip component={Button} variant="outlined" label="Most Recent"/>
                     </Box>
                     <List id="food-history-list">
-                      {foodHistory.data.map((food, i) => (
+                      {foodQuery.data.data.map((food, i) => (
                         <ListItem key={`${food.date}_${food.name}`}>
                           <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
                         </ListItem>
@@ -390,8 +445,7 @@ function App() {
             <form onSubmit={handleSubmit}>
               <Autocomplete
                 options={mock_recentFoods}
-                onChange={handleFoodChange}
-                onFocus={handleFoodFocus}
+                onFocus={() => setState({...state, open: {...open, food: "bottom" }})}
                 renderInput={(params) => (
                   <Box ref={params.InputProps.ref}>
                     <TextField
@@ -417,11 +471,7 @@ function App() {
 }
 
 const Dashboard = (props) => {
-  // Queries
-  const weightQuery = useQuery({ queryKey: ["weight", dbApi.getAll], queryFn: () => dbApi.getAll("weight") });
-  const exerciseQuery = useQuery({ queryKey: ["exercise"], queryFn: () => dbApi.getAll("exercise") });
-  const foodQuery = useQuery({ queryKey: ["foods"], queryFn: () => dbApi.getAll("foods") });
-  console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
+  const { weightQuery } = props.queries;
   return (
     <>
      {/* Page Header */}
