@@ -80,7 +80,32 @@ const supabaseApi = createApi({
 
         return { data };
       }
-    })
+    }),
+    getFromDatabaseTable: builder.query({
+      query: (table) => '/database/read/' + table,
+      async onQueryStarted({ table }, { dispatch, queryFulfilled }) {
+        try {
+          const response = await dispatch(
+            queryFulfilled.matchPending({ table })
+          )
+          console.log('response onQueryStarted: ', response)
+          return response
+        } catch (error) {
+          return error
+        }
+      },
+    }),
+
+    updateDatabaseTable: builder.mutation({
+      query: (payload) => {
+        console.log('updateDatabaseTable payload: ', payload)
+        return ({
+          url: `/database/${payload.params}`,
+          method: payload.method,
+          body: payload.data,
+        })
+      },
+    }),
   })
 })
 

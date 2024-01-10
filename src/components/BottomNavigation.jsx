@@ -17,12 +17,13 @@ const items = {
 
 export default function SimpleBottomNavigation(props) {
   return (
-    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
+    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)', color: "#fff" }}>
       {props?.extraContent && props.extraContent}
       <BottomNavigation
         showLabels
         value={props.tab}
         onChange={(event, newValue) => props.setTab(newValue)}
+        sx={{ backgroundColor: 'rgba(80, 170, 255, 1)', color: '#fff' }}
       >
       {Object
         .keys(items)

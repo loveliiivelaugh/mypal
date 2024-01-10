@@ -3,14 +3,17 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useQuery } from '@tanstack/react-query'
 import { 
-  AppBar, Chip, InputAdornment,
+  InputLabel, Avatar, Select, MenuItem,
+  AppBar, Chip, InputAdornment, CssBaseline, Divider,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
-  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, InputLabel, Avatar, Select, MenuItem 
+  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { Add, ArrowBack, Attachment, Check, Delete } from '@mui/icons-material';
+// import { styled } from '@mui/material/styles';
 
 // Components
 import BasicDatePicker from './components/BasicDatePicker';
@@ -157,6 +160,16 @@ function App() {
   // Render
   return (
     <>
+      <CssBaseline />
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Fitness Tracker
+          </Typography>
+          <Login />
+        </Toolbar>
+      </AppBar>
+
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
@@ -188,7 +201,7 @@ function App() {
             exercise: (
               <List>
                 <ListItem sx={{ justifyContent: "space-between" }}>
-                  <ListItem sx={{ justifyContent: "space-between" }}Text primary={state?.exerciseSelected?.name}></ListItem>
+                  <ListItem sx={{ justifyContent: "space-between" }} primary={state?.exerciseSelected?.name}></ListItem>
                 </ListItem>
                 <ListItem sx={{ justifyContent: "space-between" }}>
                   <InputLabel># of Sets</InputLabel>
@@ -349,7 +362,7 @@ function App() {
                             endAdornment: (
                               <InputAdornment position="end">
                                 <IconButton p={1} onClick={() => setState({...state, foodName: "" })}>
-                                  <CloseIcon />
+                                  <QrCodeScannerIcon />
                                 </IconButton>
                               </InputAdornment>
                             )
@@ -487,26 +500,42 @@ function App() {
           <Grid item xs={12} sm={12} sx={{ p: 2}}>
             <Login />
           </Grid>
-          <Grid item xs={12} sm={12} sx={{ p: 2, mb: 6 }}>
-            <form onSubmit={handleSubmit}>
+          <Grid item xs={12} sm={12} p={2}>
+            <Box component="form" onSubmit={handleSubmit}>
               <Autocomplete
                 options={mock_recentFoods}
                 onFocus={() => setState({...state, open: {...open, food: "bottom" }})}
+                sx={{ p: 0, borderRadius: 8, backgroundColor: "rgba(33,33,33,0.8)", color: "#fff" }}
                 renderInput={(params) => (
-                  <Box ref={params.InputProps.ref}>
-                    <TextField
-                      type="text"
-                      {...params.inputProps}
-                      value={state.exerciseName}
-                      placeholder="Search for a food"
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  </Box>
+                  <TextField
+                    type="text"
+                    ref={params.InputProps.ref}
+                    {...params.inputProps}
+                    value={state.exerciseName}
+                    placeholder="Search for a food"
+                    onChange={handleChange}
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                            <SearchIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                            <QrCodeScannerIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                  />
                 )}
               />
               {/* <button type="submit">Submit</button> */}
-            </form>
+            </Box>
           </Grid>
         </>
         }
@@ -522,7 +551,7 @@ const Dashboard = (props) => {
     <>
      {/* Page Header */}
       <Grid item xs={12} sm={12}>
-            <Typography variant="h1" component="p" gutterBottom>
+            <Typography variant="h4" component="h4" gutterBottom>
               Today
             </Typography>
           </Grid>

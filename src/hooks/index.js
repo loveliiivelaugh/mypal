@@ -60,9 +60,21 @@ export const useMealTime = () => {
 
 
 // useActions hook -- used to dispatch actions (simple wrapper around useDispatch to reduce verbosity and boilerplate)
-const useActions = () => {
+export const useActions = () => {
   const dispatch = useDispatch();
   return {
     createAlert: (type, message) => dispatch(alerts.createAlert({ type, message }))
   }
 };
+
+
+// useColorMode hook -- used to toggle between light and dark mode
+export const useColorMode = () => {
+  const [colorMode, setColorMode] = useState('dark');
+
+  const toggleColorMode = () => {
+    setColorMode(colorMode === 'light' ? 'dark' : 'light');
+  };
+
+  return [colorMode, toggleColorMode];
+}

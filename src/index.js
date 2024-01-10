@@ -1,3 +1,4 @@
+// Packages
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux'
@@ -5,13 +6,17 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+// Providers
 import { AlertsProvider } from './contexts/alerts.context';
+import { ThemeProvider } from './theme';
 import { store } from './redux'
-
+// Components
+import App from './App';
+// Utitlities
+import reportWebVitals from './reportWebVitals';
+// Styles
 import './index.css';
+
 
 // Create a client
 const queryClient = new QueryClient()
@@ -20,11 +25,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ReduxProvider store={store}>
-      <AlertsProvider>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </AlertsProvider>
+      <ThemeProvider>
+        <AlertsProvider>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </AlertsProvider>
+      </ThemeProvider>
     </ReduxProvider>
   </React.StrictMode>
 );
