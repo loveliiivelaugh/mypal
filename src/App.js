@@ -10,10 +10,13 @@ import {
   TextField, Toolbar, Typography, ListItemButton, Tab, Tabs,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
+import HikingIcon from '@mui/icons-material/Hiking';
+import SportsScoreIcon from '@mui/icons-material/SportsScore';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import { Add, ArrowBack, Attachment, Check, Delete } from '@mui/icons-material';
-// import { styled } from '@mui/material/styles';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import { Add, ArrowBack, Attachment, Check, Delete, Notifications } from '@mui/icons-material';
 
 // Components
 import BasicDatePicker from './components/BasicDatePicker';
@@ -162,11 +165,15 @@ function App() {
     <>
       <CssBaseline />
       <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Fitness Tracker
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Avatar alt="M" src="/static/images/avatar/1.jpg" />
+          <Typography variant="h5" component="h5">
+            oAIFitness
           </Typography>
-          <Login />
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Login />
+            <Notifications />
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -185,8 +192,6 @@ function App() {
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: "40vw" },
         }}
       >
-
-      {console.log("state: ", state)}
         <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton onClick={() => setState({...state, open: {...open, food: "bottom" }})}><ArrowBack /></IconButton>
@@ -496,12 +501,8 @@ function App() {
         tab={tab}
         setTab={value => setState({ ...state, tab: value  })}
         extraContent={
-        <>
-          <Grid item xs={12} sm={12} sx={{ p: 2}}>
-            <Login />
-          </Grid>
           <Grid item xs={12} sm={12} p={2}>
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box component="form"> 
               <Autocomplete
                 options={mock_recentFoods}
                 onFocus={() => setState({...state, open: {...open, food: "bottom" }})}
@@ -537,7 +538,6 @@ function App() {
               {/* <button type="submit">Submit</button> */}
             </Box>
           </Grid>
-        </>
         }
         // ...props
       />
@@ -575,21 +575,23 @@ const Dashboard = (props) => {
                   <Stack component={List} spacing={2}>
                   {[
                     { heading: "Base Goal",
-                      value: 3590
+                      value: 3590,
+                      icon: <SportsScoreIcon/>
                     },
                     {
                       heading: "Food",
-                      value: 0
+                      value: 0,
+                      icon: <RestaurantIcon/>
                     },
                     { 
                       heading: "Exercise",
-                      value: 0
+                      value: 0,
+                      icon: <WhatshotIcon/>
                     }
-                  ].map((item) => (
+                  ].map((item, i) => (
                     <ListItem key={item.heading}>
-                      <ListItemIcon></ListItemIcon>
-                      <ListItemText primary={item.heading} />
-                      <ListItemText primary={item.value} />
+                      <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>{item.icon}</ListItemIcon>
+                      <ListItemText primary={item.heading} secondary={item.value} />
                     </ListItem>
                   ))}
                   </Stack>
@@ -606,9 +608,9 @@ const Dashboard = (props) => {
                   <Typography variant="h5" component="p" gutterBottom>
                     Steps
                   </Typography>
-                  <Typography variant="body1" component="p" gutterBottom>
-                    &icon& 268
-                  </Typography>
+                  <IconButton sx={{ color: "#fff" }}>
+                    <HikingIcon /> {' '} 394
+                  </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                     Goal: 10,000 steps
                   </Typography>
@@ -622,17 +624,27 @@ const Dashboard = (props) => {
             {/* Exercise Card */}
             <Card sx={{ minWidth: 275, p: 2 }}>
               <Grid container spacing={2}>
-                <Grid item sm={12} textAlign="left">
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h5" component="p" gutterBottom>
-                      Exercise
-                    </Typography>
-                    <Button variant="text" onClick={() => props.handleDrawers('bottom', 'exercise', 'open')}>+</Button>
-                  </Box>
+                <Grid item sm={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="h5" component="p" gutterBottom>
+                    Exercise
+                  </Typography>
+                  <IconButton onClick={() => props.handleDrawers('bottom', 'exercise', 'open')} sx={{ color: "#fff" }}>
+                    <Add /> 
+                  </IconButton>
+                </Grid>
+                <Grid item sm={12} sx={{ textAlign: "left", display: "flex" }}>
+                  <IconButton sx={{ color: "#fc0" }}>
+                    <WhatshotIcon/>
+                  </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                   {/* TODO: Need to research into how to calculate calories burned per exercise */}
                     0 cal
                   </Typography>
+                </Grid>
+                <Grid item sm={12} sx={{ textAlign: "left", display: "flex" }}>
+                  <IconButton sx={{ color: "#fc0" }}>
+                    <WatchLaterIcon />
+                  </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                   {/* TODO: Need to add a function that will calculate total time of daily exercise */}
                     00:00 hr
@@ -656,11 +668,13 @@ const Dashboard = (props) => {
                         Last 90 days
                       </Typography>
                     </Stack>
-                    <Button variant="text" onClick={() => props.handleDrawers('bottom', 'weight', 'open')}>+</Button>
+                    <IconButton onClick={() => props.handleDrawers('bottom', 'weight', 'open')} sx={{ color: "#fff" }}>
+                      <Add />
+                    </IconButton>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                  <LineChart data={weightQuery?.data?.data} />
+                  <LineChart />
                 </Grid>
               </Grid>
             </Card>

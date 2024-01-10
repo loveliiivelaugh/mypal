@@ -19,8 +19,21 @@ export default class Example extends PureComponent {
   render() {
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart width={400} height={400}>
-          <Pie data={data02} dataKey="value" cx="50%" cy="50%" innerRadius={70} outerRadius={90} fill="#82ca9d" label />
+        <PieChart width={200} height={200}>
+          <Pie 
+            data={data02} 
+            dataKey="value" 
+            cx="50%" 
+            cy="50%" 
+            innerRadius={70} 
+            outerRadius={75} 
+            fill="#82ca9d" 
+            label={false} 
+          />
+          <text x="50%" y="50%" textAnchor="middle" fill="#fff" dominantBaseline="middle">
+            3,590<br/>
+            <tspan fontSize="12" fill="#999">Remaining</tspan>
+          </text>
         </PieChart>
       </ResponsiveContainer>
     );
