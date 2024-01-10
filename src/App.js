@@ -1,5 +1,7 @@
 // Packages
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query'
 import { 
   AppBar, Chip, InputAdornment,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
@@ -8,8 +10,8 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import { ArrowBack, Attachment, Check } from '@mui/icons-material';
-import { useQuery } from '@tanstack/react-query'
+import { Add, ArrowBack, Attachment, Check, Delete } from '@mui/icons-material';
+
 // Components
 import BasicDatePicker from './components/BasicDatePicker';
 import CustomShapeBarChart from './components/charts/CustomShapeBar';
@@ -23,10 +25,13 @@ import { useGetExerciseQuery, useGetFoodQuery, dbApi } from './api';
 import foodRepoData from './api/food_repo.data';
 
 // Constants
-import { exerciseHistory, foodHistory, mock_exercises, mock_recentFoods, tabs } from './utilities/constants';
+import { 
+  exerciseHistory, foodHistory, mock_exercises, mock_recentFoods, tabs 
+} from './utilities/constants';
 
 // Utilities
 import { cap_first, tryCatchHandler } from './utilities/helpers'
+import { alerts } from './redux'
 
 // Styles
 import './App.css';
@@ -48,6 +53,7 @@ const initialState = {
 
 function App() {
   // State / Hooks
+  const dispatch = useDispatch();
   const [state, setState] = React.useState(initialState);
   const { exerciseName, open, skip, tab } = state;
   
@@ -58,10 +64,12 @@ function App() {
   const weightQuery = useQuery({ queryKey: ["weight", dbApi.getAll], queryFn: () => dbApi.getAll("weight") });
   const exerciseQuery = useQuery({ queryKey: ["exercise"], queryFn: () => dbApi.getAll("exercise") });
   const foodQuery = useQuery({ queryKey: ["food"], queryFn: () => dbApi.getAll("food") });
-  console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
+  // console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
   
   // Helpers
   const getOpenSection = () => Object.keys(open).find(section => open[section]);
+
+  console.log(foodRepoData)
 
   // Handlers
   const handleSubmit = async (event) => {
@@ -87,7 +95,7 @@ function App() {
     // Send payload to db
     const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
 
-    // if (error) dispatch(alertActions.createAlert({ type: "error", message: `${error}` }))
+    if (error) dispatch(alerts.createAlert({ type: "error", message: `${error}` }))
     console.log("Database request result: ", response);
 
     setState({ ...state, skip: true });
@@ -145,7 +153,6 @@ function App() {
         }}
       >
         <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
-          {console.log("in right drawer: ", state)}
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton onClick={() => setState({...state, open: {...open, food: "bottom" }})}><ArrowBack /></IconButton>
             <Typography variant="h6" textAlign="center">Add Food</Typography>
@@ -153,7 +160,7 @@ function App() {
           </Toolbar>
           <List>
             <ListItem sx={{ justifyContent: "space-between" }}>
-              <ListItemText primary={state?.foodSelected?.display_name_translations["en"]} secondary={state?.foodSelected?.display_name_translations["en"]} />
+              <ListItemText primary={state?.foodSelected?.display_name_translations?.["en"]} secondary={state?.foodSelected?.display_name_translations?.  ["en"]} />
             </ListItem>
             <ListItem sx={{ justifyContent: "space-between" }}>
               <InputLabel>Serving Size</InputLabel>
@@ -300,12 +307,25 @@ function App() {
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="subtitle1">History</Typography>
-                      <Chip component={Button} variant="outlined" label="Most Recent"/>
+                      <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => dispatch(alerts.createAlert({ type: "success", message: "Successfully saved food!" }))}/>
                     </Box>
                     <List id="food-history-list">
-                      {foodQuery.data.data.map((food, i) => (
-                        <ListItem key={`${food.date}_${food.name}`}>
+                      {foodQuery?.data?.data.map((food, i) => (
+                        <ListItem key={`${food.date}_${food.name}`} component={ListItemButton}>
                           <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
+                          <Box>
+                            <IconButton 
+                              onClick={() => setState({
+                                ...state, 
+                                foodSelected: foodRepoData.data
+                                  .find(({ display_name_translations }) => (display_name_translations["en"] === food.name)), 
+                                open: {...open, food: "right" }
+                              })}
+                            >
+                              <Add />
+                            </IconButton>
+                            <IconButton onClick={() => dbApi.delete("food", food.id)}><Delete /></IconButton>
+                          </Box>
                         </ListItem>
                       ))}
                     </List>

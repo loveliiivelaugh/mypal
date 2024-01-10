@@ -5,12 +5,13 @@ import { setupListeners } from '@reduxjs/toolkit/query/react'
 import { exerciseApi, foodApi } from '../api'
 
 // Reducers
-import { exerciseSlice } from './features'
+import { alertSlice, exerciseSlice } from './features'
 
 
 const store = configureStore({
   reducer: {
     exercise: exerciseSlice,
+    alerts: alertSlice,
     // food: foodSlice,
 
     // Add the generated reducer as a specific top-level slice

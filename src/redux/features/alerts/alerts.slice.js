@@ -17,6 +17,7 @@ export const alertSlice = createSlice({
       state.message = null
     }
   },
+  
 })
 
 // Action creators are generated for each case reducer function

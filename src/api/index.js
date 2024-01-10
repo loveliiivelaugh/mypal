@@ -1,5 +1,5 @@
 // Need to use the React-specific entry point to import createApi
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 
 import { supabase } from '../db'
 
@@ -53,9 +53,9 @@ export const foodApi = createApi({
   }),
   tagTypes: ['Food'],
   endpoints: (builder) => ({
-    getFood: builder.query({
-      query: (params) => `/complexSearch?query=${params.query}`,
-    }),
+      getFood: builder.query({
+        query: (params) => `/complexSearch?query=${params.query}`,
+      }),
   }),
 });
 
@@ -63,6 +63,29 @@ export const foodApi = createApi({
 // auto-generated based on the defined endpoints
 export const { useGetExerciseQuery } = exerciseApi;
 export const { useGetFoodQuery } = foodApi;
+
+const supabaseApi = createApi({
+  baseQuery: fakeBaseQuery(),
+  endpoints: (builder) => ({
+    getFromDatabase: builder.query({
+      queryFn: async (table, id) => {
+        const {data, error} = await supabase
+          .from(table)
+          .select()
+          .eq('id', id)
+
+        if (error) {
+          throw { error };
+        }
+
+        return { data };
+      }
+    })
+  })
+})
+
+export const { useMutateDatabaseQuery } = supabaseApi
+export { supabaseApi }
 
 
 export const dbApi = {

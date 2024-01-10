@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux'
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { store } from './redux'
-
 import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { AlertsProvider } from './contexts/alerts.context';
+import { store } from './redux'
+
+import './index.css';
 
 // Create a client
 const queryClient = new QueryClient()
@@ -18,9 +20,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ReduxProvider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
+      <AlertsProvider>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </AlertsProvider>
     </ReduxProvider>
   </React.StrictMode>
 );
