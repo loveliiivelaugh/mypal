@@ -1,6 +1,6 @@
 // Packages
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useQuery } from '@tanstack/react-query'
 import { 
   AppBar, Chip, InputAdornment,
@@ -35,8 +35,15 @@ import { alerts } from './redux'
 
 // Styles
 import './App.css';
+import { useResponsive } from './hooks';
 
 
+const useActions = () => {
+  const dispatch = useDispatch();
+  return {
+    createAlert: (type, message) => dispatch(alerts.createAlert({ type, message }))
+  }
+};
 
 const initialState = {
   exerciseName: '',
@@ -53,14 +60,19 @@ const initialState = {
 
 function App() {
   // State / Hooks
-  const dispatch = useDispatch();
-  const [state, setState] = React.useState(initialState);
+  const { isSmallScreen } = useResponsive();
+  const [state, setState] = useState(initialState);
   const { exerciseName, open, skip, tab } = state;
+
+  // Global Actions
+  const { createAlert } = useActions();
   
   // Api
   const { data, isLoading, isError } = useGetExerciseQuery({ name: exerciseName }, { skip });
-  
-  // Queries
+  // const weightHistory = useGetWeightQuery();
+  // const foodHistory = useGetFoodQuery();
+
+  // Queries *TODO: Convert these queries to redux toolkit queries ^^
   const weightQuery = useQuery({ queryKey: ["weight", dbApi.getAll], queryFn: () => dbApi.getAll("weight") });
   const exerciseQuery = useQuery({ queryKey: ["exercise"], queryFn: () => dbApi.getAll("exercise") });
   const foodQuery = useQuery({ queryKey: ["food"], queryFn: () => dbApi.getAll("food") });
@@ -74,8 +86,9 @@ function App() {
   // Handlers
   const handleSubmit = async (event) => {
     event?.preventDefault();
+    setState({ ...state, isSubmitting: true });
 
-    let { weight, date, reps, sets, foodName, calories, time } = state;
+    let { weight, date, reps, sets, time } = state;
     if (!date) date = new Date().toLocaleDateString();
     if (!time) time = new Date().toLocaleTimeString();
     // Get/define payload from payload definitions
@@ -95,16 +108,25 @@ function App() {
     // Send payload to db
     const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
 
-    if (error) dispatch(alerts.createAlert({ type: "error", message: `${error}` }))
+    if (error) createAlert("error", error.message);
     console.log("Database request result: ", response);
 
-    setState({ ...state, skip: true });
+    if (response) {
+      createAlert("success", `Saved ${getOpenSection()}!`);
+      // Refetch database data
+      
+    };
 
     // Clear payload values from state
     Object.keys(payload).forEach(key => state[key] = "");
 
-    // Close open drawer
-    setState({ ...state, open: { ...open, [getOpenSection()]: false } });
+    // Reset state values
+    setState({ 
+      ...state, 
+      skip: true, 
+      isSubmitting: false, 
+      open: { ...open, [getOpenSection()]: false }
+    });
   };
 
   const handleChange = (event) => {
@@ -132,8 +154,6 @@ function App() {
     4: <Profile />,
   }[tab]);
 
-  // Effects
-
   // Render
   return (
     <>
@@ -145,51 +165,95 @@ function App() {
 
       <Drawer
         anchor="right"
-        open={open?.["food"] === "right"}
+        open={Object.keys(open).some(key => open?.[key] === "right")}
         onClose={() => handleDrawers("bottom", getOpenSection(), "open")}
         sx={{
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: "40vw" },
         }}
       >
+
+      {console.log("state: ", state)}
         <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton onClick={() => setState({...state, open: {...open, food: "bottom" }})}><ArrowBack /></IconButton>
-            <Typography variant="h6" textAlign="center">Add Food</Typography>
+            <Typography variant="h6" textAlign="center">Add {cap_first(getOpenSection())}</Typography>
             <IconButton type="submit"><Check /></IconButton>
           </Toolbar>
-          <List>
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <ListItemText primary={state?.foodSelected?.display_name_translations?.["en"]} secondary={state?.foodSelected?.display_name_translations?.  ["en"]} />
-            </ListItem>
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <InputLabel>Serving Size</InputLabel>
-              <TextField id="serving_size" value={state?.serving_size} onChange={handleChange} placeholder="4oz" />
-            </ListItem>
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <InputLabel>Number of Servings</InputLabel>
-              <TextField id="num_servings" value={state?.num_servings} onChange={handleChange} placeholder={1} />
-            </ListItem>
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <InputLabel>Time</InputLabel>
-              <TextField id="serving_time" value={state?.serving_time} onChange={handleChange} placeholder={new Date().toLocaleString()} />
-            </ListItem>
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <InputLabel>Meal</InputLabel>
-              <Select id="meal" value={state?.meal || "Breakfast"} onChange={handleChange} placeholder="Select a Meal">
-                <MenuItem value={"Breakfast"}>Breakfast</MenuItem>
-                <MenuItem value={"Lunch"}>Lunch</MenuItem>
-                <MenuItem value={"Dinner"}>Dinner</MenuItem>
-                <MenuItem value={"Snack"}>Snack</MenuItem>
-              </Select>
-            </ListItem>
-            <ListItem>
-              <Stack variant="row">
 
-              </Stack>
-            </ListItem>
+          { // Render "right" drawer content based on open section
+            {
+            
+            weight: <></>,
+            exercise: (
+              <List>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <ListItem sx={{ justifyContent: "space-between" }}Text primary={state?.exerciseSelected?.name}></ListItem>
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel># of Sets</InputLabel>
+                  <TextField
+                    id="sets"
+                    type="number"
+                    value={state?.sets}
+                    onChange={handleChange}
+                    placeholder={5}
+                  />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel># of Reps</InputLabel>
+                  <TextField
+                    id="reps"
+                    type="number"
+                    value={state?.reps}
+                    onChange={handleChange}
+                    placeholder={10}
+                  />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel>Date</InputLabel>
+                  <BasicDatePicker id="date" label="Date" value={state["date"]} handleChange={handleChange} placeholder={new Date().toLocaleString()} /> 
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <Button variant="outlined" fullWidth type="submit">Add Exercise</Button>
+                </ListItem>
+              </List>
+            ),
+            food: (
+              <List>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <ListItemText primary={state?.foodSelected?.display_name_translations?.["en"]} secondary={state?.foodSelected?.display_name_translations?.["en"]} />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel>Serving Size</InputLabel>
+                  <TextField id="serving_size" value={state?.serving_size} onChange={handleChange} placeholder="4oz" />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel>Number of Servings</InputLabel>
+                  <TextField id="num_servings" value={state?.num_servings} onChange={handleChange} placeholder={1} />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel>Time</InputLabel>
+                  <TextField id="serving_time" value={state?.serving_time} onChange={handleChange} placeholder={new Date().toLocaleString()} />
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <InputLabel>Meal</InputLabel>
+                  <Select id="meal" value={state?.meal || "Breakfast"} onChange={handleChange} placeholder="Select a Meal">
+                    <MenuItem value={"Breakfast"}>Breakfast</MenuItem>
+                    <MenuItem value={"Lunch"}>Lunch</MenuItem>
+                    <MenuItem value={"Dinner"}>Dinner</MenuItem>
+                    <MenuItem value={"Snack"}>Snack</MenuItem>
+                  </Select>
+                </ListItem>
+                <ListItem>
+                  <Stack variant="row">
 
-          </List>
+                  </Stack>
+                </ListItem>
+              </List>
+            )
+          }[getOpenSection()]}
+
         </Box>
       </Drawer>
 
@@ -307,7 +371,7 @@ function App() {
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="subtitle1">History</Typography>
-                      <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => dispatch(alerts.createAlert({ type: "success", message: "Successfully saved food!" }))}/>
+                      <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => createAlert("success", "SUper Super tesT!")}/>
                     </Box>
                     <List id="food-history-list">
                       {foodQuery?.data?.data.map((food, i) => (
@@ -352,7 +416,7 @@ function App() {
                       console.log("renderOption: ", props, option)
                       // return option
                       return (
-                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={e => setState({ ...state, exerciseSelected: option })}>
+                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() => setState({ ...state, exerciseSelected: option, open:{...open, [getOpenSection()]: "right"} })}>
                           <>{option?.name}{` `}</>
                           <Chip size="small" label={option?.muscle} />
                           <Chip variant="outlined" size="small" label={option?.type} />
@@ -384,42 +448,6 @@ function App() {
                   />
                 </Box>
                 <Grid id="exercise-history-container" container>
-                  <Grid item sm={12}>
-                    {state.exerciseSelected && (
-                      <Grid container sx={{ display: "Flex", justifyContent: "space-around"}}>
-                        <Grid item sm={12} textAlign="center">
-                          <Typography variant="h4">{state?.exerciseSelected?.name}</Typography>
-                        </Grid>
-                        <Grid item sm={12}>
-                          <InputLabel># of Reps</InputLabel>
-                          <TextField
-                            id="reps"
-                            type="number"
-                            value={state?.reps}
-                            onChange={handleChange}
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid item sm={12}>
-                          <InputLabel># of Sets</InputLabel>
-                          <TextField
-                            id="sets"
-                            type="number"
-                            value={state?.sets}
-                            onChange={handleChange}
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid item sm={12}>
-                          <InputLabel>Date</InputLabel>
-                          <BasicDatePicker id="date" label="Date" value={state["date"]} handleChange={handleChange} /> 
-                        </Grid>
-                        <Grid item sm={12}>
-                          <Button variant="outlined" fullWidth onClick={handleSubmit}>Add Exercise</Button>
-                        </Grid>
-                      </Grid>
-                    )}
-                  </Grid>
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
                     <Tabs>
                       {tabs.map(tab => <Tab key={`${tab}_tab`} label={tab} />)}
@@ -429,9 +457,7 @@ function App() {
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="body1">History</Typography>
-                      <Chip component={Button} variant="outlined">
-                        <Typography variant="subtitle1">Most Recent</Typography>
-                      </Chip>
+                      <Chip component={Button} variant="outlined" label="Most Recent" />
                     </Box>
                     <List id="exercise-history-list">
                       {exerciseHistory.data.map(({ date, exercise, sets }) => (
@@ -640,8 +666,8 @@ const Dashboard = (props) => {
 
 const LogFood = () => {
   // State / Hooks
-  const [foodSearch, setFoodSearch] = React.useState("");
-  const [skip, setSkip] = React.useState(true);
+  const [foodSearch, setFoodSearch] = useState("");
+  const [skip, setSkip] = useState(true);
 
   // Queries
   const { data, isLoading, isError } = useGetFoodQuery({ foodSearch }, { skip });
