@@ -388,14 +388,14 @@ function App() {
                     </Box>
                     <List id="food-history-list">
                       {hooks?.food?.isLoading
-                        ? ( <CircularProgress />)
+                        ? <CircularProgress />
                         : hooks?.food?.data.map((food, i) => (
                         <ListItem key={`${food.date}_${food.name}`} component={ListItemButton}>
                           <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
                           <Box>
                             <IconButton 
                               onClick={() => setState({
-                                ...state, 
+                                ...state,
                                 foodSelected: foodRepoData.data
                                   .find(({ display_name_translations }) => (display_name_translations["en"] === food.name)), 
                                 open: {...open, food: "right" }
@@ -543,6 +543,7 @@ function App() {
 }
 
 const Dashboard = (props) => {
+  const hooks = useHooks();
   const { handleDrawers } = props;
   const { weightQuery } = props.queries;
   return (
@@ -567,13 +568,18 @@ const Dashboard = (props) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <TwoLevelPieChart />
+                  <TwoLevelPieChart>
+                  <text x="50%" y="50%" textAnchor="middle" fill="#fff" dominantBaseline="middle">
+                    {hooks?.profile?.tdee}<br/>
+                    <tspan fontSize="12" fill="#999">Remaining</tspan>
+                  </text>
+                  </TwoLevelPieChart>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Stack component={List} spacing={2}>
                   {[
                     { heading: "Base Goal",
-                      value: 3590,
+                      value: hooks?.profile?.tdee,
                       icon: <SportsScoreIcon/>
                     },
                     {

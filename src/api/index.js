@@ -69,13 +69,15 @@ const supabaseApi = createApi({
   endpoints: (builder) => ({
     // GET a single item by id
     get: builder.query({
-      queryFn: async (table, id) => {
+      queryFn: async (params) => {
+        console.log("inside queryFn(): ", params)
         const {data, error} = await supabase
-          .from(table)
-          .select('*')
-          .eq("user_id", id)
+          .from("information_schema.columns")
+          .select('column_name, data_type')
+          // .eq('table_name', params);
 
         return [data, error];
+        // return params;
       }
     }),
     // GET all items/rows from a table
