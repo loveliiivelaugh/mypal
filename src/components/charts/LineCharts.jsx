@@ -12,7 +12,9 @@ const dates = new Array(20)
   .fill(dataPoint)
   .map((data, i) => ({
     ...data,
-    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString()
+    // date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString()
+    // date without the year
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString().slice(0, -5)
   }));
 
 const Example = (props) => {
@@ -22,7 +24,7 @@ const Example = (props) => {
         <LineChart
           width={500}
           height={300}
-          data={dates.reverse()}
+          data={dates}
           margin={{
             top: 5,
             right: 30,
@@ -30,13 +32,13 @@ const Example = (props) => {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="1 1" />
+          <CartesianGrid vertical={false} horizontal strokeDasharray={"1"} />
           <XAxis dataKey="date" />
           <YAxis dataKey="weight" />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{ r: 1 }} />
-          <Line type="monotone" dataKey="expectedWeight" stroke="#82ca9d" />
+          {/* <Tooltip /> */}
+          {/* <Legend /> */}
+          <Line type="linear" dataKey="weight" stroke="#82ca9d" dot={false}  />
+          {/* <Line type="monotone" dataKey="expectedWeight" stroke="#82ca9d" /> */}
         </LineChart>
       </ResponsiveContainer>
     );

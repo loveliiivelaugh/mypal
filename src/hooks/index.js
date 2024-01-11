@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { alerts } from '../redux';
+import { supabase } from '../db';
+
+// Services
+import { 
+  useGetSessionQuery,
+  useGetAllQuery,
+  useGetQuery,
+  useGetExerciseQuery, 
+  useGetFoodQuery, 
+  dbApi, 
+} from '../api';
 
 // useResponsive hook -- used to determine the screen size
 import { useMediaQuery } from '@react-hook/media-query';
@@ -77,4 +88,59 @@ export const useColorMode = () => {
   };
 
   return [colorMode, toggleColorMode];
+}
+
+
+// useAuth hook -- used to get the current user session
+export const useAuth = () => {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    // Get the session from Supabase
+    const session = supabase.auth.getSession();
+
+    // Update the local session state if the session changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    // Initial state
+    setSession(session);
+
+    // Cleanup
+    return () => {
+      // listener?.unsubscribe();
+    };
+  }, []);
+
+  return session;
+}
+
+
+export const useHooks = () => {
+  const responsive = useResponsive();
+  const globalState = useSelector(state => state);
+  const auth = useGetSessionQuery();
+  const weight = useGetAllQuery("weight");
+  const exercise = useGetAllQuery("exercise");
+  const food = useGetAllQuery("food");
+  const profile = useGetAllQuery("profile");
+  const actions = useActions();
+  let user_id = auth?.data?.session?.user?.id;
+  let current_profile = profile?.data?.find((item) => item.user_id === user_id);
+
+  return { 
+    user_id,
+    auth, 
+    globalState, 
+    responsive, 
+    profile: current_profile, 
+    weight, 
+    exercise, 
+    food, 
+    actions,
+    db: dbApi,
+  };
 }

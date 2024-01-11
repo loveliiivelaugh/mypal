@@ -67,49 +67,63 @@ export const { useGetFoodQuery } = foodApi;
 const supabaseApi = createApi({
   baseQuery: fakeBaseQuery(),
   endpoints: (builder) => ({
-    getFromDatabase: builder.query({
+    // GET a single item by id
+    get: builder.query({
       queryFn: async (table, id) => {
         const {data, error} = await supabase
           .from(table)
-          .select()
-          .eq('id', id)
+          .select('*')
+          .eq("user_id", id)
 
-        if (error) {
-          throw { error };
-        }
-
-        return { data };
+        return [data, error];
       }
     }),
-    getFromDatabaseTable: builder.query({
-      query: (table) => '/database/read/' + table,
-      async onQueryStarted({ table }, { dispatch, queryFulfilled }) {
-        try {
-          const response = await dispatch(
-            queryFulfilled.matchPending({ table })
-          )
-          console.log('response onQueryStarted: ', response)
-          return response
-        } catch (error) {
-          return error
-        }
-      },
+    // GET all items/rows from a table
+    getAll: builder.query({
+      queryFn: async (table) => await supabase
+        .from(table)
+        .select(),
+    }),
+    // GET the current user session
+    getSession: builder.query({
+      queryFn: async () => await supabase
+        .auth
+        .getSession()
+    }),
+    // CREATE a new item/row in a table
+    add: builder.mutation({
+      queryFn: async (table, payload) => await supabase
+        .from(table)
+        .insert(payload)
+        .select(),
+    }),
+    // UPDATE an item/row in a table
+    update: builder.mutation({
+      queryFn: async (table, id, payload) => await supabase
+        .from(table)
+        .update(payload)
+        .eq('id', id),
+    }),
+    // DELETE an item/row in a table
+    delete: builder.mutation({
+      queryFn: async (table, id) => await supabase
+        .from(table)
+        .delete()
+        .eq('id', id),
     }),
 
-    updateDatabaseTable: builder.mutation({
-      query: (payload) => {
-        console.log('updateDatabaseTable payload: ', payload)
-        return ({
-          url: `/database/${payload.params}`,
-          method: payload.method,
-          body: payload.data,
-        })
-      },
-    }),
-  })
+  }),
+
 })
 
-export const { useMutateDatabaseQuery } = supabaseApi
+export const { 
+  useGetQuery,
+  useGetSessionQuery,
+  useAddMutation,
+  useUpdateMutation,
+  useDeleteMutation,
+  useGetAllQuery,
+} = supabaseApi
 export { supabaseApi }
 
 

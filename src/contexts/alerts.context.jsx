@@ -9,9 +9,8 @@ import { alerts as actions } from '../redux'
 const alertsContext = createContext();
 
 export const AlertsProvider = ({ children }) => {
-
   return (
-    <alertsContext.Provider>
+    <alertsContext.Provider value={{}}>
       {children}
       <Alerts/>
     </alertsContext.Provider>
@@ -40,7 +39,14 @@ const Alerts = (props) => {
   return (
     <Snackbar open={open} autoHideDuration={6000} anchorOrigin={origin}>
       <Alert severity={alerts.type || 'info'} onClose={() => {}} action={null}>
-        <Typography variant="h6">{alerts.message}</Typography>
+        {alerts?.message && 
+          alerts?.message
+            ?.split('\n')
+            .map((message, i) => (
+          <Typography key={i} variant="h6">
+            {message}
+          </Typography>
+        ))}
       </Alert>
     </Snackbar>
   )

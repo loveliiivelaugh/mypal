@@ -5,7 +5,6 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 import { supabase } from '../db'
 
-
 export default function Login() {
   // State / Hooks
   const [session, setSession] = useState(null)

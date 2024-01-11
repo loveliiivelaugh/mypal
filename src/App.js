@@ -1,13 +1,11 @@
 // Packages
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useQuery } from '@tanstack/react-query'
 import { 
   InputLabel, Avatar, Select, MenuItem,
   AppBar, Chip, InputAdornment, CssBaseline, Divider,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
-  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs,
+  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, Badge, Tooltip, CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import HikingIcon from '@mui/icons-material/Hiking';
@@ -16,7 +14,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
-import { Add, ArrowBack, Attachment, Check, Delete, Notifications } from '@mui/icons-material';
+import { Add, ArrowBack, Attachment, Check, Close, Delete, Notifications } from '@mui/icons-material';
 
 // Components
 import BasicDatePicker from './components/BasicDatePicker';
@@ -25,9 +23,16 @@ import LineChart from './components/charts/LineCharts';
 import Login from './components/Login';
 import SimpleBottomNavigation from './components/BottomNavigation';
 import TwoLevelPieChart from './components/charts/TwoLevelPie';
+import TdeeCalculator from './components/forms/TdeeCalculator';
 
 // Services
-import { useGetExerciseQuery, useGetFoodQuery, dbApi } from './api';
+import { 
+  useGetSessionQuery,
+  useGetAllQuery,
+  useGetExerciseQuery, 
+  useGetFoodQuery, 
+  dbApi, 
+} from './api';
 import foodRepoData from './api/food_repo.data';
 
 // Constants
@@ -37,19 +42,11 @@ import {
 
 // Utilities
 import { cap_first, tryCatchHandler } from './utilities/helpers'
-import { alerts } from './redux'
+import { useHooks } from './hooks';
 
 // Styles
 import './App.css';
-import { useResponsive } from './hooks';
 
-
-const useActions = () => {
-  const dispatch = useDispatch();
-  return {
-    createAlert: (type, message) => dispatch(alerts.createAlert({ type, message }))
-  }
-};
 
 const initialState = {
   exerciseName: '',
@@ -66,28 +63,19 @@ const initialState = {
 
 function App() {
   // State / Hooks
-  const { isSmallScreen } = useResponsive();
+  const hooks = useHooks();
   const [state, setState] = useState(initialState);
   const { exerciseName, open, skip, tab } = state;
+  console.log({ hooks })
 
   // Global Actions
-  const { createAlert } = useActions();
+  const { createAlert } = hooks.actions;
   
   // Api
   const { data, isLoading, isError } = useGetExerciseQuery({ name: exerciseName }, { skip });
-  // const weightHistory = useGetWeightQuery();
-  // const foodHistory = useGetFoodQuery();
 
-  // Queries *TODO: Convert these queries to redux toolkit queries ^^
-  const weightQuery = useQuery({ queryKey: ["weight", dbApi.getAll], queryFn: () => dbApi.getAll("weight") });
-  const exerciseQuery = useQuery({ queryKey: ["exercise"], queryFn: () => dbApi.getAll("exercise") });
-  const foodQuery = useQuery({ queryKey: ["food"], queryFn: () => dbApi.getAll("food") });
-  // console.log("useQuery(): ", weightQuery.data, exerciseQuery.data, foodQuery.data);
-  
   // Helpers
   const getOpenSection = () => Object.keys(open).find(section => open[section]);
-
-  console.log(foodRepoData)
 
   // Handlers
   const handleSubmit = async (event) => {
@@ -108,6 +96,9 @@ function App() {
         date, time,
       }
     }[getOpenSection()] || {};
+
+    // Add current logged in user_id to payload
+    payload.user_id = hooks.user_id;
 
     console.log("handleSubmit(): ", payload)
 
@@ -150,7 +141,7 @@ function App() {
   };
 
   // Render
-  const tabProps = { dashboard: { handleDrawers, queries: {weightQuery, exerciseQuery, foodQuery} }};
+  const tabProps = { dashboard: { handleDrawers, queries: {} }};
 
   const renderTab = (tab) => ({
     0: <Dashboard {...tabProps.dashboard} />,
@@ -177,6 +168,8 @@ function App() {
         </Toolbar>
       </AppBar>
 
+      {/* <TdeeCalculator /> */}
+
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
@@ -201,13 +194,11 @@ function App() {
 
           { // Render "right" drawer content based on open section
             {
-            
+            help: (<TdeeCalculator />),
             weight: <></>,
             exercise: (
               <List>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <ListItem sx={{ justifyContent: "space-between" }} primary={state?.exerciseSelected?.name}></ListItem>
-                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }} primary={state?.exerciseSelected?.name}/>
                 <ListItem sx={{ justifyContent: "space-between" }}>
                   <InputLabel># of Sets</InputLabel>
                   <TextField
@@ -277,7 +268,7 @@ function App() {
 
       <Drawer
         anchor="bottom"
-        open={getOpenSection() || false}
+        open={Object.keys(open).some(key => open?.[key] === "bottom")}
         onClose={() => handleDrawers(false, getOpenSection(), 'close')}
         sx={{
           flexShrink: 0,
@@ -288,11 +279,13 @@ function App() {
         <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
 
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button onClick={() => handleDrawers(false, getOpenSection(), 'close')}>X</Button>
+            <IconButton onClick={() => handleDrawers(false, getOpenSection(), 'close')}>
+              <Close />
+            </IconButton>
             <Typography variant="h6" component="p" gutterBottom>
               {`Add ${cap_first(getOpenSection())}`}
             </Typography>
-            <Button type="submit">✔️</Button>
+            <IconButton type="submit">✔️</IconButton>
           </Box>
           <Toolbar />
           {{
@@ -380,7 +373,9 @@ function App() {
                 <Grid id="food-history-container" container>
                   <Grid item xs={12} sm={12} sx={{ p: 2}}>
                     <Tabs>
-                      {["All", "My Meals", "My Recipes", "My Foods"].map((tab, i) => <Tab key={`${tab}_tab`} label={tab} value={i} />)}
+                      {["All", "My Meals", "My Recipes", "My Foods"]
+                        .map((tab, i) => <Tab key={`${tab}_tab`} label={tab} value={i} />
+                      )}
                     </Tabs>
                   </Grid>
 
@@ -392,7 +387,9 @@ function App() {
                       <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => createAlert("success", "SUper Super tesT!")}/>
                     </Box>
                     <List id="food-history-list">
-                      {foodQuery?.data?.data.map((food, i) => (
+                      {hooks?.food?.isLoading
+                        ? ( <CircularProgress />)
+                        : hooks?.food?.data.map((food, i) => (
                         <ListItem key={`${food.date}_${food.name}`} component={ListItemButton}>
                           <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
                           <Box>
@@ -546,11 +543,12 @@ function App() {
 }
 
 const Dashboard = (props) => {
+  const { handleDrawers } = props;
   const { weightQuery } = props.queries;
   return (
     <>
-     {/* Page Header */}
-      <Grid item xs={12} sm={12}>
+      {/* Page Header */}
+        <Grid item xs={12} sm={12}>
             <Typography variant="h4" component="h4" gutterBottom>
               Today
             </Typography>
@@ -592,6 +590,9 @@ const Dashboard = (props) => {
                     <ListItem key={item.heading}>
                       <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>{item.icon}</ListItemIcon>
                       <ListItemText primary={item.heading} secondary={item.value} />
+                      <Tooltip title={`${item.heading} Help`} placement="top">
+                        <Badge badgeContent="?" color="primary" onClick={() => handleDrawers("right", "help", "open")} sx={{ cursor: "pointer" }} />
+                      </Tooltip>
                     </ListItem>
                   ))}
                   </Stack>

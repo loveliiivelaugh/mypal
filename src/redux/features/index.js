@@ -1,4 +1,6 @@
 
-import { exerciseSlice } from "./exercise";
+import { authSlice } from "./auth";
 import { alertSlice } from "./alerts";
-export {alertSlice, exerciseSlice};
+import { exerciseSlice } from "./exercise";
+
+export {alertSlice, authSlice, exerciseSlice};
