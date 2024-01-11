@@ -120,6 +120,7 @@ export const useAuth = () => {
 
 
 export const useHooks = () => {
+  // Hooks / Initial Queries / Redux
   const responsive = useResponsive();
   const globalState = useSelector(state => state);
   const auth = useGetSessionQuery();
@@ -128,6 +129,7 @@ export const useHooks = () => {
   const food = useGetAllQuery("food");
   const profile = useGetAllQuery("profile");
   const actions = useActions();
+  
   let user_id = auth?.data?.session?.user?.id;
   let current_profile = profile?.data?.find((item) => item.user_id === user_id);
 
@@ -135,7 +137,7 @@ export const useHooks = () => {
     user_id,
     auth, 
     globalState, 
-    responsive, 
+    responsive,
     profile: current_profile, 
     weight, 
     exercise, 

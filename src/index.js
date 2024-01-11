@@ -1,25 +1,23 @@
 // Packages
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider as ReduxProvider } from 'react-redux'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+import { Provider as ReduxProvider } from 'react-redux';
+
 // Providers
 import { AlertsProvider } from './contexts/alerts.context';
 import { ThemeProvider } from './theme';
-import { store } from './redux'
+import { store } from './redux';
+
 // Components
 import App from './App';
+import ErrorBoundary from './components/ErrorBoundar';
+
 // Utitlities
 import reportWebVitals from './reportWebVitals';
+
 // Styles
 import './index.css';
 
-
-// Create a client
-const queryClient = new QueryClient()
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -27,9 +25,9 @@ root.render(
     <ReduxProvider store={store}>
       <ThemeProvider>
         <AlertsProvider>
-          <QueryClientProvider client={queryClient}>
+          <ErrorBoundary>
             <App />
-          </QueryClientProvider>
+          </ErrorBoundary>
         </AlertsProvider>
       </ThemeProvider>
     </ReduxProvider>

@@ -71,10 +71,11 @@ const supabaseApi = createApi({
     get: builder.query({
       queryFn: async (params) => {
         console.log("inside queryFn(): ", params)
+        const {table, id, columns, selector} = params;
         const {data, error} = await supabase
-          .from("information_schema.columns")
-          .select('column_name, data_type')
-          // .eq('table_name', params);
+          .from(table)
+          .select(columns.join(','))
+          .eq(selector, id);
 
         return [data, error];
         // return params;
