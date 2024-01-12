@@ -134,21 +134,37 @@ export const useHooks = () => {
   const add = useAddMutation();
   const actions = useActions();
   
+  // Destructuring and formatting for ease of use throughout the app
   let user_id = auth?.data?.session?.user?.id;
   let current_profile = profile?.data?.find((item) => item.user_id === user_id);
   let drawers = globalState?.alerts?.drawers;
+  let todaysCaloriesConsumed = food?.data
+    ?.filter((item) => (
+      (item.user_id === user_id) && (item.date === new Date().toISOString().slice(0, 10))
+    ));
 
-  return { 
+  const calculateTotalCalories = (foodArray = []) => {
+    // Use the reduce function to sum up the 'calories' property of each object
+    const totalCalories = foodArray.reduce((total, food) => total + food.calories, 0);
+    return totalCalories;
+  };
+
+  food.todaysCaloriesConsumed = calculateTotalCalories(todaysCaloriesConsumed);
+  // Remaining calories for the day = Goal (TDEE) - calories consumed + calories burned (exercise)
+  food.goalCalories = (current_profile?.tdee - food.todaysCaloriesConsumed);
+
+  return {
     user_id,
     auth, 
-    globalState, 
+    globalState,
     responsive,
     profile: current_profile, 
     weight, 
     exercise, 
     food, 
     actions,
-    db: dbApi, add,
+    db: dbApi, 
+    add,
     drawers,
   };
 }

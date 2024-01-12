@@ -154,16 +154,9 @@ const exerciseHistory = {
       ],
     },
   ],
-  formatSetsArrayToString: (sets) => {
-    // find average
-    const getAverage = (arr) => arr.reduce((acc, set) => acc + set, 0) / arr.length;
-    // find average reps and weight
-    const [
-      averageReps,
-      averageWeight,
-    ] = ['reps', 'weight'].map((key) => getAverage(sets.map(set => set[key])));
-    // return string
-    return `${sets.length} sets, ${averageReps} reps, ${averageWeight} lbs`;
+  formatSetsArrayToString: (exercise) => {
+    const [sets, reps, weight] = exercise;
+    return `${sets} sets, ${reps} reps, ${weight} lbs`;
   },
 };
 

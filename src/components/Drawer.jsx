@@ -70,6 +70,7 @@ const Drawers = (props) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("handle submit props form: ", form)
     props.handleForm(form)
   };
   
@@ -93,7 +94,7 @@ const Drawers = (props) => {
     }
   }
   
-  console.log("inside Drawers: ", props, drawers)
+  // console.log("inside Drawers: ", props, drawers);
   // render
   return (
     <Drawer

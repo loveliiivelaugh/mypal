@@ -147,38 +147,54 @@ function App() {
     const { actions, drawers, db } = hooks;
     const { active } = drawers;
 
-    // Format food submit *TODO: move to separate function
-    const calculate_calories = (calories) => {
-      const servingSize = parseInt(form.serving_size);
-      const numServings = parseInt(form.num_servings);
-      const serving = (typeof(servingSize) === "number")
-        ? servingSize
-        : 1;
+    console.log("handleSubmite top: ", form, active)
+    const { nutrients, muscle } = state?.selected;
+    if (nutrients) {
+      // Format food submit *TODO: move to separate function
+      const calculate_calories = (calories) => {
+        const servingSize = parseInt(form.serving_size);
+        const numServings = parseInt(form.num_servings);
+        const serving = (typeof(servingSize) === "number")
+          ? servingSize
+          : 1;
 
-      return ((calories * serving) * numServings);
+        return ((calories * serving) * numServings);
+      };
+      
+      console.log("handleSubmit(): ", { nutrients, form, state })
+      const formattedNutrients = Object.assign(
+        {}, 
+        ...Object
+          .keys(nutrients)
+          .map(nutrient => ({ 
+            [nutrient]: nutrients[nutrient]?.per_hundred, 
+            unit: nutrients[nutrient]?.unit 
+        })))
+
+      if (active === "food") form = {
+        name: state.selected?.name_translations["en" || "it"] 
+          || "No name/english translation found", 
+        calories: calculate_calories(nutrients?.energy_calories_kcal.per_hundred),
+        nutrients: formattedNutrients,
+        date: form.date || new Date().toLocaleDateString(),
+        time: form.time || new Date().toLocaleTimeString(),
+        meal: form.meal || "snack",
+      };
+      // --- END Format food submit *TODO: move to separate function ---
     };
 
-    const { nutrients } = state?.selected;
-    console.log("handleSubmit(): ", { nutrients, form, state })
-    const formattedNutrients = Object.assign(
-      {}, 
-      ...Object
-        .keys(nutrients)
-        .map(nutrient => ({ 
-          [nutrient]: nutrients[nutrient]?.per_hundred, 
-          unit: nutrients[nutrient]?.unit 
-      })))
+    if (muscle) {
+      // Format exercise submit *TODO: move to separate function
+      const formattedExercise = {
+        date: form.date || new Date().toLocaleDateString(),
+        time: form.time || new Date().toLocaleTimeString(),
+        ...state.selected,
+        ...form,
+      };
 
-    if (active === "food") form = {
-      name: state.selected?.name_translations["en" || "it"] 
-        || "No name/english translation found", 
-      calories: calculate_calories(nutrients?.energy_calories_kcal.per_hundred),
-      nutrients: formattedNutrients,
-      date: form.date || new Date().toLocaleDateString(),
-      time: form.time || new Date().toLocaleTimeString(),
-      meal: form.meal || "snack",
-    };
-    // --- END Format food submit *TODO: move to separate function ---
+      form = formattedExercise;
+      // --- END Format exercise submit *TODO: move to separate function ---
+    }
 
     console.log("submitting form: ", active, form, state)
     const [response, error] = await tryCatchHandler(
@@ -306,7 +322,10 @@ const Dashboard = (props) => {
       anchor: "right",
       open: true,
     });
-  }
+  };
+
+  console.log("Dashboard() props: ", hooks);
+
   return (
     <>
       {/* Page Header */}
@@ -331,7 +350,7 @@ const Dashboard = (props) => {
                 <Grid item xs={12} sm={8}>
                   <TwoLevelPieChart>
                   <text x="50%" y="50%" textAnchor="middle" fill="#fff" dominantBaseline="middle">
-                    {hooks?.profile?.tdee}<br/>
+                    {hooks?.food?.goalCalories}<br/>
                     <tspan fontSize="12" fill="#999">Remaining</tspan>
                   </text>
                   </TwoLevelPieChart>
@@ -345,7 +364,7 @@ const Dashboard = (props) => {
                     },
                     {
                       heading: "Food",
-                      value: 0,
+                      value: hooks?.food?.todaysCaloriesConsumed,
                       icon: <RestaurantIcon/>
                     },
                     { 

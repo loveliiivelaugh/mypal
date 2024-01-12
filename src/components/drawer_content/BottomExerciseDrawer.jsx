@@ -17,10 +17,8 @@ import { exerciseHistory, mock_exercises, tabs } from '../../utilities/constants
 
 const BottomExerciseDrawer = (props) => {
   const hooks = useHooks();
-  const [state, setState] = React.useState({});
-  const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.value });
-  };
+  const [state] = React.useState({});
+  const handleChange = (event) => props.form[event.target.id] = event.target.value;
 
   const handleSelectedExercise = (exercise) => {
     props.handleSelected(exercise)
@@ -93,9 +91,9 @@ const BottomExerciseDrawer = (props) => {
             <Chip component={Button} variant="outlined" label="Most Recent" />
           </Box>
           <List id="exercise-history-list">
-            {exerciseHistory.data.map(({ date, exercise, sets }) => (
-              <ListItem key={`${date}_${exercise}`}>
-                <ListItemText primary={exercise} secondary={exerciseHistory.formatSetsArrayToString(sets)} />
+            {hooks.exercise.data.map(exercise => (
+              <ListItem key={`${exercise.id}`}>
+                <ListItemText primary={exercise.name} secondary={exerciseHistory.formatSetsArrayToString([exercise.sets, exercise.reps, exercise.weight])} />
               </ListItem>
             ))}
           </List>
