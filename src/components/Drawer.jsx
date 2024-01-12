@@ -12,6 +12,7 @@ import FoodDrawerContent from './FoodDrawer'
 import RightFoodDrawer from './RightFoodDrawer';
 import RightExerciseDrawer from './drawer_content/RightExerciseDrawer';
 import TdeeCalculator from './forms/TdeeCalculator';
+import AuthForm from './forms/AuthForm';
 import BasicDatePicker from './BasicDatePicker';
 
 // Hooks
@@ -74,21 +75,25 @@ const Drawers = (props) => {
   
   // render content based on active drawer
   const content = {
-    "weight": {
+    weight: {
       bottom: (<BottomWeightDrawer />),
-      right: (<></>),
+      right: (<>bottom weight</>),
     },
-    "exercise": {
+    exercise: {
       bottom: (<BottomExerciseDrawer handleSelected={props.handleSelected} />),
       right: (<RightExerciseDrawer form={form} selected={props.selected} />),
     },
-    "food": {
+    food: {
       bottom: (<FoodDrawerContent handleSelected={props.handleSelected} />),
       right: (<RightFoodDrawer form={form} selected={props.selected} />)
     },
-    "profile": {
+    profile: {
       bottom: (<>profile bottom</>),
       right: (<TdeeCalculator />),
+    },
+    auth: {
+      bottom: (<>auth bottom</>),
+      right: (<AuthForm />),
     }
   }
   

@@ -67,6 +67,7 @@ export const { useGetFoodQuery } = foodApi;
 const supabaseApi = createApi({
   baseQuery: fakeBaseQuery(),
   endpoints: (builder) => ({
+    // Database Methods exposed to the UI
     // GET a single item by id
     get: builder.query({
       queryFn: async (params) => {
@@ -115,13 +116,51 @@ const supabaseApi = createApi({
         .eq('id', id),
     }),
 
+    // Auth Methods exposed to the UI
+    signup: builder.mutation({
+      queryFn: async (payload) => await supabase
+        .auth
+        .signUp(payload),
+    }),
+
+    login: builder.mutation({
+      queryFn: async (payload) => await supabase
+        .auth
+        .signInWithPassword(payload),
+    }),
+
+    logout: builder.mutation({
+      queryFn: async () => await supabase
+        .auth
+        .signOut(),
+    }),
+
+    resetPassword: builder.mutation({
+      queryFn: async (payload) => await supabase
+        .auth
+        .api
+        .resetPasswordForEmail(payload),
+    }),
+    // Phone number login
+    loginWithOtp: builder.mutation({
+      queryFn: async (payload) => await supabase
+        .auth
+        .api
+        .signInWithOtp(payload),
+    }),
+
   }),
 
 })
 
 export const { 
-  useGetQuery,
   useGetSessionQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useSignupMutation,
+  useResetPasswordMutation,
+  useLoginWithOtpMutation,
+  useGetQuery,
   useAddMutation,
   useUpdateMutation,
   useDeleteMutation,

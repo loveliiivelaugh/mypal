@@ -11,7 +11,12 @@ import {
   useGetExerciseQuery, 
   useGetFoodQuery, 
   dbApi,
-  useAddMutation, 
+  useAddMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useSignupMutation,
+  useResetPasswordMutation,
+  useLoginWithOtpMutation, 
 } from '../api';
 
 // useResponsive hook -- used to determine the screen size
@@ -131,12 +136,20 @@ export const useHooks = () => {
   const exercise = useGetAllQuery("exercise");
   const food = useGetAllQuery("food");
   const profile = useGetAllQuery("profile");
-  const add = useAddMutation();
+  const [addToDb, addToDbResult] = useAddMutation();
+  const [login, loginResult] = useLoginMutation();
+  const [logout, logoutResult] = useLogoutMutation();
+  const [signup, signupResult] = useSignupMutation();
+  const [resetPassword, resetPasswordResult] = useResetPasswordMutation();
+  const [loginWithOtp, loginWithOtpResult] = useLoginWithOtpMutation();
   const actions = useActions();
   
   // Destructuring and formatting for ease of use throughout the app
   let user_id = auth?.data?.session?.user?.id;
+  // Update this line to use a SQL query instead with the related tables ...
+  // ... data: (user_id: exercises, foods, weight, profile)
   let current_profile = profile?.data?.find((item) => item.user_id === user_id);
+  // Need to update this to separate drawers into its own slice
   let drawers = globalState?.alerts?.drawers;
   let todaysCaloriesConsumed = food?.data
     ?.filter((item) => (
@@ -153,6 +166,11 @@ export const useHooks = () => {
   // Remaining calories for the day = Goal (TDEE) - calories consumed + calories burned (exercise)
   food.goalCalories = (current_profile?.tdee - food.todaysCaloriesConsumed);
 
+  // Authentication Methods
+  const methods = { login, logout, signup, resetPassword, loginWithOtp };
+  auth.methods = methods;
+
+
   return {
     user_id,
     auth, 
@@ -163,8 +181,7 @@ export const useHooks = () => {
     exercise, 
     food, 
     actions,
-    db: dbApi, 
-    add,
+    db: dbApi,
     drawers,
   };
 }
