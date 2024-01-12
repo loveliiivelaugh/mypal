@@ -12,13 +12,10 @@ const dates = new Array(20)
   .fill(dataPoint)
   .map((data, i) => ({
     ...data,
-    // date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString()
-    // date without the year
     date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString().slice(0, -5)
   }));
 
 const Example = (props) => {
-  // console.log(props?.data, dates)
     return (
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -38,7 +35,6 @@ const Example = (props) => {
           {/* <Tooltip /> */}
           {/* <Legend /> */}
           <Line type="linear" dataKey="weight" stroke="#82ca9d" dot={false}  />
-          {/* <Line type="monotone" dataKey="expectedWeight" stroke="#82ca9d" /> */}
         </LineChart>
       </ResponsiveContainer>
     );
