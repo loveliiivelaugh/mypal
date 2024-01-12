@@ -5,7 +5,7 @@ import BasicDatePicker from '../BasicDatePicker';
 
 
 const RightExerciseDrawer = (props) => {
-  const [state] = useState();
+  const [state] = useState({});
   const handleChange = (event) => props.form[event.target.id] = event.target.value;
 
   return (

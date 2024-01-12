@@ -66,67 +66,12 @@ function App() {
   // State / Hooks
   const hooks = useHooks();
   let [state, setState] = useState(initialState);
-
-  const { exerciseName, open, skip, tab } = state;
-  // console.log(state, { hooks })
-
+  const { tab } = state;
+  
   // Global Actions
   const { createAlert } = hooks.actions;
-  
   // Api
-  const { data, isLoading, isError } = useGetExerciseQuery({ name: exerciseName }, { skip });
-
   // Helpers
-  const getOpenSection = () => Object.keys(open).find(section => open[section]);
-
-  // Handlers
-  // const handleSubmit = async (event) => {
-  //   event?.preventDefault();
-  //   setState({ ...state, isSubmitting: true });
-
-  //   let { weight, date, reps, sets, time } = state;
-  //   if (!date) date = new Date().toLocaleDateString();
-  //   if (!time) time = new Date().toLocaleTimeString();
-  //   // Get/define payload from payload definitions
-  //   const payload = {
-  //     weight: { weight, date },
-  //     exercise: { name: state?.exerciseSelected?.name, reps, sets, date },
-  //     food: { 
-  //       name: state.foodSelected?.name_translations["en"], 
-  //       calories: state.foodSelected?.nutrients?.energy_calories_kcal?.per_portion,
-  //       nutrients: state.foodSelected?.nutrients,
-  //       date, time,
-  //     }
-  //   }[getOpenSection()] || {};
-
-  //   // Add current logged in user_id to payload
-  //   payload.user_id = hooks.user_id;
-
-  //   console.log("handleSubmit(): ", payload)
-
-  //   // Send payload to db
-  //   const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
-
-  //   if (error) createAlert("error", error.message);
-  //   console.log("Database request result: ", response);
-
-  //   if (response) {
-  //     createAlert("success", `Saved ${getOpenSection()}!`);
-  //     // Refetch database data
-      
-  //   };
-
-  //   // Clear payload values from state
-  //   Object.keys(payload).forEach(key => state[key] = "");
-
-  //   // Reset state values
-  //   setState({ 
-  //     ...state, 
-  //     skip: true, 
-  //     isSubmitting: false, 
-  //     open: { ...open, [getOpenSection()]: false }
-  //   });
-  // };
 
   const handleChange = (event) => {
     // if input type is text field
@@ -146,9 +91,8 @@ function App() {
   const handleSubmit = async (form) => {
     const { actions, drawers, db } = hooks;
     const { active } = drawers;
-
-    console.log("handleSubmite top: ", form, active)
     const { nutrients, muscle } = state?.selected;
+
     if (nutrients) {
       // Format food submit *TODO: move to separate function
       const calculate_calories = (calories) => {
@@ -161,7 +105,6 @@ function App() {
         return ((calories * serving) * numServings);
       };
       
-      console.log("handleSubmit(): ", { nutrients, form, state })
       const formattedNutrients = Object.assign(
         {}, 
         ...Object
@@ -174,7 +117,10 @@ function App() {
       if (active === "food") form = {
         name: state.selected?.name_translations["en" || "it"] 
           || "No name/english translation found", 
-        calories: calculate_calories(nutrients?.energy_calories_kcal.per_hundred),
+        calories: calculate_calories(
+          nutrients?.energy_calories_kcal?.per_hundred
+          || nutrients?.energy_calories_kcal?.per_portion
+        ),
         nutrients: formattedNutrients,
         date: form.date || new Date().toLocaleDateString(),
         time: form.time || new Date().toLocaleTimeString(),
@@ -196,7 +142,6 @@ function App() {
       // --- END Format exercise submit *TODO: move to separate function ---
     }
 
-    console.log("submitting form: ", active, form, state)
     const [response, error] = await tryCatchHandler(
       () => db.add(active, form), 
       () => {
@@ -205,7 +150,6 @@ function App() {
         actions.updateDrawers({ ...drawers, anchor: "bottom" });
       })
 
-    console.log("handleSubmit() response: ", response, error)
     if (error || response.error) createAlert("error", response.error?.message);
 
     // refecth data
@@ -219,10 +163,6 @@ function App() {
   };
 
   const handleSelected = (selected) => {
-    // // depending on which selection; Selected will have different keys ...
-    // // Destructure any available keys here
-    // const { name, calories, nutrients, date, time, reps, sets, weight } = selected;
-    // console.log("handleSelected(); ", selected)
     setState({ ...state, selected });
   }
   

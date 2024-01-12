@@ -1,5 +1,4 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { useState } from 'react'
 import { 
   Button, Grid, InputLabel, MenuItem, Select, TextField, Toolbar, Typography 
 } from '@mui/material'
@@ -14,22 +13,19 @@ import { useHooks } from '../../hooks'
 import { buildFields, profile_schema } from '../../db/schemas'
 
 
-const TdeeCalculator = props => {
+const TdeeCalculator = (props) => {
   const hooks = useHooks();
   const all_fields = buildFields(profile_schema)
   const include_fields = ['age', 'height', 'weight', 'goal', 'exercise'];
   const fields = all_fields
     .filter(field => include_fields.includes(field.name))
-  console.log("buildFields.generated_fields: ", fields)
 
-  const [formState, setFormState] = React.useState(
+  const [formState, setFormState] = useState(
     Object.assign(
       {}, 
       ...fields.map(field => ({ [field.name]: field.defaultValue }))
     )
   );
-
-  console.log("fields", fields)
 
   const handleChange = (event) => setFormState({ 
     ...formState, 
@@ -42,8 +38,7 @@ const TdeeCalculator = props => {
     formState.bmr = calculators.bmr(formState);
     formState.tdee = calculators.tdee(formState);
     formState.height = formatHeightToNumber(formState.height);
-    
-    console.log("submit", formState)
+  
 
     const [response, error] = await tryCatchHandler(
       () => dbApi.add("profile", [formState])
@@ -53,7 +48,6 @@ const TdeeCalculator = props => {
       const { code, message, details } = response.error;
       hooks.actions.createAlert("error", `Error Code: ${code}\n${message}\n ${details}`)
     }
-    console.log("response", response, error)
   };
 
   return (

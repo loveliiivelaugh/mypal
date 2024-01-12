@@ -1,8 +1,7 @@
 // Packages
 import React, { useState } from 'react'
 import { 
-  Box, Drawer, IconButton, Toolbar, Typography,
-  TextField
+  Box, Drawer, IconButton, Typography, TextField
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -19,17 +18,17 @@ import BasicDatePicker from './BasicDatePicker';
 import { useHooks } from '../hooks';
 
 // Utilities
-import { cap_first, tryCatchHandler } from '../utilities/helpers'
+import { cap_first } from '../utilities/helpers'
 import BottomExerciseDrawer from './drawer_content/BottomExerciseDrawer';
 
 export const BottomWeightDrawer = (props) => {
 
   const handleChange = (event) => {
-    props.form[event.target.id] = event.target.value;
-    // if (event?.target) setState({ ...state, [event.target.id]: event.target.value });
-    // // if input type is date field
-    // if (event?.date) setState({ ...state, date: new Date(event).toLocaleDateString() });
+    if (event?.target) props.form[event.target.id] = event.target.value;
+    // if input type is date field
+    // if (event?.date) props.form[event.target.id]
   };
+
   return (
     <>
       <Box sx={{ width: "100%", display: "flex" }}>
@@ -70,7 +69,6 @@ const Drawers = (props) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("handle submit props form: ", form)
     props.handleForm(form)
   };
   
@@ -106,10 +104,10 @@ const Drawers = (props) => {
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
         }}
       >
-        <Toolbar />
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          {/* Drawer Header */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
             <IconButton sx={{ color: "#fff"}} onClick={handleClose}>
               <CloseIcon />
             </IconButton>
@@ -120,7 +118,7 @@ const Drawers = (props) => {
               <CheckIcon />
             </IconButton>
           </Box>
-
+            
           {(active && anchor) && content[active][anchor]}
 
         </Box>

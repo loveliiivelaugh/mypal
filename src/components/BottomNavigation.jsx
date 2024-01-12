@@ -17,7 +17,7 @@ const items = {
 
 export default function SimpleBottomNavigation(props) {
   return (
-    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)', color: "#fff" }}>
+    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)' }}>
       {props?.extraContent && props.extraContent}
       <BottomNavigation
         showLabels
@@ -32,6 +32,7 @@ export default function SimpleBottomNavigation(props) {
             key={index} 
             label={item} 
             icon={items[item]}
+            sx={{ color: "#222" }}
           />
       ))}
       </BottomNavigation>

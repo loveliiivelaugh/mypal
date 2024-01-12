@@ -67,7 +67,7 @@ const BottomExerciseDrawer = (props) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <IconButton p={1} onClick={() => {}}>
+                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -99,7 +99,7 @@ const BottomExerciseDrawer = (props) => {
           </List>
         </Grid>
         <Grid item xs={12} sm={12} sx={{ p: 2}}>
-          <Button variant="outlined" fullWidth onClick={() => {}}>
+          <Button variant="outlined" fullWidth onClick={() => {}} sx={{ color: "#fff" }}>
             Create a New Exercise
           </Button>
         </Grid>
