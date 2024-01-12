@@ -43,12 +43,12 @@ export default function SignIn() {
   }
 
   const handleSubmit = () => {
-    // console.log("Auth Form: ", state, authType)
-    ({
-      login: () => hooks.auth.methods.login(state),
-      logout: () => hooks.auth.methods.logout(),
-      signup: () => hooks.auth.methods.signup(state),
-    }[authType])();
+    console.log("Auth Form: ", state, authType)
+    return ({
+      login: hooks.auth.methods.login(state),
+      logout: hooks.auth.methods.logout(),
+      signup: hooks.auth.methods.signup(state),
+    }[authType]);
   };
 
   return (
