@@ -1,6 +1,7 @@
 # miPal
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/17584298-1ea6-4693-88ca-dcc04f60f1be/deploy-status)](https://app.netlify.com/sites/gleeful-kitten-d6d5f6/deploys)
+
 [miPal deployed to Netlify](https://mipal.netlify.app/)
 
 ## Description
