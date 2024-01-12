@@ -52,6 +52,11 @@ export const themeConfig = {
         secondary: colors.grey["500"],
         disabled: colors.grey["300"],
       },
+      MuiIconButton: {
+        primary: colors.grey["100"],
+        secondary: colors.grey["500"],
+        disabled: colors.grey["300"],
+      }
     },
   },
 

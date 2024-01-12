@@ -52,6 +52,18 @@ miPal is an open source fitness and nutrition tracking application. It allows us
   }
   ```
 
+## Installation
+
+`git clone https://github.com/loveliiivelaugh/mypal.git`
+
+`cd mypal`
+
+`npm install`
+
+`npm start`
+
+## Usage
+
 ## Documentation
 
 * [React](https://reactjs.org/)
@@ -75,3 +87,6 @@ This project is licensed under the MIT license.
 ## Contributors
 
 * [Me😎]('https://www.github.com/loveliiivelaugh')
+
+## Tests
+

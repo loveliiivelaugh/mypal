@@ -10,7 +10,8 @@ import {
   useGetQuery,
   useGetExerciseQuery, 
   useGetFoodQuery, 
-  dbApi, 
+  dbApi,
+  useAddMutation, 
 } from '../api';
 
 // useResponsive hook -- used to determine the screen size
@@ -74,7 +75,9 @@ export const useMealTime = () => {
 export const useActions = () => {
   const dispatch = useDispatch();
   return {
-    createAlert: (type, message) => dispatch(alerts.createAlert({ type, message }))
+    createAlert: (type, message) => dispatch(alerts.createAlert({ type, message })),
+    updateDrawers: (payload) => dispatch(alerts.updateDrawers(payload)),
+    closeDrawers: () => dispatch(alerts.closeDrawers()),
   }
 };
 
@@ -128,10 +131,12 @@ export const useHooks = () => {
   const exercise = useGetAllQuery("exercise");
   const food = useGetAllQuery("food");
   const profile = useGetAllQuery("profile");
+  const add = useAddMutation();
   const actions = useActions();
   
   let user_id = auth?.data?.session?.user?.id;
   let current_profile = profile?.data?.find((item) => item.user_id === user_id);
+  let drawers = globalState?.alerts?.drawers;
 
   return { 
     user_id,
@@ -143,6 +148,7 @@ export const useHooks = () => {
     exercise, 
     food, 
     actions,
-    db: dbApi,
+    db: dbApi, add,
+    drawers,
   };
 }

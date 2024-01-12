@@ -46,6 +46,7 @@ import { useHooks } from './hooks';
 
 // Styles
 import './App.css';
+import Drawers from './components/Drawer';
 
 
 const initialState = {
@@ -64,9 +65,10 @@ const initialState = {
 function App() {
   // State / Hooks
   const hooks = useHooks();
-  const [state, setState] = useState(initialState);
+  let [state, setState] = useState(initialState);
+
   const { exerciseName, open, skip, tab } = state;
-  console.log({ hooks })
+  // console.log(state, { hooks })
 
   // Global Actions
   const { createAlert } = hooks.actions;
@@ -78,53 +80,53 @@ function App() {
   const getOpenSection = () => Object.keys(open).find(section => open[section]);
 
   // Handlers
-  const handleSubmit = async (event) => {
-    event?.preventDefault();
-    setState({ ...state, isSubmitting: true });
+  // const handleSubmit = async (event) => {
+  //   event?.preventDefault();
+  //   setState({ ...state, isSubmitting: true });
 
-    let { weight, date, reps, sets, time } = state;
-    if (!date) date = new Date().toLocaleDateString();
-    if (!time) time = new Date().toLocaleTimeString();
-    // Get/define payload from payload definitions
-    const payload = {
-      weight: { weight, date },
-      exercise: { name: state?.exerciseSelected?.name, reps, sets, date },
-      food: { 
-        name: state.foodSelected?.name_translations["en"], 
-        calories: state.foodSelected?.nutrients?.energy_calories_kcal?.per_portion,
-        nutrients: state.foodSelected?.nutrients,
-        date, time,
-      }
-    }[getOpenSection()] || {};
+  //   let { weight, date, reps, sets, time } = state;
+  //   if (!date) date = new Date().toLocaleDateString();
+  //   if (!time) time = new Date().toLocaleTimeString();
+  //   // Get/define payload from payload definitions
+  //   const payload = {
+  //     weight: { weight, date },
+  //     exercise: { name: state?.exerciseSelected?.name, reps, sets, date },
+  //     food: { 
+  //       name: state.foodSelected?.name_translations["en"], 
+  //       calories: state.foodSelected?.nutrients?.energy_calories_kcal?.per_portion,
+  //       nutrients: state.foodSelected?.nutrients,
+  //       date, time,
+  //     }
+  //   }[getOpenSection()] || {};
 
-    // Add current logged in user_id to payload
-    payload.user_id = hooks.user_id;
+  //   // Add current logged in user_id to payload
+  //   payload.user_id = hooks.user_id;
 
-    console.log("handleSubmit(): ", payload)
+  //   console.log("handleSubmit(): ", payload)
 
-    // Send payload to db
-    const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
+  //   // Send payload to db
+  //   const [response, error] = await tryCatchHandler(() => dbApi.add(getOpenSection(), [payload]));
 
-    if (error) createAlert("error", error.message);
-    console.log("Database request result: ", response);
+  //   if (error) createAlert("error", error.message);
+  //   console.log("Database request result: ", response);
 
-    if (response) {
-      createAlert("success", `Saved ${getOpenSection()}!`);
-      // Refetch database data
+  //   if (response) {
+  //     createAlert("success", `Saved ${getOpenSection()}!`);
+  //     // Refetch database data
       
-    };
+  //   };
 
-    // Clear payload values from state
-    Object.keys(payload).forEach(key => state[key] = "");
+  //   // Clear payload values from state
+  //   Object.keys(payload).forEach(key => state[key] = "");
 
-    // Reset state values
-    setState({ 
-      ...state, 
-      skip: true, 
-      isSubmitting: false, 
-      open: { ...open, [getOpenSection()]: false }
-    });
-  };
+  //   // Reset state values
+  //   setState({ 
+  //     ...state, 
+  //     skip: true, 
+  //     isSubmitting: false, 
+  //     open: { ...open, [getOpenSection()]: false }
+  //   });
+  // };
 
   const handleChange = (event) => {
     // if input type is text field
@@ -132,16 +134,84 @@ function App() {
     // if input type is date field
     if (event?.date) setState({ ...state, date: new Date(event).toLocaleDateString() });
   };
+  
+  const handleFocus = () => hooks
+    .actions
+    .updateDrawers({
+      active: "food",
+      anchor: "bottom",
+      open: true,
+    });
 
-  const handleDrawers = (direction, section, action) => {
-    // dynamically open drawers
-    if (direction && action.includes('open')) setState({ ...state, open: { ...open, [section]: direction } });
-    // dynamically close drawers
-    else setState({ ...state, open: { ...open, [section]: false } });
+  const handleSubmit = async (form) => {
+    const { actions, drawers, db } = hooks;
+    const { active } = drawers;
+
+    // Format food submit *TODO: move to separate function
+    const calculate_calories = (calories) => {
+      const servingSize = parseInt(form.serving_size);
+      const numServings = parseInt(form.num_servings);
+      const serving = (typeof(servingSize) === "number")
+        ? servingSize
+        : 1;
+
+      return ((calories * serving) * numServings);
+    };
+
+    const { nutrients } = state?.selected;
+    console.log("handleSubmit(): ", { nutrients, form, state })
+    const formattedNutrients = Object.assign(
+      {}, 
+      ...Object
+        .keys(nutrients)
+        .map(nutrient => ({ 
+          [nutrient]: nutrients[nutrient]?.per_hundred, 
+          unit: nutrients[nutrient]?.unit 
+      })))
+
+    if (active === "food") form = {
+      name: state.selected?.name_translations["en" || "it"] 
+        || "No name/english translation found", 
+      calories: calculate_calories(nutrients?.energy_calories_kcal.per_hundred),
+      nutrients: formattedNutrients,
+      date: form.date || new Date().toLocaleDateString(),
+      time: form.time || new Date().toLocaleTimeString(),
+      meal: form.meal || "snack",
+    };
+    // --- END Format food submit *TODO: move to separate function ---
+
+    console.log("submitting form: ", active, form, state)
+    const [response, error] = await tryCatchHandler(
+      () => db.add(active, form), 
+      () => {
+        actions.closeDrawers();
+        actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
+        actions.updateDrawers({ ...drawers, anchor: "bottom" });
+      })
+
+    console.log("handleSubmit() response: ", response, error)
+    if (error || response.error) createAlert("error", response.error?.message);
+
+    // refecth data
+    ({
+      food: () => hooks.food.refetch(),
+      exercise: () => hooks.exercise.refetch(),
+      weight: () => hooks.weight.refetch(),
+      profile: () => hooks.profile.refetch(),
+    }[active])();
+
   };
 
+  const handleSelected = (selected) => {
+    // // depending on which selection; Selected will have different keys ...
+    // // Destructure any available keys here
+    // const { name, calories, nutrients, date, time, reps, sets, weight } = selected;
+    // console.log("handleSelected(); ", selected)
+    setState({ ...state, selected });
+  }
+  
   // Render
-  const tabProps = { dashboard: { handleDrawers, queries: {} }};
+  const tabProps = { dashboard: {}};
 
   const renderTab = (tab) => ({
     0: <Dashboard {...tabProps.dashboard} />,
@@ -168,341 +238,26 @@ function App() {
         </Toolbar>
       </AppBar>
 
-      {/* <TdeeCalculator /> */}
-
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
         </Grid>
       </header>
 
-      <Drawer
-        anchor="right"
-        open={Object.keys(open).some(key => open?.[key] === "right")}
-        onClose={() => handleDrawers("bottom", getOpenSection(), "open")}
-        sx={{
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: "40vw" },
-        }}
-      >
-        <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            <IconButton onClick={() => setState({...state, open: {...open, food: "bottom" }})}><ArrowBack /></IconButton>
-            <Typography variant="h6" textAlign="center">Add {cap_first(getOpenSection())}</Typography>
-            <IconButton type="submit"><Check /></IconButton>
-          </Toolbar>
-
-          { // Render "right" drawer content based on open section
-            {
-            help: (<TdeeCalculator />),
-            weight: <></>,
-            exercise: (
-              <List>
-                <ListItem sx={{ justifyContent: "space-between" }} primary={state?.exerciseSelected?.name}/>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel># of Sets</InputLabel>
-                  <TextField
-                    id="sets"
-                    type="number"
-                    value={state?.sets}
-                    onChange={handleChange}
-                    placeholder={5}
-                  />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel># of Reps</InputLabel>
-                  <TextField
-                    id="reps"
-                    type="number"
-                    value={state?.reps}
-                    onChange={handleChange}
-                    placeholder={10}
-                  />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel>Date</InputLabel>
-                  <BasicDatePicker id="date" label="Date" value={state["date"]} handleChange={handleChange} placeholder={new Date().toLocaleString()} /> 
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <Button variant="outlined" fullWidth type="submit">Add Exercise</Button>
-                </ListItem>
-              </List>
-            ),
-            food: (
-              <List>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <ListItemText primary={state?.foodSelected?.display_name_translations?.["en"]} secondary={state?.foodSelected?.display_name_translations?.["en"]} />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel>Serving Size</InputLabel>
-                  <TextField id="serving_size" value={state?.serving_size} onChange={handleChange} placeholder="4oz" />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel>Number of Servings</InputLabel>
-                  <TextField id="num_servings" value={state?.num_servings} onChange={handleChange} placeholder={1} />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel>Time</InputLabel>
-                  <TextField id="serving_time" value={state?.serving_time} onChange={handleChange} placeholder={new Date().toLocaleString()} />
-                </ListItem>
-                <ListItem sx={{ justifyContent: "space-between" }}>
-                  <InputLabel>Meal</InputLabel>
-                  <Select id="meal" value={state?.meal || "Breakfast"} onChange={handleChange} placeholder="Select a Meal">
-                    <MenuItem value={"Breakfast"}>Breakfast</MenuItem>
-                    <MenuItem value={"Lunch"}>Lunch</MenuItem>
-                    <MenuItem value={"Dinner"}>Dinner</MenuItem>
-                    <MenuItem value={"Snack"}>Snack</MenuItem>
-                  </Select>
-                </ListItem>
-                <ListItem>
-                  <Stack variant="row">
-
-                  </Stack>
-                </ListItem>
-              </List>
-            )
-          }[getOpenSection()]}
-
-        </Box>
-      </Drawer>
-
-      <Drawer
-        anchor="bottom"
-        open={Object.keys(open).some(key => open?.[key] === "bottom")}
-        onClose={() => handleDrawers(false, getOpenSection(), 'close')}
-        sx={{
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }} component="form" onSubmit={handleSubmit}>
-
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <IconButton onClick={() => handleDrawers(false, getOpenSection(), 'close')}>
-              <Close />
-            </IconButton>
-            <Typography variant="h6" component="p" gutterBottom>
-              {`Add ${cap_first(getOpenSection())}`}
-            </Typography>
-            <IconButton type="submit">✔️</IconButton>
-          </Box>
-          <Toolbar />
-          {{
-            weight: (
-              <>
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <TextField
-                    id="weight"
-                    label="Weight"
-                    variant="outlined"
-                    type="float"
-                    fullWidth
-                    onChange={handleChange}
-                    InputProps={{ inputProps: { min: 0, max: 1000 } }}
-
-                  />
-                </Box>
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <BasicDatePicker id="date" label="Date" value={state["date"]} handleChange={handleChange} /> 
-                </Box>
-                <Box sx={{ width: "100%", display: "flex", border: "1px solid rgba(33,33,33,0.2)", borderRadius: 1, justifyContent: "space-between", my: 1, py: 1 }}>
-                  <Typography id="demo-simple-select-label" variant="body1">Progress Photo</Typography>
-                  <IconButton p={1}>
-                    <Attachment />
-                  </IconButton>
-                </Box>
-              </>
-            ),
-            food: (
-              <>
-                <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
-                  <Autocomplete
-                    id="food"
-                    options={foodRepoData?.data || []}
-                    fullWidth
-                    onLoadedData={() => setState({...state, skip: true })}
-                    loading={isLoading}
-                    sx={{ ml: 4 }}
-                    getOptionLabel={(option) => {
-                      // console.log("getOptionLabel: ", option, option?.name)
-                      return option?.display_name_translations["en"]
-                    }}
-                    renderOption={(props, option) => {
-                      // return option
-                      const image = option.images.find(({categories}) => categories.includes("Front"))?.thumb;
-                      // console.log("renderOption: ", props, option, image)
-                      return (
-                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() => setState({...state, foodSelected: option, open: {...open, food: "right" }})}>
-                          <Avatar src={image} />
-                          <Typography variant="h6">{option?.display_name_translations["en"]}</Typography>
-                          <Chip size="small" label={option?.country} />
-                        </Stack>
-                      )
-                    }}
-                    renderInput={(params) => (
-                      <Box ref={params.InputProps.ref}>
-                        <TextField
-                          type="text"
-                          {...params.inputProps}
-                          value={state.foodName}
-                          placeholder="Search for a food"
-                          onChange={handleChange}
-                          fullWidth
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <IconButton p={1} onClick={() => setState({...state, skip: false })}>
-                                  <SearchIcon />
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton p={1} onClick={() => setState({...state, foodName: "" })}>
-                                  <QrCodeScannerIcon />
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      </Box>
-                    )}
-                  />
-                </Box>
-                <Grid id="food-history-container" container>
-                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
-                    <Tabs>
-                      {["All", "My Meals", "My Recipes", "My Foods"]
-                        .map((tab, i) => <Tab key={`${tab}_tab`} label={tab} value={i} />
-                      )}
-                    </Tabs>
-                  </Grid>
-
-                  {/* TODO: Quick Add Buttons Section goes here */}
-                  
-                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="subtitle1">History</Typography>
-                      <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => createAlert("success", "SUper Super tesT!")}/>
-                    </Box>
-                    <List id="food-history-list">
-                      {hooks?.food?.isLoading
-                        ? <CircularProgress />
-                        : hooks?.food?.data.map((food, i) => (
-                        <ListItem key={`${food.date}_${food.name}`} component={ListItemButton}>
-                          <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
-                          <Box>
-                            <IconButton 
-                              onClick={() => setState({
-                                ...state,
-                                foodSelected: foodRepoData.data
-                                  .find(({ display_name_translations }) => (display_name_translations["en"] === food.name)), 
-                                open: {...open, food: "right" }
-                              })}
-                            >
-                              <Add />
-                            </IconButton>
-                            <IconButton onClick={() => dbApi.delete("food", food.id)}><Delete /></IconButton>
-                          </Box>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                  
-                </Grid>
-              </>
-            ),
-            exercise: (
-              <>
-                <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
-                  <Autocomplete
-                    id="exerciseName"
-                    options={mock_exercises || data || []}
-                    fullWidth
-                    onLoadedData={() => setState({...state, skip: true })}
-                    loading={isLoading}
-                    sx={{ ml: 4 }}
-                    getOptionLabel={(option) => {
-                      console.log("getOptionLabel: ", option, option?.name)
-                      return option?.name
-                    }}
-                    renderOption={(props, option) => {
-                      console.log("renderOption: ", props, option)
-                      // return option
-                      return (
-                        <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() => setState({ ...state, exerciseSelected: option, open:{...open, [getOpenSection()]: "right"} })}>
-                          <>{option?.name}{` `}</>
-                          <Chip size="small" label={option?.muscle} />
-                          <Chip variant="outlined" size="small" label={option?.type} />
-                        </Stack>
-                      )
-                    }}
-                    onClick={e => console.log("click!!", e)}
-                    renderInput={(params) => (
-                      <Box ref={params.InputProps.ref}>
-                        <TextField
-                          type="text"
-                          {...params.inputProps}
-                          value={state.exerciseName}
-                          placeholder="Search for an exercise"
-                          onChange={handleChange}
-                          fullWidth
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <IconButton p={1} onClick={() => setState({...state, skip: false })}>
-                                  <SearchIcon />
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Box>
-                    )}
-                  />
-                </Box>
-                <Grid id="exercise-history-container" container>
-                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
-                    <Tabs>
-                      {tabs.map(tab => <Tab key={`${tab}_tab`} label={tab} />)}
-                    </Tabs>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body1">History</Typography>
-                      <Chip component={Button} variant="outlined" label="Most Recent" />
-                    </Box>
-                    <List id="exercise-history-list">
-                      {exerciseHistory.data.map(({ date, exercise, sets }) => (
-                        <ListItem key={`${date}_${exercise}`}>
-                          <ListItemText primary={exercise} secondary={exerciseHistory.formatSetsArrayToString(sets)} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                  <Grid item xs={12} sm={12} sx={{ p: 2}}>
-                    <Button variant="outlined" fullWidth onClick={() => handleDrawers("right", getOpenSection(), 'open')}>
-                      Create a New Exercise
-                    </Button>
-                  </Grid>
-                </Grid>
-              </>
-            ),
-          }[getOpenSection()]}
-        </Box>
-      </Drawer>
+      <Drawers
+        selected={state?.selected || null}
+        handleSelected={handleSelected} 
+        handleForm={handleSubmit}
+      />
 
       <SimpleBottomNavigation 
         tab={tab}
         setTab={value => setState({ ...state, tab: value  })}
         extraContent={
           <Grid item xs={12} sm={12} p={2}>
-            <Box component="form"> 
+            <Box component="form" onClick={handleFocus}> 
               <Autocomplete
                 options={mock_recentFoods}
-                onFocus={() => setState({...state, open: {...open, food: "bottom" }})}
                 sx={{ p: 0, borderRadius: 8, backgroundColor: "rgba(33,33,33,0.8)", color: "#fff" }}
                 renderInput={(params) => (
                   <TextField
@@ -544,8 +299,14 @@ function App() {
 
 const Dashboard = (props) => {
   const hooks = useHooks();
-  const { handleDrawers } = props;
-  const { weightQuery } = props.queries;
+  const handleProfileClick = () => {
+    hooks.actions.closeDrawers();
+    hooks.actions.updateDrawers({
+      active: "profile",
+      anchor: "right",
+      open: true,
+    });
+  }
   return (
     <>
       {/* Page Header */}
@@ -594,10 +355,12 @@ const Dashboard = (props) => {
                     }
                   ].map((item, i) => (
                     <ListItem key={item.heading}>
-                      <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>{item.icon}</ListItemIcon>
+                      <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
+                        {item.icon}
+                      </ListItemIcon>
                       <ListItemText primary={item.heading} secondary={item.value} />
                       <Tooltip title={`${item.heading} Help`} placement="top">
-                        <Badge badgeContent="?" color="primary" onClick={() => handleDrawers("right", "help", "open")} sx={{ cursor: "pointer" }} />
+                        <Badge badgeContent="?" color="primary" onClick={handleProfileClick} sx={{ cursor: "pointer" }} />
                       </Tooltip>
                     </ListItem>
                   ))}
@@ -635,7 +398,7 @@ const Dashboard = (props) => {
                   <Typography variant="h5" component="p" gutterBottom>
                     Exercise
                   </Typography>
-                  <IconButton onClick={() => props.handleDrawers('bottom', 'exercise', 'open')} sx={{ color: "#fff" }}>
+                  <IconButton onClick={() => hooks.actions.updateDrawers({ active: "exercise", anchor: "bottom", open: true })} sx={{ color: "#fff" }}>
                     <Add /> 
                   </IconButton>
                 </Grid>
@@ -675,7 +438,7 @@ const Dashboard = (props) => {
                         Last 90 days
                       </Typography>
                     </Stack>
-                    <IconButton onClick={() => props.handleDrawers('bottom', 'weight', 'open')} sx={{ color: "#fff" }}>
+                    <IconButton onClick={() => hooks.actions.updateDrawers({ active: "weight", anchor: "bottom", open: true})} sx={{ color: "#fff" }}>
                       <Add />
                     </IconButton>
                   </Box>
@@ -912,3 +675,4 @@ const Profile = () => {
 
 
 export default App;
+

@@ -5,6 +5,11 @@ export const alertSlice = createSlice({
   initialState: {
     type: null,
     message: null,
+    drawers: {
+      active: null,
+      anchor: "bottom",
+      open: false,
+    }
   },
   reducers: {
     createAlert: (state, action) => {
@@ -15,6 +20,17 @@ export const alertSlice = createSlice({
     removeAlert: (state) => {
       state.type = null
       state.message = null
+    },
+
+    updateDrawers: (state, action) => {
+      console.log("inside updateDrawers: redux: ", action)
+      state.drawers = action.payload;
+    },
+
+    closeDrawers: (state) => {
+      state.drawers.active = null;
+      state.drawers.open = false;
+      state.drawers.anchor = "bottom";
     }
   },
   
@@ -23,7 +39,9 @@ export const alertSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
   createAlert,
-  removeAlert
+  removeAlert,
+  updateDrawers,
+  closeDrawers,
 } = alertSlice.actions
 
 
