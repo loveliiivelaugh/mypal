@@ -36,7 +36,16 @@ export default function SignIn() {
   const handleChange = (event) => setState({ ...state, [event.target.name]: event.target.value });
   console.log("Auth Form: ", hooks)
 
-  const toggleAuth = (auth) => setAuthType(auth)
+  const toggleAuth = (auth) => {
+    hooks.actions.alerts.drawers.closeDrawers();
+    setAuthType(auth);
+    hooks.actions.alerts.drawers.updateDrawers({
+      active: "auth",
+      anchor: "right",
+      open: true,
+    });
+  }
+
   const forgotPassword = () => {
     console.log("Forgot Password", hooks, state)
     hooks.auth.methods.resetPassword(state.email);

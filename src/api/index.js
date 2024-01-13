@@ -8,7 +8,8 @@ import { supabase } from '../db'
 const { 
   REACT_APP_RAPID_API_KEY: key, 
   REACT_APP_RAPID_API_EXERCISE_HOST_2: host,
-  REACT_APP_RAPID_API_FOOD_HOST: foodHost
+  REACT_APP_RAPID_API_FOOD_HOST: foodHost,
+  REACT_APP_RAPID_API_CALORIES_BURNED: calsBurnedHost,
 } = process.env;
 
 const headers = {
@@ -63,6 +64,42 @@ export const foodApi = createApi({
 // auto-generated based on the defined endpoints
 export const { useGetExerciseQuery } = exerciseApi;
 export const { useGetFoodQuery } = foodApi;
+
+export const getCaloriesBurned = async ({exercise, weight, duration}) => {
+  const url = `https://${calsBurnedHost}/v1/caloriesburned?` +
+    `activity=${exercise}&weight=${weight}&duration=${duration}}`;
+  const options = {
+    method: 'GET', 
+    headers: {
+      ...headers, 
+      'X-RapidAPI-Host': calsBurnedHost,
+    }
+  };
+  const response = await fetch(url, options);
+  const data = await response.json();
+  return data;
+};
+
+export const calsBurnedApi = createApi({
+  reducerPath: 'calsBurnedApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: `https://${calsBurnedHost}/v1`,
+    prepareHeaders(headers) {
+      headers.set('X-RapidAPI-Key', key)
+      headers.set('X-RapidAPI-Host', calsBurnedHost)
+      return headers
+    },
+  }),
+  tagTypes: ['CaloriesBurned'],
+  endpoints: (builder) => ({
+    getCaloriesBurned: builder.query({
+      query: ({exercise, weight, duration}) => `caloriesburned?activity=${exercise}&weight=${weight}&duration=${duration}`,
+    }),
+  }),
+});
+
+export const { useGetCaloriesBurnedQuery } = calsBurnedApi;
+
 
 const supabaseApi = createApi({
   baseQuery: fakeBaseQuery(),

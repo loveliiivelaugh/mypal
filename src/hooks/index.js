@@ -7,16 +7,14 @@ import { supabase } from '../db';
 import { 
   useGetSessionQuery,
   useGetAllQuery,
-  useGetQuery,
-  useGetExerciseQuery, 
-  useGetFoodQuery, 
   dbApi,
   useAddMutation,
   useLoginMutation,
   useLogoutMutation,
   useSignupMutation,
   useResetPasswordMutation,
-  useLoginWithOtpMutation, 
+  useLoginWithOtpMutation,
+  useGetCaloriesBurnedQuery,
 } from '../api';
 
 // useResponsive hook -- used to determine the screen size

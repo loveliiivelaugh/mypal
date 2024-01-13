@@ -1,11 +1,11 @@
 // Packages
 import { useState } from 'react';
 import { 
-  InputLabel, Avatar, Select, MenuItem,
-  AppBar, Chip, InputAdornment, CssBaseline, Divider,
+  Avatar,
+  AppBar, InputAdornment, CssBaseline,
   Autocomplete, Box, Button, Card, Drawer, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
-  TextField, Toolbar, Typography, ListItemButton, Tab, Tabs, Badge, Tooltip, CircularProgress,
+  TextField, Toolbar, Typography, ListItemButton, Badge, Tooltip
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import HikingIcon from '@mui/icons-material/Hiking';
@@ -14,39 +14,28 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
-import { Add, ArrowBack, Attachment, Check, Close, Delete, Notifications } from '@mui/icons-material';
+import { Add, Notifications } from '@mui/icons-material';
 
 // Components
-import BasicDatePicker from './components/BasicDatePicker';
 import CustomShapeBarChart from './components/charts/CustomShapeBar';
 import LineChart from './components/charts/LineCharts';
 import Login from './components/Login';
 import SimpleBottomNavigation from './components/BottomNavigation';
 import TwoLevelPieChart from './components/charts/TwoLevelPie';
-import TdeeCalculator from './components/forms/TdeeCalculator';
+import Drawers from './components/Drawer';
 
 // Services
-import { 
-  useGetSessionQuery,
-  useGetAllQuery,
-  useGetExerciseQuery, 
-  useGetFoodQuery, 
-  dbApi, 
-} from './api';
-import foodRepoData from './api/food_repo.data';
+import { getCaloriesBurned, useGetFoodQuery } from './api';
+import { useHooks } from './hooks';
 
 // Constants
-import { 
-  exerciseHistory, foodHistory, mock_exercises, mock_recentFoods, tabs 
-} from './utilities/constants';
+import { mock_recentFoods } from './utilities/constants';
 
 // Utilities
 import { cap_first, tryCatchHandler } from './utilities/helpers'
-import { useHooks } from './hooks';
 
 // Styles
 import './App.css';
-import Drawers from './components/Drawer';
 
 
 const initialState = {
@@ -130,6 +119,8 @@ function App() {
     };
 
     if (muscle) {
+      console.log("if muscle", state, form);
+      
       // Format exercise submit *TODO: move to separate function
       const formattedExercise = {
         date: form.date || new Date().toLocaleDateString(),
@@ -137,6 +128,17 @@ function App() {
         ...state.selected,
         ...form,
       };
+
+      // // Get calories burned
+      // API call to get calories burned -- not working very well
+      // const { name, weight, duration } = formattedExercise;
+      // formattedExercise.caloriesBurned = await getCaloriesBurned({
+      //   weight,
+      //   duration: duration || 1,
+      //   exercise: name
+      // });
+
+      console.log("caloriesBurned", formattedExercise);
 
       form = formattedExercise;
       // --- END Format exercise submit *TODO: move to separate function ---
@@ -185,7 +187,7 @@ function App() {
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Avatar alt="M" src="/static/images/avatar/1.jpg" />
           <Typography variant="h5" component="h5">
-            oAIFitness
+            Open Fitness 💪
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Login />

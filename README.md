@@ -1,8 +1,17 @@
 # miPal
 
+## CI/CD
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/17584298-1ea6-4693-88ca-dcc04f60f1be/deploy-status)](https://app.netlify.com/sites/gleeful-kitten-d6d5f6/deploys)
 
 [miPal development deployment](https://main--gleeful-kitten-d6d5f6.netlify.app/)
+
+* version control: [GitHub]()
+* continuous integration: [GitHub Actions]()
+* continuous deployment: [Netlify]()
+* project management: [GitHub Projects]()
+* issue tracking: [GitHub Issues]()
+* code review: [GitHub Pull Requests]()
 
 ## Description
 
@@ -60,6 +69,24 @@ miPal is an open source fitness and nutrition tracking application. It allows us
 git clone https://github.com/loveliiivelaugh/mypal.git
 cd mypal
 npm install
+```
+
+Add a .env file to the root directory with the following variables:
+(An example of this can be found in the .env.example file)
+
+```code
+cp .env.example .env
+```
+
+Add your Supabase URL and Anon Key to the .env file.
+Also add the RapidAPI hosts and keys found in the .env.example file.
+
+```code
+REACT_APP_SUPABASE_URL=your_supabase_url
+REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+```code
 npm start
 ```
 
@@ -90,4 +117,3 @@ This project is licensed under the MIT license.
 * [Me😎]('https://www.github.com/loveliiivelaugh')
 
 ## Tests
-
