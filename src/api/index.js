@@ -100,6 +100,24 @@ export const calsBurnedApi = createApi({
 
 export const { useGetCaloriesBurnedQuery } = calsBurnedApi;
 
+export const foodSearchApi = createApi({
+  reducerPath: 'foodSearchApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: `https://${foodHost}/recipes`,
+    prepareHeaders(headers) {
+      headers.set('X-RapidAPI-Key', key)
+      headers.set('X-RapidAPI-Host', foodHost)
+      return headers
+    },
+  }),
+  tagTypes: ['FoodSearch'],
+  endpoints: (builder) => ({
+    getFoodSearch: builder.query({
+      query: ({query}) => `complexSearch?query=${query}`,
+    }),
+  }),
+});
+
 
 const supabaseApi = createApi({
   baseQuery: fakeBaseQuery(),

@@ -35,7 +35,7 @@ miPal is an open source fitness and nutrition tracking application. It allows us
 
 ```json
 "dependencies": {
-    "@emotion/react": "^11.11.3",
+     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.15.2",
@@ -52,6 +52,7 @@ miPal is an open source fitness and nutrition tracking application. It allows us
     "@testing-library/user-event": "^13.5.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
+    "formik": "^2.4.5",
     "framer-motion": "^10.17.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -94,19 +95,23 @@ npm start
 
 ## Documentation
 
-* [React](https://reactjs.org/)
+* [React](https://reactjs.org/) -- UI library
 
-* [Redux](https://redux.js.org/)
+* [Redux](https://redux.js.org/) -- State management
 
-* [Material-UI](https://mui.com/)
+* [Material-UI](https://mui.com/) -- UI components/Design system
 
-* [Supabase](https://supabase.io/)
+* [Supabase](https://supabase.io/) -- Database
 
-* [Recharts](https://recharts.org/en-US/)
+* [Recharts](https://recharts.org/en-US/) -- Data visualization
 
-* [Dayjs](https://day.js.org/)
+* [Dayjs](https://day.js.org/) -- Date formatting
 
-* [Framer Motion](https://www.framer.com/motion/)
+* [Framer Motion](https://www.framer.com/motion/) -- Animation
+
+* [Styled Components](https://styled-components.com/) -- CSS-in-JS
+
+* [Formik](https://formik.org/) -- Form management
 
 ## License
 
@@ -117,3 +122,6 @@ This project is licensed under the MIT license.
 * [Me😎]('https://www.github.com/loveliiivelaugh')
 
 ## Tests
+
+
+

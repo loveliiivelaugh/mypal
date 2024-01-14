@@ -56,12 +56,9 @@ function App() {
   const hooks = useHooks();
   let [state, setState] = useState(initialState);
   const { tab } = state;
-  
-  // Global Actions
-  const { createAlert } = hooks.actions;
-  // Api
-  // Helpers
 
+  // Handlers
+  // handleChange handles all input changes throughout app
   const handleChange = (event) => {
     // if input type is text field
     if (event?.target) setState({ ...state, [event.target.id]: event.target.value });
@@ -77,6 +74,7 @@ function App() {
       open: true,
     });
 
+    // Submit handler handles all form submissions throughout app
   const handleSubmit = async (form) => {
     const { actions, drawers, db } = hooks;
     const { active } = drawers;
@@ -152,7 +150,7 @@ function App() {
         actions.updateDrawers({ ...drawers, anchor: "bottom" });
       })
 
-    if (error || response.error) createAlert("error", response.error?.message);
+    if (error || response.error) actions.createAlert("error", response.error?.message);
 
     // refecth data
     ({

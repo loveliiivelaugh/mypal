@@ -10,17 +10,25 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 // Components
 import FoodDrawerContent from './FoodDrawer'
 import RightFoodDrawer from './RightFoodDrawer';
-import RightExerciseDrawer from './drawer_content/RightExerciseDrawer';
+import RightExerciseDrawer from './drawers/RightExerciseDrawer';
+import { FormContainer } from '../hooks/useForms';
 import TdeeCalculator from './forms/TdeeCalculator';
 import AuthForm from './forms/AuthForm';
 import BasicDatePicker from './BasicDatePicker';
+import BottomExerciseDrawer from './drawers/BottomExerciseDrawer';
 
 // Hooks
 import { useHooks } from '../hooks';
 
 // Utilities
 import { cap_first } from '../utilities/helpers'
-import BottomExerciseDrawer from './drawer_content/BottomExerciseDrawer';
+import {
+  exercise_schema,
+  food_schema,
+  weight_schema,
+  profile_schema,
+} from '../db/schemas';
+
 
 export const BottomWeightDrawer = (props) => {
 
@@ -68,11 +76,6 @@ const Drawers = (props) => {
   // Handlers
   const handleClose = () => actions.closeDrawers();
   
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    props.handleForm(form)
-  };
-  
   // render content based on active drawer
   const content = {
     weight: {
@@ -81,11 +84,12 @@ const Drawers = (props) => {
     },
     exercise: {
       bottom: (<BottomExerciseDrawer handleSelected={props.handleSelected} />),
-      right: (<RightExerciseDrawer form={form} selected={props.selected} />),
+      right: (<FormContainer schema={exercise_schema} />),
     },
     food: {
       bottom: (<FoodDrawerContent handleSelected={props.handleSelected} />),
       right: (<RightFoodDrawer form={form} selected={props.selected} />)
+      // right: (<FormContainer schema={food_schema} />)
     },
     profile: {
       bottom: (<>profile bottom</>),
@@ -95,9 +99,8 @@ const Drawers = (props) => {
       bottom: (<>auth bottom</>),
       right: (<AuthForm />),
     }
-  }
+  };
   
-  // console.log("inside Drawers: ", props, drawers);
   // render
   return (
     <Drawer
@@ -109,24 +112,7 @@ const Drawers = (props) => {
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
         }}
       >
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
-
-          {/* Drawer Header */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-            <IconButton sx={{ color: "#fff"}} onClick={handleClose}>
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h6" component="p" gutterBottom>
-              {`Add ${cap_first(active)}`}
-            </Typography>
-            <IconButton sx={{ color: "#fff"}} type="submit">
-              <CheckIcon />
-            </IconButton>
-          </Box>
-            
-          {(active && anchor) && content[active][anchor]}
-
-        </Box>
+        {(active && anchor) && content[active][anchor]}
       </Drawer>
   )
 }

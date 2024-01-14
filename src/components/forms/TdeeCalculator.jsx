@@ -11,6 +11,7 @@ import {
 import { dbApi } from '../../api'
 import { useHooks } from '../../hooks'
 import { buildFields, profile_schema } from '../../db/schemas'
+import { FormContainer } from '../../hooks/useForms'
 
 
 const TdeeCalculator = (props) => {
@@ -50,6 +51,19 @@ const TdeeCalculator = (props) => {
     }
   };
 
+  const formProps = {
+    schema: profile_schema,
+    handleChange,
+    handleSubmit,
+    formFooterElements: (
+      <Toolbar>
+        <Button type="submit" variant="contained" color="primary">
+          Submit
+        </Button>
+      </Toolbar>
+    )
+  }
+
   return (
     <Grid container p={4}>
       <Grid item xs={12}>
@@ -86,7 +100,8 @@ const TdeeCalculator = (props) => {
         </Typography>
       </Grid>
       <Toolbar />
-      {fields.map((field, index) => (
+      <FormContainer {...formProps} />
+      {/* {fields.map((field, index) => (
         <Grid item xs={12} key={index} sx={{ display: "flex", justifyContent: "space-between", my: 0.25 }}>
           <InputLabel>{field.label}</InputLabel>
           {field.type === "select" ? (
@@ -123,7 +138,7 @@ const TdeeCalculator = (props) => {
           />
           )}
         </Grid>
-      ))}
+      ))} */}
       <Grid item xs={12} my={1}>
         <Button variant="contained" fullWidth onClick={handleSubmit}>
           Submit
