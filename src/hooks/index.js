@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { alerts } from '../redux';
+import { alerts, exercise } from '../redux';
 import { supabase } from '../db';
 
 // Services
@@ -81,6 +81,7 @@ export const useActions = () => {
     createAlert: (type, message) => dispatch(alerts.createAlert({ type, message })),
     updateDrawers: (payload) => dispatch(alerts.updateDrawers(payload)),
     closeDrawers: () => dispatch(alerts.closeDrawers()),
+    handleSelected: (payload) => dispatch(exercise.handleSelected(payload)),
   }
 };
 
@@ -181,8 +182,5 @@ export const useHooks = () => {
     actions,
     db: dbApi,
     drawers,
-    // app: {
-    //   // forms,
-    // }
   };
 }

@@ -55,38 +55,27 @@ const formatDataTypes = (type) => ({
 }[type]) || "text";
 
 const generateFields = (schema, form) => {
+  console.log("generateFields(): ", schema, form)
+  // destructure name from form
+  const { name, display_name_translations } = form?.selected;
+  let defaultValue = "";
+  if (name) defaultValue = name; // When selected is an exercise
+  // When selected is a meal
+  if (display_name_translations) defaultValue = display_name_translations["en" || "it"];
 
-  // console.log("generateFields(): ", schema, form)
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
     .map((field) => (field.column_name !== "id") && ({
       label: cap_first(field.column_name),
       type: formatDataTypes(field.data_type),
       name: field.column_name,
-      defaultValue: field.column_default,
+      defaultValue: defaultValue ? defaultValue : field.column_default,
       helperText: `Enter your ${field.column_name}`,
       required: false,
       onChange: form.handleChange,
       ...(field.options && { options: field.options })
     })
   ).filter(field => field) // filter out undefined values
-
-  // // Update form state according to data with default values
-  // fieldsObjectFromSchema
-  //   .forEach(({ name, defaultValue }) => handleChange({ 
-  //     target: { id: name, value: defaultValue || "" } 
-  //   }));
-  // fieldsObjectFromSchema
-  //   .forEach(({ name, defaultValue }) => formState[name] = defaultValue || "");
-
-  const formState = Object.assign(
-    {}, 
-    ...fieldsObjectFromSchema.map(field => ({ 
-      [field.name]: field.defaultValue || "" 
-    }))
-  );
-
-  // form.setValues(formState);
 
   // Build field elements from fields object
   return buildFieldElementsFromFieldsObject(fieldsObjectFromSchema, form);
@@ -98,7 +87,6 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       name, type, label, helperText, defaultValue, options = [] 
     } = field;
 
-    // console.log("buildFieldElementsFromFieldsObject(): ", field, formState)
     // Define common properties for all fields
     const FieldProps = {
       key: name,
@@ -109,12 +97,6 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       label,
       helperText,
       defaultValue,
-      // onChange: ((event) => {
-      //   // if input type is text field
-      //   if (event?.target) formState[name] = event.target.value;
-      //   // if input type is date field
-      //   if (event?.date) formState.date = new Date(event).toLocaleDateString();
-      // }),
       onChange: formState.handleChange,
     };
 
@@ -148,6 +130,7 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       date: <BasicDatePicker {...DateProps} />,
       time: <BasicDatePicker {...DateProps} />,
       select: <SelectWrapper {...SelectProps} />,
+      json: <TextField {...TextFieldProps} />,
     }[type])
   });
 

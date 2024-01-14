@@ -1,18 +1,21 @@
 import React from 'react'
 import {
-  Autocomplete, Avatar, Button, Chip, Stack, TextField,
-  Box, IconButton, Toolbar, Typography, Grid,
+  Autocomplete, Avatar, Chip, Stack, TextField,
+  Box, IconButton, Typography, Grid,
   InputAdornment, Tab, Tabs, CircularProgress, List,
-  ListItem, ListItemText, ListItemAvatar, ListItemButton,
+  ListItem, ListItemText, ListItemButton,
 } from '@mui/material'
-import { useHooks } from '../hooks';
-import { cap_first } from '../utilities/helpers'
-import { foodHistory } from '../utilities/constants'
-import foodRepoData from '../api/food_repo.data';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+import { useHooks } from '../hooks';
+import { cap_first } from '../utilities/helpers'
+import { foodHistory } from '../utilities/constants'
+import foodRepoData from '../api/food_repo.data';
 
 
 const FoodDrawer = (props) => {
@@ -29,8 +32,7 @@ const FoodDrawer = (props) => {
   }
 
   const handleSelectedFood = (food) => {
-    console.log("handleSelectedFood: ", food);
-    props.handleSelected(food);
+    actions.handleSelected(food);
     actions.closeDrawers();
     actions.updateDrawers({
       active: "food",
@@ -41,6 +43,17 @@ const FoodDrawer = (props) => {
 
   return (
     <>
+      <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+        <IconButton sx={{ color: "#fff"}} onClick={hooks.actions.closeDrawers}>
+          <CloseIcon />
+        </IconButton>
+        <Typography variant="h6" component="p" gutterBottom>
+          {`Add ${cap_first(hooks.drawers.active)}`}
+        </Typography>
+        <IconButton sx={{ color: "#fff"}} type="submit">
+          <CheckIcon />
+        </IconButton>
+      </Box>
       <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
         <Autocomplete
           id="food"
@@ -49,16 +62,17 @@ const FoodDrawer = (props) => {
           onLoadedData={() => {}}
           loading={hooks.food.isLoading}
           sx={{ ml: 4 }}
-          getOptionLabel={(option) => {
-            // console.log("getOptionLabel: ", option, option?.name)
-            return option?.display_name_translations["en"]
-          }}
+          getOptionLabel={(option) => option?.display_name_translations["en"]}
           renderOption={(props, option) => {
-            // return option
             const image = option.images.find(({categories}) => categories.includes("Front"))?.thumb;
-            // console.log("renderOption: ", props, option, image)
             return (
-              <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() =>handleSelectedFood(option)}>
+              <Stack 
+                direction="row" 
+                spacing={1} 
+                p={1} 
+                sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)" } }} 
+                onClick={() => handleSelectedFood(option)}
+              >
                 <Avatar src={image} />
                 <Typography variant="h6">{option?.display_name_translations["en"]}</Typography>
                 <Chip size="small" label={option?.country} />
@@ -109,18 +123,16 @@ const FoodDrawer = (props) => {
         <Grid item xs={12} sm={12} sx={{ p: 2}}>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="subtitle1">History</Typography>
-            <Chip component={Button} variant="outlined" label="Most Recent" onClick={() => actions.createAlert("success", "SUper Super tesT!")}/>
+            <Chip variant="outlined" label="Most Recent" />
           </Box>
           <List id="food-history-list">
             {hooks?.food?.isLoading
               ? <CircularProgress />
               : hooks?.food?.data.map((food, i) => (
-              <ListItem key={`${food.date}_${food.name}`} component={ListItemButton}>
+              <ListItem key={`${food.date}_${food.name}`} component={ListItemButton} onClick={() => handleSelectedFood(food)}>
                 <ListItemText primary={food.name} secondary={foodHistory.formatFoodObjectToString(food)} />
                 <Box>
-                  <IconButton 
-                    onClick={() => handleSelectedFood(food)}
-                  >
+                  <IconButton onClick={() => handleSelectedFood(food)}>
                     <AddIcon />
                   </IconButton>
                   <IconButton onClick={() => hooks.dbApi.delete("food", food.id)}>

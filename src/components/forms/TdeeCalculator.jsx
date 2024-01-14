@@ -28,11 +28,6 @@ const TdeeCalculator = (props) => {
     )
   );
 
-  const handleChange = (event) => setFormState({ 
-    ...formState, 
-    [event.target.name]: event.target.value 
-  });
-
   // TODO: This needs to be added to the dynamic submit handler
   const handleSubmit = async () => {
     formState.user_id = hooks.user_id;
@@ -50,19 +45,6 @@ const TdeeCalculator = (props) => {
       hooks.actions.createAlert("error", `Error Code: ${code}\n${message}\n ${details}`)
     }
   };
-
-  const formProps = {
-    schema: profile_schema,
-    handleChange,
-    handleSubmit,
-    formFooterElements: (
-      <Toolbar>
-        <Button type="submit" variant="contained" color="primary">
-          Submit
-        </Button>
-      </Toolbar>
-    )
-  }
 
   return (
     <Grid container p={4}>
@@ -100,45 +82,7 @@ const TdeeCalculator = (props) => {
         </Typography>
       </Grid>
       <Toolbar />
-      <FormContainer {...formProps} />
-      {/* {fields.map((field, index) => (
-        <Grid item xs={12} key={index} sx={{ display: "flex", justifyContent: "space-between", my: 0.25 }}>
-          <InputLabel>{field.label}</InputLabel>
-          {field.type === "select" ? (
-            <Select
-              id={field.name}
-              aria-describedby="my-helper-text"
-              type={field.type}
-              name={field.name}
-              defaultValue={field.defaultValue}
-              helperText={field.helperText}
-              select={field.type === "select"}
-              onChange={handleChange}
-              required
-              SelectProps={{
-                native: true,
-              }}
-            >
-              {field.options && field.options.map((option, index) => (
-                <MenuItem key={index} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          ) : (
-          <TextField
-            id={field.name}
-            aria-describedby="my-helper-text"
-            type={field.type}
-            name={field.name}
-            defaultValue={field.defaultValue}
-            onChange={handleChange}
-            helperText={field.helperText}
-            required
-          />
-          )}
-        </Grid>
-      ))} */}
+      <FormContainer schema={profile_schema} />
       <Grid item xs={12} my={1}>
         <Button variant="contained" fullWidth onClick={handleSubmit}>
           Submit

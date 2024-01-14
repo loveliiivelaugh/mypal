@@ -1,16 +1,13 @@
 // Packages
-import React, { useState } from 'react'
 import { 
   Box, Drawer, IconButton, Typography, TextField
 } from '@mui/material'
+import AttachmentIcon from '@mui/icons-material/Attachment';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import AttachmentIcon from '@mui/icons-material/Attachment';
 
 // Components
 import FoodDrawerContent from './FoodDrawer'
-import RightFoodDrawer from './RightFoodDrawer';
-import RightExerciseDrawer from './drawers/RightExerciseDrawer';
 import { FormContainer } from '../hooks/useForms';
 import TdeeCalculator from './forms/TdeeCalculator';
 import AuthForm from './forms/AuthForm';
@@ -21,7 +18,6 @@ import BottomExerciseDrawer from './drawers/BottomExerciseDrawer';
 import { useHooks } from '../hooks';
 
 // Utilities
-import { cap_first } from '../utilities/helpers'
 import {
   exercise_schema,
   food_schema,
@@ -34,8 +30,6 @@ export const BottomWeightDrawer = (props) => {
 
   const handleChange = (event) => {
     if (event?.target) props.form[event.target.id] = event.target.value;
-    // if input type is date field
-    // if (event?.date) props.form[event.target.id]
   };
 
   return (
@@ -59,6 +53,7 @@ export const BottomWeightDrawer = (props) => {
         <Typography id="demo-simple-select-label" variant="body1">Progress Photo</Typography>
         <IconButton p={1}>
           <AttachmentIcon />
+          <attachment />
         </IconButton>
       </Box>
     </>
@@ -69,12 +64,7 @@ export const BottomWeightDrawer = (props) => {
 const Drawers = (props) => {
   // State / Hooks
   const { actions, drawers } = useHooks();
-  const [form] = useState({});
-  // Destructure
   const { active, anchor, open } = drawers;
-
-  // Handlers
-  const handleClose = () => actions.closeDrawers();
   
   // render content based on active drawer
   const content = {
@@ -83,13 +73,12 @@ const Drawers = (props) => {
       right: (<>bottom weight</>),
     },
     exercise: {
-      bottom: (<BottomExerciseDrawer handleSelected={props.handleSelected} />),
+      bottom: (<BottomExerciseDrawer handleSelected={actions.handleSelected} />),
       right: (<FormContainer schema={exercise_schema} />),
     },
     food: {
-      bottom: (<FoodDrawerContent handleSelected={props.handleSelected} />),
-      right: (<RightFoodDrawer form={form} selected={props.selected} />)
-      // right: (<FormContainer schema={food_schema} />)
+      bottom: (<FoodDrawerContent handleSelected={actions.handleSelected} />),
+      right: (<FormContainer schema={food_schema} />)
     },
     profile: {
       bottom: (<>profile bottom</>),
@@ -106,7 +95,7 @@ const Drawers = (props) => {
     <Drawer
         anchor={anchor}
         open={open}
-        onClose={handleClose}
+        onClose={() => actions.closeDrawers()}
         sx={{
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },

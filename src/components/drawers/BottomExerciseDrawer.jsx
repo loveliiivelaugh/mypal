@@ -1,5 +1,5 @@
 // Packages
-import React from 'react'
+import { useState } from 'react'
 import {
   Autocomplete, Box, Button, Grid,
   InputAdornment, IconButton, Typography,
@@ -7,30 +7,45 @@ import {
   List, ListItem, ListItemText, 
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 // Hooks
 import { useHooks } from '../../hooks';
 
 // Utilities
 import { exerciseHistory, mock_exercises, tabs } from '../../utilities/constants'
+import { cap_first } from '../../utilities/helpers'
 
 
 const BottomExerciseDrawer = (props) => {
   const hooks = useHooks();
-  const [state] = React.useState({});
+  const [state] = useState({});
   const handleChange = (event) => props.form[event.target.id] = event.target.value;
 
   const handleSelectedExercise = (exercise) => {
-    props.handleSelected(exercise)
+    hooks.actions.handleSelected(exercise);
+    hooks.actions.closeDrawers();
     hooks.actions.updateDrawers({
       active: "exercise",
       anchor: "right",
       open: true,
-    })
+    });
   };
 
   return (
     <>
+      <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+        <IconButton sx={{ color: "#fff"}} onClick={hooks.actions.closeDrawers}>
+          <CloseIcon />
+        </IconButton>
+        <Typography variant="h6" component="p" gutterBottom>
+          {`Add ${cap_first(hooks.drawers.active)}`}
+        </Typography>
+        <IconButton sx={{ color: "#fff"}} type="submit">
+          <CheckIcon />
+        </IconButton>
+      </Box>
       <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
         <Autocomplete
           id="exerciseName"

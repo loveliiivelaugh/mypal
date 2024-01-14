@@ -73,98 +73,6 @@ function App() {
       anchor: "bottom",
       open: true,
     });
-
-    // Submit handler handles all form submissions throughout app
-  const handleSubmit = async (form) => {
-    const { actions, drawers, db } = hooks;
-    const { active } = drawers;
-    const { nutrients, muscle } = state?.selected;
-
-    if (nutrients) {
-      // Format food submit *TODO: move to separate function
-      const calculate_calories = (calories) => {
-        const servingSize = parseInt(form.serving_size);
-        const numServings = parseInt(form.num_servings);
-        const serving = (typeof(servingSize) === "number")
-          ? servingSize
-          : 1;
-
-        return ((calories * serving) * numServings);
-      };
-      
-      const formattedNutrients = Object.assign(
-        {}, 
-        ...Object
-          .keys(nutrients)
-          .map(nutrient => ({ 
-            [nutrient]: nutrients[nutrient]?.per_hundred, 
-            unit: nutrients[nutrient]?.unit 
-        })))
-
-      if (active === "food") form = {
-        name: state.selected?.name_translations["en" || "it"] 
-          || "No name/english translation found", 
-        calories: calculate_calories(
-          nutrients?.energy_calories_kcal?.per_hundred
-          || nutrients?.energy_calories_kcal?.per_portion
-        ),
-        nutrients: formattedNutrients,
-        date: form.date || new Date().toLocaleDateString(),
-        time: form.time || new Date().toLocaleTimeString(),
-        meal: form.meal || "snack",
-      };
-      // --- END Format food submit *TODO: move to separate function ---
-    };
-
-    if (muscle) {
-      console.log("if muscle", state, form);
-      
-      // Format exercise submit *TODO: move to separate function
-      const formattedExercise = {
-        date: form.date || new Date().toLocaleDateString(),
-        time: form.time || new Date().toLocaleTimeString(),
-        ...state.selected,
-        ...form,
-      };
-
-      // // Get calories burned
-      // API call to get calories burned -- not working very well
-      // const { name, weight, duration } = formattedExercise;
-      // formattedExercise.caloriesBurned = await getCaloriesBurned({
-      //   weight,
-      //   duration: duration || 1,
-      //   exercise: name
-      // });
-
-      console.log("caloriesBurned", formattedExercise);
-
-      form = formattedExercise;
-      // --- END Format exercise submit *TODO: move to separate function ---
-    }
-
-    const [response, error] = await tryCatchHandler(
-      () => db.add(active, form), 
-      () => {
-        actions.closeDrawers();
-        actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
-        actions.updateDrawers({ ...drawers, anchor: "bottom" });
-      })
-
-    if (error || response.error) actions.createAlert("error", response.error?.message);
-
-    // refecth data
-    ({
-      food: () => hooks.food.refetch(),
-      exercise: () => hooks.exercise.refetch(),
-      weight: () => hooks.weight.refetch(),
-      profile: () => hooks.profile.refetch(),
-    }[active])();
-
-  };
-
-  const handleSelected = (selected) => {
-    setState({ ...state, selected });
-  }
   
   // Render
   const tabProps = { dashboard: {}};
@@ -183,7 +91,7 @@ function App() {
       <CssBaseline />
       <AppBar position="static">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Avatar alt="M" src="/static/images/avatar/1.jpg" />
+          <Avatar alt="A" src="/static/images/avatar/1.jpg" />
           <Typography variant="h5" component="h5">
             Open Fitness 💪
           </Typography>
@@ -200,11 +108,7 @@ function App() {
         </Grid>
       </header>
 
-      <Drawers
-        selected={state?.selected || null}
-        handleSelected={handleSelected} 
-        handleForm={handleSubmit}
-      />
+      <Drawers />
 
       <SimpleBottomNavigation 
         tab={tab}
@@ -263,8 +167,6 @@ const Dashboard = (props) => {
       open: true,
     });
   };
-
-  console.log("Dashboard() props: ", hooks);
 
   return (
     <>

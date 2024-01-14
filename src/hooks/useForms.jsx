@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Formik, useFormik } from 'formik';
-import * as yup from 'yup';
+import { useFormik } from 'formik';
 import { 
   Box, Grid, IconButton, InputLabel, Typography
 } from '@mui/material'
@@ -9,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { useHooks } from '.'
 import { cap_first, generateFields, tryCatchHandler } from '../utilities/helpers'
+import { validationSchema } from '../utilities/validations';
 
 
 export const useForms = () => {
@@ -20,11 +20,11 @@ export const useForms = () => {
   // Handlers
   // handleSubmit handles all form submissions throughout app
   const handleSubmit = async (form) => {
-    const { actions, drawers, db} = hooks;
+    const { actions, db, drawers, globalState } = hooks;
     const { active } = drawers;
-    // TODO: pull these values from hooks.app
-    const { nutrients, muscle } = state?.selected;
-
+    const { name, nutrients, muscle } = globalState?.exercise?.selected;
+    form.name = name || form.name;
+    console.log("handleSubmit: ", form, active, globalState);
     if (nutrients) {
       // Format food submit *TODO: move to separate function
       const calculate_calories = (calories) => {
@@ -116,7 +116,6 @@ export const useForms = () => {
 };
 
 const Fields = ({ schema, form }) => {
-  // console.log("Fields: ", schema, form)
   return generateFields(schema, form)
     .map(field => (
       <Grid item xs={12} key={field.props.key}>
@@ -128,22 +127,8 @@ const Fields = ({ schema, form }) => {
     ));
 };
 
-const validationSchema = yup.object({
-  // email: yup
-  //   .string('Enter your email')
-  //   .email('Enter a valid email')
-  //   .required('Email is required'),
-  // password: yup
-  //   .string('Enter your password')
-  //   .min(8, 'Password should be of minimum 8 characters length')
-  //   .required('Password is required'),
-});
 
-export const FormContainer = ({ 
-  schema,
-  children, 
-  formFooterElements 
-}) => {
+export const FormContainer = ({ schema, children, formFooterElements }) => {
   const forms = useForms()
   const hooks = useHooks()
   const formik = useFormik({
@@ -152,10 +137,15 @@ export const FormContainer = ({
     onSubmit: forms.handleSubmit,
   });
 
-  console.log("FormContainer: ", formik)
+  // Set selected on form object to extract default values
+  formik.selected = hooks?.globalState?.exercise?.selected;
+
   return (
-    <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
-     {/* Drawer Header */}
+    <Box 
+      component="form" 
+      onSubmit={formik.handleSubmit} 
+      sx={{ width: '100%', height: '100%', overflow: 'auto' }}
+    >
       <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
         <IconButton sx={{ color: "#fff"}} onClick={hooks.actions.closeDrawers}>
           <CloseIcon />
