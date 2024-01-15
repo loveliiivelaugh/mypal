@@ -25,7 +25,7 @@ import TwoLevelPieChart from './components/charts/TwoLevelPie';
 import Drawers from './components/Drawer';
 
 // Services
-import { getCaloriesBurned, useGetFoodQuery } from './api';
+import { useGetFoodQuery } from './api';
 import { useHooks } from './hooks';
 
 // Constants
@@ -159,7 +159,9 @@ function App() {
 }
 
 const Dashboard = () => {
+  // Hooks / State
   const hooks = useHooks();
+  // Handlers
   const handleProfileClick = () => {
     hooks.actions.closeDrawers();
     hooks.actions.updateDrawers({
@@ -168,6 +170,23 @@ const Dashboard = () => {
       open: true,
     });
   };
+  // Constants
+  const mainKpis = [
+    { heading: "Base Goal",
+      value: hooks?.profile?.current_profile?.tdee,
+      icon: <SportsScoreIcon/>
+    },
+    {
+      heading: "Food",
+      value: hooks?.food?.todaysCaloriesConsumed,
+      icon: <RestaurantIcon/>
+    },
+    { 
+      heading: "Exercise",
+      value: 0,
+      icon: <WhatshotIcon/>
+    }
+  ];
 
   return (
     <>
@@ -200,22 +219,7 @@ const Dashboard = () => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Stack component={List} spacing={2}>
-                  {[
-                    { heading: "Base Goal",
-                      value: hooks?.profile?.current_profile?.tdee,
-                      icon: <SportsScoreIcon/>
-                    },
-                    {
-                      heading: "Food",
-                      value: hooks?.food?.todaysCaloriesConsumed,
-                      icon: <RestaurantIcon/>
-                    },
-                    { 
-                      heading: "Exercise",
-                      value: 0,
-                      icon: <WhatshotIcon/>
-                    }
-                  ].map((item, i) => (
+                  {mainKpis.map((item, i) => (
                     <ListItem key={item.heading}>
                       <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
                         {item.icon}

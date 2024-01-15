@@ -41,6 +41,8 @@ export const useSubmit = () => {
     // Handle selected item for food and exercise forms
     if (selected) form.name = (selected?.name || form.name);
 
+    console.log("Making db submission inside: ", form, selected)
+
     // Handle selected item for food form
     if (selected?.nutrients) {
       const { nutrients } = selected;
@@ -67,8 +69,6 @@ export const useSubmit = () => {
         })))
 
       form = {
-        name: selected?.name_translations["en" || "it"] 
-          || "No name found", 
         calories: calculate_calories(nutrients?.energy_calories_kcal),
         nutrients: formattedNutrients,
         date: form.date || new Date().toLocaleDateString(),
@@ -180,6 +180,8 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
       selectedItemName = formik?.selected?.display_name_translations["en" || "it"]
         || "Name not found";
   };
+
+  formik.selectedItemName = selectedItemName;
 
   const closeRightDrawer = () => {
     hooks.actions.handleSelected(null);
