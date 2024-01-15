@@ -31,6 +31,8 @@ miPal is an open source fitness and nutrition tracking application. It allows us
 
 * [Questions](#questions)
 
+* [ToDo](#todo)
+
 ## Dependencies
 
 ```json
@@ -123,5 +125,20 @@ This project is licensed under the MIT license.
 
 ## Tests
 
+## ToDo
 
+* [ ] Add Food data
 
+* [ ] Add Exercise data
+
+* [ ] Convert to PWA
+
+* [ ] Convert to TypeScript
+
+* [ ] Add tests
+
+* [ ] Add more data visualizations
+
+* [ ] Add more animations
+
+* [ ] Add more user settings
