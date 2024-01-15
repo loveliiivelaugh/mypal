@@ -8,7 +8,7 @@ export const exercisesSlice = createSlice({
   reducers: {
     handleSelected: (state, action) => {
       state.selected = action.payload
-    }
+    },
   },
 })
 

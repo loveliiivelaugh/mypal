@@ -1,31 +1,53 @@
-import { useState } from 'react'
-import { useFormik } from 'formik';
+// Packages
 import { 
-  Box, Grid, IconButton, InputLabel, Typography
+  Box, Grid, IconButton, InputLabel, ListItemText, Typography
 } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { useFormik } from 'formik';
 
+// Utitilities
 import { useHooks } from '.'
-import { cap_first, generateFields, tryCatchHandler } from '../utilities/helpers'
+import { 
+  cap_first, 
+  calculators, 
+  formatHeightToNumber,
+  generateFields, 
+  tryCatchHandler 
+} from '../utilities/helpers'
 import { validationSchema } from '../utilities/validations';
 
 
-export const useForms = () => {
+// Hook: useSubmit() - handles all form submissions
+export const useSubmit = () => {
+  // Hooks
   const hooks = useHooks()
-  const [state, setState] = useState({})
 
-  console.log("useForms: ", state)
-
-  // Handlers
-  // handleSubmit handles all form submissions throughout app
+  // !handleSubmit should handle all form submissions throughout app
+  // *atm does not support bottom drawer forms and auth forms*
+  // TODO: refactor to support bottom drawer forms and auth forms
   const handleSubmit = async (form) => {
     const { actions, db, drawers, globalState } = hooks;
     const { active } = drawers;
-    const { name, nutrients, muscle } = globalState?.exercise?.selected;
-    form.name = name || form.name;
-    console.log("handleSubmit: ", form, active, globalState);
-    if (nutrients) {
+    const selected = globalState?.exercise?.selected;
+    
+    // This is being handled in Supabase when data is inserted
+    // // Assign user_id to all form submissions
+    // form.user_id = parseInt(hooks?.user_id);
+
+    // Handle profile form -- No selected item
+    if ((active === "profile") || !selected) {
+      form.bmr = calculators.bmr(form);
+      form.tdee = calculators.tdee(form);
+      // form.height = formatHeightToNumber(form.height);
+    };
+
+    // Handle selected item for food and exercise forms
+    if (selected) form.name = (selected?.name || form.name);
+
+    // Handle selected item for food form
+    if (selected?.nutrients) {
+      const { nutrients } = selected;
       // Format food submit *TODO: move to separate function
       const calculate_calories = (calories) => {
         const servingSize = parseInt(form.serving_size);
@@ -34,6 +56,7 @@ export const useForms = () => {
           ? servingSize
           : 1;
 
+          // PEMDAS -- order of operations 🤓
         return ((calories * serving) * numServings);
       };
       
@@ -41,18 +64,16 @@ export const useForms = () => {
         {}, 
         ...Object
           .keys(nutrients)
-          .map(nutrient => ({ 
-            [nutrient]: nutrients[nutrient]?.per_hundred, 
+          .map(nutrient => ({
+            [nutrient]: (nutrients[nutrient]?.per_hundred 
+              || nutrients[nutrient]?.per_portion), 
             unit: nutrients[nutrient]?.unit 
         })))
 
-      if (active === "food") form = {
-        name: state.selected?.name_translations["en" || "it"] 
-          || "No name/english translation found", 
-        calories: calculate_calories(
-          nutrients?.energy_calories_kcal?.per_hundred
-          || nutrients?.energy_calories_kcal?.per_portion
-        ),
+      form = {
+        name: selected?.name_translations["en" || "it"] 
+          || "No name found", 
+        calories: calculate_calories(nutrients?.energy_calories_kcal),
         nutrients: formattedNutrients,
         date: form.date || new Date().toLocaleDateString(),
         time: form.time || new Date().toLocaleTimeString(),
@@ -61,18 +82,17 @@ export const useForms = () => {
       // --- END Format food submit *TODO: move to separate function ---
     };
 
-    if (muscle) {
-      console.log("if muscle", state, form);
-      
+    // Handle selected item for exercise form
+    if (selected?.muscle) {
       // Format exercise submit *TODO: move to separate function
       const formattedExercise = {
         date: form.date || new Date().toLocaleDateString(),
         time: form.time || new Date().toLocaleTimeString(),
-        ...state.selected,
+        ...selected,
         ...form,
       };
 
-      // // Get calories burned
+      // // Get calories burned -- not working very well
       // API call to get calories burned -- not working very well
       // const { name, weight, duration } = formattedExercise;
       // formattedExercise.caloriesBurned = await getCaloriesBurned({
@@ -81,38 +101,51 @@ export const useForms = () => {
       //   exercise: name
       // });
 
-      console.log("caloriesBurned", formattedExercise);
-
       form = formattedExercise;
       // --- END Format exercise submit *TODO: move to separate function ---
-    }
+    };
 
+    console.log("Making db submission: ", form)
+    // Make request to database to save form data
     const [response, error] = await tryCatchHandler(
-      () => db.add(active, form), 
+      // try
       () => {
-        actions.closeDrawers();
-        actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
-        actions.updateDrawers({ ...drawers, anchor: "bottom" });
+        if (active === "profile" && hooks.profile) 
+          db.update(active, hooks.profile.current_profile.id, form);
+        else db.add(active, form);
+      }, 
+      // finally
+      () => {
+        // Refecth data -- pretty sure there is an option to refetch on mutation
+        // TODO: look into refetch on mutation and refactor to remove this
+        ({
+          food: () => hooks.food.refetch(),
+          exercise: () => hooks.exercise.refetch(),
+          weight: () => hooks.weight.refetch(),
+          profile: () => hooks.profile.refetch(),
+        }[active])();
+
+        // Clear selected item
+        hooks.actions.handleSelected(null);
+
+        // Handle Drawers accordingly
+        if (active !== "profile" || !selected) actions.closeDrawers();
+        else actions.updateDrawers({ 
+          ...drawers, 
+          anchor: "bottom"
+        });
+        
       })
 
-    if (error || response.error) actions.createAlert("error", response.error?.message);
-
-    // refecth data
-    ({
-      food: () => hooks.food.refetch(),
-      exercise: () => hooks.exercise.refetch(),
-      weight: () => hooks.weight.refetch(),
-      profile: () => hooks.profile.refetch(),
-    }[active])();
+    // Handle errors
+    if (error || response.error) actions.createAlert("error", response.error?.message)
+    // Trigger alerts
+    else actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
   };
 
   
-  // Return all functions and state to be used in components
-  return { 
-    formState: state,
-    setFormState: setState,
-    handleSubmit,
-  };
+  // Return submit handler
+  return { handleSubmit };
 };
 
 const Fields = ({ schema, form }) => {
@@ -129,16 +162,34 @@ const Fields = ({ schema, form }) => {
 
 
 export const FormContainer = ({ schema, children, formFooterElements }) => {
-  const forms = useForms()
+  // Hooks / State
+  const { handleSubmit } = useSubmit()
   const hooks = useHooks()
   const formik = useFormik({
     initialValues: {},
     validationSchema: validationSchema,
-    onSubmit: forms.handleSubmit,
+    onSubmit: handleSubmit,
   });
 
-  // Set selected on form object to extract default values
+  // Set current selection on form object to extract default values
   formik.selected = hooks?.globalState?.exercise?.selected;
+
+  // Extract Selected Item Name to display in form header
+  let selectedItemName;
+  if (formik?.selected) {
+    // When selected is an exercise
+    if (formik?.selected?.name) selectedItemName = formik?.selected?.name;
+    // When selected is a meal
+    if (formik?.selected?.display_name_translations) 
+      selectedItemName = formik?.selected?.display_name_translations["en" || "it"]
+        || "Name not found";
+  };
+
+  const closeRightDrawer = () => {
+    hooks.actions.handleSelected(null);
+    hooks.actions.closeDrawers();
+    hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+  };
 
   return (
     <Box 
@@ -146,8 +197,9 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
       onSubmit={formik.handleSubmit} 
       sx={{ width: '100%', height: '100%', overflow: 'auto' }}
     >
+      {/* Universal Drawer Header */}
       <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-        <IconButton sx={{ color: "#fff"}} onClick={hooks.actions.closeDrawers}>
+        <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
           <CloseIcon />
         </IconButton>
         <Typography variant="h6" component="p" gutterBottom>
@@ -157,7 +209,10 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
           <CheckIcon />
         </IconButton>
       </Box>
-      <Grid container spacing={2}>
+
+      {/* Dynamic Form Section */}
+      <Grid container spacing={2} p={4}>
+        <ListItemText primary={selectedItemName} secondary={selectedItemName} />
         <Fields schema={schema} form={formik} />
       </Grid>
       {children}

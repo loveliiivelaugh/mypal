@@ -118,7 +118,7 @@ export const useAuth = () => {
 
     // Cleanup
     return () => {
-      // listener?.unsubscribe();
+      listener?.unsubscribe();
     };
   }, []);
 
@@ -131,9 +131,10 @@ export const useHooks = () => {
   const responsive = useResponsive();
   const globalState = useSelector(state => state);
   const auth = useGetSessionQuery();
+  const food = useGetAllQuery("food");
   const weight = useGetAllQuery("weight");
   const exercise = useGetAllQuery("exercise");
-  const food = useGetAllQuery("food");
+  const steps = useGetAllQuery("steps");
   const profile = useGetAllQuery("profile");
   const [addToDb, addToDbResult] = useAddMutation();
   const [login, loginResult] = useLoginMutation();
@@ -155,6 +156,12 @@ export const useHooks = () => {
       (item.user_id === user_id) && (item.date === new Date().toISOString().slice(0, 10))
     ));
 
+  console.log("todaysCaloriesConsumed: ", todaysCaloriesConsumed)
+
+  steps.todaysSteps = steps?.data 
+    ? steps?.data.reduce((total, steps) => total + steps.value, 0)
+    : 0;
+
   const calculateTotalCalories = (foodArray = []) => {
     // Use the reduce function to sum up the 'calories' property of each object
     const totalCalories = foodArray.reduce((total, food) => total + food.calories, 0);
@@ -175,9 +182,10 @@ export const useHooks = () => {
     auth, 
     globalState,
     responsive,
-    profile: current_profile, 
+    profile: { ...profile, current_profile }, 
     weight, 
-    exercise, 
+    exercise,
+    steps,
     food, 
     actions,
     db: dbApi,

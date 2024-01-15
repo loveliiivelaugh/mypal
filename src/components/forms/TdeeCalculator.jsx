@@ -1,51 +1,12 @@
-import { useState } from 'react'
-import { 
-  Button, Grid, InputLabel, MenuItem, Select, TextField, Toolbar, Typography 
-} from '@mui/material'
-
-import { 
-  calculators, 
-  formatHeightToNumber, 
-  tryCatchHandler 
-} from '../../utilities/helpers'
-import { dbApi } from '../../api'
-import { useHooks } from '../../hooks'
-import { buildFields, profile_schema } from '../../db/schemas'
+// Packages
+import { Grid, Toolbar, Typography } from '@mui/material'
+// Components
 import { FormContainer } from '../../hooks/useForms'
+// Utilities
+import { profile_schema } from '../../db/schemas'
 
 
-const TdeeCalculator = (props) => {
-  const hooks = useHooks();
-  const all_fields = buildFields(profile_schema)
-  const include_fields = ['age', 'height', 'weight', 'goal', 'exercise'];
-  const fields = all_fields
-    .filter(field => include_fields.includes(field.name))
-
-  const [formState, setFormState] = useState(
-    Object.assign(
-      {}, 
-      ...fields.map(field => ({ [field.name]: field.defaultValue }))
-    )
-  );
-
-  // TODO: This needs to be added to the dynamic submit handler
-  const handleSubmit = async () => {
-    formState.user_id = hooks.user_id;
-    formState.bmr = calculators.bmr(formState);
-    formState.tdee = calculators.tdee(formState);
-    formState.height = formatHeightToNumber(formState.height);
-  
-
-    const [response, error] = await tryCatchHandler(
-      () => dbApi.add("profile", [formState])
-    );
-
-    if (response.error) {
-      const { code, message, details } = response.error;
-      hooks.actions.createAlert("error", `Error Code: ${code}\n${message}\n ${details}`)
-    }
-  };
-
+const TdeeCalculator = () => {
   return (
     <Grid container p={4}>
       <Grid item xs={12}>
@@ -83,11 +44,6 @@ const TdeeCalculator = (props) => {
       </Grid>
       <Toolbar />
       <FormContainer schema={profile_schema} />
-      <Grid item xs={12} my={1}>
-        <Button variant="contained" fullWidth onClick={handleSubmit}>
-          Submit
-        </Button>
-      </Grid>
     </Grid>
   )
 }

@@ -31,10 +31,11 @@ const formatHeightToNumber = (height) => {
 
 const calculators = {
   bmr: ({ age, height, weight }) => {
-    const bmr = (88.362 + (13.397 * parseInt(weight)) + (4.799 * formatHeightToNumber(height)) - (5.677 * parseInt(age)));
+    const bmr = (88.362 + (13.397 * parseInt(weight)) + (4.799 * height) - (5.677 * parseInt(age)));
     return parseInt(bmr);
   },
   tdee: (params) => {
+    console.log("calculators.tdee(): ", params)
     const { exercise, goal } = params;
     const tdee = (calculators.bmr(params) * exercise + goal);
     return parseInt(tdee);
@@ -56,25 +57,30 @@ const formatDataTypes = (type) => ({
 
 const generateFields = (schema, form) => {
   console.log("generateFields(): ", schema, form)
+
   // destructure name from form
-  const { name, display_name_translations } = form?.selected;
-  let defaultValue = "";
-  if (name) defaultValue = name; // When selected is an exercise
-  // When selected is a meal
-  if (display_name_translations) defaultValue = display_name_translations["en" || "it"];
+  let defaultValue;
+  if (form?.selected) {
+    const { name, display_name_translations } = form?.selected;
+    if (name) defaultValue = name; // When selected is an exercise
+    if (display_name_translations) // When selected is a meal
+      defaultValue = display_name_translations["en" || "it"] || "Name not found";
+  };
 
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
-    .map((field) => (field.column_name !== "id") && ({
-      label: cap_first(field.column_name),
-      type: formatDataTypes(field.data_type),
-      name: field.column_name,
-      defaultValue: defaultValue ? defaultValue : field.column_default,
-      helperText: `Enter your ${field.column_name}`,
-      required: false,
-      onChange: form.handleChange,
-      ...(field.options && { options: field.options })
-    })
+    .map((field) => ((field.column_name !== "id") && !field.hidden) 
+      && ({
+        label: cap_first(field.column_name).replace("_", " "),
+        type: formatDataTypes(field.data_type),
+        name: field.column_name,
+        defaultValue: defaultValue ? defaultValue : field.column_default,
+        helperText: `Enter your ${field.column_name}`,
+        required: false,
+        onChange: form.handleChange,
+        hidden: field.hidden || false,
+        ...(field.options && { options: field.options })
+      })
   ).filter(field => field) // filter out undefined values
 
   // Build field elements from fields object
@@ -83,12 +89,21 @@ const generateFields = (schema, form) => {
 
 const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsObject
   .map((field) => {
+
+    // Destructure field object
     const {
-      name, type, label, helperText, defaultValue, options = [] 
+      name, 
+      type, 
+      label, 
+      helperText, 
+      defaultValue, 
+      hidden, 
+      // if options doesnt have a value set it to an empty array
+      options = [] 
     } = field;
 
     // Define common properties for all fields
-    const FieldProps = {
+    const commonProperties = {
       key: name,
       id: name,
       value: formState[name],
@@ -98,39 +113,45 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       helperText,
       defaultValue,
       onChange: formState.handleChange,
+      sx: { hidden }
     };
 
-    const TextFieldProps = {
-      ...FieldProps,
-      // variant: "outlined",
-      // fullWidth: true,
-      // margin: "normal",
-    };
-
-    const SelectProps = {
-      ...FieldProps,
-      // variant: "outlined",
-      // fullWidth: true,
-      // margin: "normal",
-      options,
-      SelectProps: {
-        native: true,
+    // Define properties specific to the field type
+    const FieldsProps = {
+      TextField: {...commonProperties },
+      Select: {
+        ...commonProperties,
+        options,
+        SelectProps: {
+          native: true,
+        },
+      },
+      Date: {
+        ...commonProperties,
+        value: new Date(field.value).toLocaleDateString(),
+        placeholder: new Date().toLocaleDateString(),
+      },
+      Time: {
+        ...commonProperties,
+        value: new Date(field.value).toLocaleTimeString(),
+        placeholder: new Date().toLocaleTimeString(),
+      },
+      Json: {
+        ...commonProperties,
+        value: JSON.stringify(field.value),
+        type: "text",
+        multiline: true,
+        minRows: 4,
       },
     };
 
-    const DateProps = {
-      ...FieldProps,
-      value: '', // TODO: Fix this -- throwing error w/defaultValue
-      placeholder: new Date().toLocaleDateString(),
-    }
-
     return ({
-      text: <TextField {...TextFieldProps} />,
-      number: <TextField {...TextFieldProps} />,
-      date: <BasicDatePicker {...DateProps} />,
-      time: <BasicDatePicker {...DateProps} />,
-      select: <SelectWrapper {...SelectProps} />,
-      json: <TextField {...TextFieldProps} />,
+      text: <TextField {...FieldsProps.TextField} />,
+      number: <TextField {...FieldsProps.TextField} />,
+      date: <BasicDatePicker {...FieldsProps.Date} />,
+      time: <BasicDatePicker {...FieldsProps.Time} />,
+      select: <SelectWrapper {...FieldsProps.Select} />,
+      json: <TextField {...FieldsProps.Json} />,
     }[type])
   });
 

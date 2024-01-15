@@ -4,11 +4,13 @@ import {
   Autocomplete, Box, Button, Grid,
   InputAdornment, IconButton, Typography,
   Chip, TextField, Tab, Tabs, Stack,
-  List, ListItem, ListItemText, 
+  List, ListItem, ListItemText, ListItemButton,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 // Hooks
 import { useHooks } from '../../hooks';
@@ -96,7 +98,7 @@ const BottomExerciseDrawer = (props) => {
       <Grid id="exercise-history-container" container>
         <Grid item xs={12} sm={12} sx={{ p: 2}}>
           <Tabs>
-            {tabs.map(tab => <Tab key={`${tab}_tab`} label={tab} />)}
+            {tabs.map(tab => <Tab key={`${tab}_tab`} label={tab} value={tab} />)}
           </Tabs>
         </Grid>
         
@@ -107,14 +109,22 @@ const BottomExerciseDrawer = (props) => {
           </Box>
           <List id="exercise-history-list">
             {hooks.exercise.data.map(exercise => (
-              <ListItem key={`${exercise.id}`}>
+              <ListItem key={`${exercise.id}`} component={ListItemButton} onClick={() => handleSelectedExercise(exercise)}>
                 <ListItemText primary={exercise.name} secondary={exerciseHistory.formatSetsArrayToString([exercise.sets, exercise.reps, exercise.weight])} />
+                <Box>
+                  <IconButton onClick={() => handleSelectedExercise(exercise)}>
+                    <AddIcon />
+                  </IconButton>
+                  <IconButton onClick={() => hooks.dbApi.delete("exercise", exercise.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </ListItem>
             ))}
           </List>
         </Grid>
         <Grid item xs={12} sm={12} sx={{ p: 2}}>
-          <Button variant="outlined" fullWidth onClick={() => {}} sx={{ color: "#fff" }}>
+          <Button variant="outlined" fullWidth onClick={() => hooks.actions.updateDrawers({ active: 'exercise', anchor: 'right', open: true })} sx={{ color: "#fff" }}>
             Create a New Exercise
           </Button>
         </Grid>

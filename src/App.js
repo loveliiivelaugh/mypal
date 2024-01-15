@@ -31,9 +31,6 @@ import { useHooks } from './hooks';
 // Constants
 import { mock_recentFoods } from './utilities/constants';
 
-// Utilities
-import { cap_first, tryCatchHandler } from './utilities/helpers'
-
 // Styles
 import './App.css';
 
@@ -57,6 +54,8 @@ function App() {
   let [state, setState] = useState(initialState);
   const { tab } = state;
 
+  console.log("App(): ", hooks);
+
   // Handlers
   // handleChange handles all input changes throughout app
   const handleChange = (event) => {
@@ -74,11 +73,8 @@ function App() {
       open: true,
     });
   
-  // Render
-  const tabProps = { dashboard: {}};
-
   const renderTab = (tab) => ({
-    0: <Dashboard {...tabProps.dashboard} />,
+    0: <Dashboard />,
     1: <LogFood />,
     2: <NewsFeed />,
     3: <Plans />,
@@ -157,7 +153,7 @@ function App() {
   );
 }
 
-const Dashboard = (props) => {
+const Dashboard = () => {
   const hooks = useHooks();
   const handleProfileClick = () => {
     hooks.actions.closeDrawers();
@@ -201,7 +197,7 @@ const Dashboard = (props) => {
                   <Stack component={List} spacing={2}>
                   {[
                     { heading: "Base Goal",
-                      value: hooks?.profile?.tdee,
+                      value: hooks?.profile?.current_profile?.tdee,
                       icon: <SportsScoreIcon/>
                     },
                     {
@@ -240,7 +236,7 @@ const Dashboard = (props) => {
                     Steps
                   </Typography>
                   <IconButton sx={{ color: "#fff" }}>
-                    <HikingIcon /> {' '} 394
+                    <HikingIcon /> {` ${hooks?.steps?.todaysSteps}`} 
                   </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                     Goal: 10,000 steps
