@@ -51,7 +51,7 @@ const initialState = {
 function App() {
   // State / Hooks
   const hooks = useHooks();
-  let [state, setState] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const { tab } = state;
 
   console.log("App(): ", hooks);
@@ -85,6 +85,8 @@ function App() {
   return (
     <>
       <CssBaseline />
+
+      {/* NavBar */}
       <AppBar position="static">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Avatar alt="A" src="/static/images/avatar/1.jpg" />
@@ -98,17 +100,20 @@ function App() {
         </Toolbar>
       </AppBar>
 
+      {/* Main */}
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
         </Grid>
       </header>
 
+      {/* Dynamic All Drawers */}
       <Drawers />
 
+      {/* Bottom Navigation */}
       <SimpleBottomNavigation 
-        tab={tab}
-        setTab={value => setState({ ...state, tab: value  })}
+        // tab={tab}
+        // setTab={value => setState({ ...state, tab: value  })}
         extraContent={
           <Grid item xs={12} sm={12} p={2}>
             <Box component="form" onClick={handleFocus}> 
@@ -143,12 +148,12 @@ function App() {
                   />
                 )}
               />
-              {/* <button type="submit">Submit</button> */}
             </Box>
           </Grid>
         }
-        // ...props
       />
+
+
     </>
   );
 }

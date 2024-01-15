@@ -21,8 +21,8 @@ export default function SimpleBottomNavigation(props) {
       {props?.extraContent && props.extraContent}
       <BottomNavigation
         showLabels
-        value={props.tab}
-        onChange={(event, newValue) => props.setTab(newValue)}
+        // value={props.tab}
+        // onChange={(event, newValue) => props.setTab(newValue)}
         sx={{ backgroundColor: 'rgba(80, 170, 255, 1)', color: '#fff' }}
       >
       {Object

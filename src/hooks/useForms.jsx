@@ -30,10 +30,6 @@ export const useSubmit = () => {
     const { actions, db, drawers, globalState } = hooks;
     const { active } = drawers;
     const selected = globalState?.exercise?.selected;
-    
-    // This is being handled in Supabase when data is inserted
-    // // Assign user_id to all form submissions
-    // form.user_id = parseInt(hooks?.user_id);
 
     // Handle profile form -- No selected item
     if ((active === "profile") || !selected) {
@@ -93,7 +89,7 @@ export const useSubmit = () => {
       };
 
       // // Get calories burned -- not working very well
-      // API call to get calories burned -- not working very well
+      // API call to get calories burned -- API not working very well
       // const { name, weight, duration } = formattedExercise;
       // formattedExercise.caloriesBurned = await getCaloriesBurned({
       //   weight,

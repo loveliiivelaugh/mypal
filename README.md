@@ -74,15 +74,19 @@ cd mypal
 npm install
 ```
 
-Add a .env file to the root directory with the following variables:
-(An example of this can be found in the .env.example file)
+Add a `.env` file to the root directory with the following variables:
+(An example of this can be found in the `.env.example` file)
 
 ```code
 cp .env.example .env
 ```
 
-Add your Supabase URL and Anon Key to the .env file.
-Also add the RapidAPI hosts and keys found in the .env.example file.
+This project uses Supabase for the database and authentication.
+The Supabase URL and Anon Key can be found in the Supabase project settings.
+The table definitions can be found in `./src/db/tables.sql`.
+Create the tables in your Supabase project using the SQL definitions.
+Add your Supabase URL and Anon Key to the `.env` file.
+Also add the RapidAPI hosts and keys found in the `.env.example` file.
 
 ```code
 REACT_APP_SUPABASE_URL=your_supabase_url
