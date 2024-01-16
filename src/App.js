@@ -25,7 +25,7 @@ import TwoLevelPieChart from './components/charts/TwoLevelPie';
 import Drawers from './components/Drawer';
 
 // Services
-import { getCaloriesBurned, useGetFoodQuery } from './api';
+import { useGetFoodQuery } from './api';
 import { useHooks } from './hooks';
 
 // Constants
@@ -52,7 +52,7 @@ const initialState = {
 function App() {
   // State / Hooks
   const hooks = useHooks();
-  let [state, setState] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const { tab } = state;
 
   console.log("App(): ", hooks);
@@ -87,16 +87,18 @@ function App() {
     <>
       <CssBaseline />
       <NavBar heading="Open Fitness 💪" />
+      {/* Main */}
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
         </Grid>
       </header>
+      {/* Dynamic All Drawers */}
       <Drawers />
-
+      {/* Bottom Navigation */}
       <SimpleBottomNavigation 
-        tab={tab}
-        setTab={value => setState({ ...state, tab: value  })}
+        // tab={tab}
+        // setTab={value => setState({ ...state, tab: value  })}
         extraContent={
           <Grid item xs={12} sm={12} p={2}>
             <Box component="form" onClick={handleFocus}> 
@@ -131,18 +133,18 @@ function App() {
                   />
                 )}
               />
-              {/* <button type="submit">Submit</button> */}
             </Box>
           </Grid>
         }
-        // ...props
       />
     </>
   );
 }
 
 const Dashboard = () => {
+  // Hooks / State
   const hooks = useHooks();
+  // Handlers
   const handleProfileClick = () => {
     hooks.actions.closeDrawers();
     hooks.actions.updateDrawers({
@@ -151,6 +153,23 @@ const Dashboard = () => {
       open: true,
     });
   };
+  // Constants
+  const mainKpis = [
+    { heading: "Base Goal",
+      value: hooks?.profile?.current_profile?.tdee,
+      icon: <SportsScoreIcon/>
+    },
+    {
+      heading: "Food",
+      value: hooks?.food?.todaysCaloriesConsumed,
+      icon: <RestaurantIcon/>
+    },
+    { 
+      heading: "Exercise",
+      value: 0,
+      icon: <WhatshotIcon/>
+    }
+  ];
 
   return (
     <>
@@ -183,22 +202,7 @@ const Dashboard = () => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Stack component={List} spacing={2}>
-                  {[
-                    { heading: "Base Goal",
-                      value: hooks?.profile?.current_profile?.tdee,
-                      icon: <SportsScoreIcon/>
-                    },
-                    {
-                      heading: "Food",
-                      value: hooks?.food?.todaysCaloriesConsumed,
-                      icon: <RestaurantIcon/>
-                    },
-                    { 
-                      heading: "Exercise",
-                      value: 0,
-                      icon: <WhatshotIcon/>
-                    }
-                  ].map((item, i) => (
+                  {mainKpis.map((item, i) => (
                     <ListItem key={item.heading}>
                       <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
                         {item.icon}
