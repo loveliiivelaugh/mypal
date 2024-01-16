@@ -30,10 +30,6 @@ export const useSubmit = () => {
     const { actions, db, drawers, globalState } = hooks;
     const { active } = drawers;
     const selected = globalState?.exercise?.selected;
-    
-    // This is being handled in Supabase when data is inserted
-    // // Assign user_id to all form submissions
-    // form.user_id = parseInt(hooks?.user_id);
 
     // Handle profile form -- No selected item
     if ((active === "profile") || !selected) {
@@ -44,6 +40,8 @@ export const useSubmit = () => {
 
     // Handle selected item for food and exercise forms
     if (selected) form.name = (selected?.name || form.name);
+
+    console.log("Making db submission inside: ", form, selected)
 
     // Handle selected item for food form
     if (selected?.nutrients) {
@@ -71,8 +69,6 @@ export const useSubmit = () => {
         })))
 
       form = {
-        name: selected?.name_translations["en" || "it"] 
-          || "No name found", 
         calories: calculate_calories(nutrients?.energy_calories_kcal),
         nutrients: formattedNutrients,
         date: form.date || new Date().toLocaleDateString(),
@@ -93,7 +89,7 @@ export const useSubmit = () => {
       };
 
       // // Get calories burned -- not working very well
-      // API call to get calories burned -- not working very well
+      // API call to get calories burned -- API not working very well
       // const { name, weight, duration } = formattedExercise;
       // formattedExercise.caloriesBurned = await getCaloriesBurned({
       //   weight,
@@ -185,10 +181,13 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
         || "Name not found";
   };
 
+  formik.selectedItemName = selectedItemName;
+
   const closeRightDrawer = () => {
     hooks.actions.handleSelected(null);
     hooks.actions.closeDrawers();
-    hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+    if (hooks.drawers.active === "profile") hooks.actions.closeDrawers();
+    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
   };
 
   return (
