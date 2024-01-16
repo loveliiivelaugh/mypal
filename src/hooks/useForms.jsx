@@ -136,7 +136,7 @@ export const useSubmit = () => {
     // Handle errors
     if (error || response.error) actions.createAlert("error", response.error?.message)
     // Trigger alerts
-    else actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
+    if (!error) actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
   };
 
   
@@ -167,6 +167,7 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
     onSubmit: handleSubmit,
   });
 
+  console.log("Right drawer opened: Last attempt muscle group image: ", hooks)
   // Set current selection on form object to extract default values
   formik.selected = hooks?.globalState?.exercise?.selected;
 
@@ -174,7 +175,10 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
   let selectedItemName;
   if (formik?.selected) {
     // When selected is an exercise
-    if (formik?.selected?.name) selectedItemName = formik?.selected?.name;
+    if (formik?.selected?.name) {
+      selectedItemName = formik?.selected?.name;
+      // // Get muscle group image
+    }
     // When selected is a meal
     if (formik?.selected?.display_name_translations) 
       selectedItemName = formik?.selected?.display_name_translations["en" || "it"]

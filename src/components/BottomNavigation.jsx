@@ -1,10 +1,16 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+// Packages
+import { useState } from 'react';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import {
+  Box, BottomNavigation, BottomNavigationAction, Grid, IconButton, InputAdornment, TextField, Autocomplete
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+
+// Services
+import { useHooks } from '../hooks';
 
 
 const items = {
@@ -16,9 +22,68 @@ const items = {
 };
 
 export default function SimpleBottomNavigation(props) {
+  // State / Hooks
+  const hooks = useHooks();
+  const [state, setState] = useState({});
+  // Handlers
+  const handleChange = (event) => {
+    // if input type is text field
+    if (event?.target) setState({ 
+      ...state, 
+      [event.target.id]: event.target.value 
+    });
+    // if input type is date field
+    if (event?.date) setState({ 
+      ...state, 
+      date: new Date(event).toLocaleDateString() 
+    });
+  };
+  
+  const handleFocus = () => hooks
+    .actions
+    .updateDrawers({
+      active: "food",
+      anchor: "bottom",
+      open: true,
+    });
+
   return (
     <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)' }}>
-      {props?.extraContent && props.extraContent}
+      <Grid item xs={12} sm={12} p={2}>
+        <Box component="form" onClick={handleFocus}> 
+          <Autocomplete
+            options={[]}
+            sx={{ p: 0, borderRadius: 8, backgroundColor: "rgba(33,33,33,0.8)", color: "#fff" }}
+            renderInput={(params) => (
+              <TextField
+                type="text"
+                ref={params.InputProps.ref}
+                {...params.inputProps}
+                value={state.exerciseName}
+                placeholder="Search for a food"
+                onChange={handleChange}
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                        <QrCodeScannerIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Grid>
       <BottomNavigation
         showLabels
         // value={props.tab}

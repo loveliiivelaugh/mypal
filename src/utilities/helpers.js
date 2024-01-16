@@ -56,7 +56,7 @@ const formatDataTypes = (type) => ({
 }[type]) || "text";
 
 const generateFields = (schema, form) => {
-  console.log("generateFields(): ", schema, form)
+  // console.log("generateFields(): ", schema, form)
 
   // destructure name from form
   let defaultValue;
@@ -69,19 +69,33 @@ const generateFields = (schema, form) => {
 
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
-    .map((field) => ((field.column_name !== "id") && !field.hidden) 
-      && ({
-        label: cap_first(field.column_name).replace("_", " "),
-        type: formatDataTypes(field.data_type),
-        name: field.column_name,
-        defaultValue: defaultValue ? defaultValue : field.column_default,
-        helperText: `Enter your ${field.column_name}`,
-        required: false,
-        onChange: form.handleChange,
-        hidden: field.hidden || false,
-        ...(field.options && { options: field.options })
-      })
-  ).filter(field => field) // filter out undefined values
+    .map((field) => {
+      
+      if ((field.column_name !== "id") && !field.hidden) {
+
+        defaultValue = (defaultValue && (field.column_name === "name")) 
+          ? defaultValue 
+          : field.column_default
+
+        // form.handleChange({ // dont know if we need this
+        //   target: { id: field.name, value: defaultValue } 
+        // });
+        form.values[field.column_name] = defaultValue;
+
+        return ({
+          label: cap_first(field.column_name).replace("_", " "),
+          type: formatDataTypes(field.data_type),
+          name: field.column_name,
+          defaultValue,
+          helperText: `Enter your ${field.column_name}`,
+          required: false,
+          onChange: form.handleChange,
+          hidden: field.hidden || false,
+          ...(field.options && { options: field.options })
+        })
+      } // end if statement
+
+    }).filter(field => field); // filter out undefined values
 
   // Build field elements from fields object
   return buildFieldElementsFromFieldsObject(fieldsObjectFromSchema, form);
