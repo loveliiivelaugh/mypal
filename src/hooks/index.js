@@ -146,9 +146,12 @@ export const useHooks = () => {
   
   // Destructuring and formatting for ease of use throughout the app
   let user_id = auth?.data?.session?.user?.id;
+  console.log("Is user_id changing when auth changes? ", user_id)
+  let user_email = auth?.data?.session?.user?.email;
   // Update this line to use a SQL query instead with the related tables ...
   // ... data: (user_id: exercises, foods, weight, profile)
   let current_profile = profile?.data?.find((item) => item.user_id === user_id);
+  
   // Need to update this to separate drawers into its own slice
   let drawers = globalState?.alerts?.drawers;
   let todaysCaloriesConsumed = food?.data
@@ -175,7 +178,7 @@ export const useHooks = () => {
   // Authentication Methods
   const methods = { login, logout, signup, resetPassword, loginWithOtp };
   auth.methods = methods;
-
+  auth.email = user_email;
 
   return {
     user_id,
