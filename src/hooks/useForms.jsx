@@ -186,7 +186,8 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
   const closeRightDrawer = () => {
     hooks.actions.handleSelected(null);
     hooks.actions.closeDrawers();
-    hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+    if (hooks.drawers.active === "profile") hooks.actions.closeDrawers();
+    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
   };
 
   return (
