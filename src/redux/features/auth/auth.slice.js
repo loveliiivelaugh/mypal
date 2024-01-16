@@ -14,9 +14,19 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher(supabaseApi.endpoints.getSession.matchFulfilled, (state, action) => {
-        state.session = action.payload.session
-      })
+      .addMatcher(
+        supabaseApi.endpoints.getSession.matchFulfilled, 
+        (state, action) => {
+          state.session = action.payload.session;
+        }
+      )
+      .addMatcher(
+        supabaseApi.endpoints.logout.matchFulfilled, 
+        (state) => {
+          state = authSlice.getInitialState();
+        }
+      )
+
   },
 })
 

@@ -1,12 +1,12 @@
 // Packages
 import { useState, useEffect } from 'react'
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { IconButton } from '@mui/material'
+import { Box, IconButton, Tooltip } from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
+import LogoutIcon from '@mui/icons-material/Logout'
 
-import { supabase } from '../db'
+// Utilities
 import { useHooks } from '../hooks'
+import { supabase } from '../db'
 
 
 export default function Login() {
@@ -35,10 +35,21 @@ export default function Login() {
   // Render
   // <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
   if (!session) return (
-    <IconButton onClick={() => hooks.actions.updateDrawers({ active: "auth", anchor: "right", open: true })}>
-      <LoginIcon />
-    </IconButton>
+    <Tooltip title="Login">
+      <IconButton onClick={() => hooks.actions.updateDrawers({ active: "auth", anchor: "right", open: true })} sx={{ color: "#fff"}}>
+        <LoginIcon />
+      </IconButton>
+    </Tooltip>
   )
-  else return ( <div>Logged in!</div> )
+  else return (
+    <Box sx={{ color: "#fff" }}>
+      {hooks.auth.email}
+      <Tooltip title="Logout">
+        <IconButton onClick={() => hooks.actions.updateDrawers({ active: "auth", anchor: "right", open: true })} sx={{ color: "#fff" }}>
+          <LogoutIcon />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  )
 
 }

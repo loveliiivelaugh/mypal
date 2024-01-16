@@ -33,6 +33,7 @@ import { mock_recentFoods } from './utilities/constants';
 
 // Styles
 import './App.css';
+import { NavBar } from './components/layout';
 
 
 const initialState = {
@@ -85,25 +86,12 @@ function App() {
   return (
     <>
       <CssBaseline />
-      <AppBar position="static">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Avatar alt="A" src="/static/images/avatar/1.jpg" />
-          <Typography variant="h5" component="h5">
-            Open Fitness 💪
-          </Typography>
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Login />
-            <Notifications />
-          </Box>
-        </Toolbar>
-      </AppBar>
-
+      <NavBar heading="Open Fitness 💪" />
       <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
         </Grid>
       </header>
-
       <Drawers />
 
       <SimpleBottomNavigation 
