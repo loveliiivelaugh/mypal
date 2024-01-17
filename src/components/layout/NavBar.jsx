@@ -2,7 +2,7 @@ import React from 'react'
 import { AppBar, Avatar, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
-import Login from '../Login'
+import Login from '../forms/Login'
 
 
 const NavBar = (props) => {

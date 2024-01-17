@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 // Services
-import { useHooks } from '../hooks';
+import { useHooks } from '../../hooks';
 
 
 const items = {

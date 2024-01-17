@@ -1,6 +1,7 @@
 // Packages / Imports
-import { MenuItem, Select, TextField } from '@mui/material'
-import BasicDatePicker from '../components/BasicDatePicker';
+import { Box, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material'
+import AttachmentIcon from '@mui/icons-material/Attachment';
+import { BasicDatePicker } from '../components/forms';
 
 
 // Utilities
@@ -166,8 +167,21 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       time: <BasicDatePicker {...FieldsProps.Time} />,
       select: <SelectWrapper {...FieldsProps.Select} />,
       json: <TextField {...FieldsProps.Json} />,
+      attachment: <Attachment />,
     }[type])
   });
+
+const Attachment = () => (
+  <Box sx={{}}>
+    <Typography id="demo-simple-select-label" variant="body1">
+      Progress Photo
+    </Typography>
+    <IconButton p={1}>
+      <AttachmentIcon />
+      <attachment />
+    </IconButton>
+  </Box>
+);
 
 const SelectWrapper = (props) => (
   <Select {...props}>

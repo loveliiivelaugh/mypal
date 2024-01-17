@@ -3,14 +3,9 @@ import { useState } from 'react';
 import { CssBaseline, Grid } from '@mui/material';
 
 // Components
-import Dashboard from './components/pages/Dashboard';
-import LogFood from './components/pages/LogFood';
-import NewsFeed from './components/pages/NewsFeed';
-import Plans from './components/pages/Plans';
-import Profile from './components/pages/Profile';
-import { NavBar } from './components/layout';
-import Drawers from './components/Drawer';
-import SimpleBottomNavigation from './components/BottomNavigation';
+import { Dashboard, LogFood, NewsFeed, Plans, Profile } from './components/pages';
+import { NavBar, BottomNavigation } from './components/layout';
+import { Drawers } from './components/drawers';
 
 // Styles
 import './App.css';
@@ -41,7 +36,7 @@ function App() {
       </header>
       {/* Dynamic All Drawers */}
       <Drawers />
-      <SimpleBottomNavigation />
+      <BottomNavigation />
     </>
   );
 }

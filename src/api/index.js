@@ -1,10 +1,6 @@
 // Need to use the React-specific entry point to import createApi
-import { useState } from 'react';
 import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
-
-import { supabase } from '../db'
-import { tryCatchHandler } from '../utilities/helpers';
-
+import { supabase } from '../db';
 
 // env variables
 const { 
@@ -15,7 +11,6 @@ const {
   REACT_APP_RAPID_API_MUSCLE_GROUP_IMAGE: muscleGroupImageHost,
 } = process.env;
 
-console.log({ muscleGroupImageHost })
 const headers = {
   'X-RapidAPI-Key': key,
   'X-RapidAPI-Host': host,

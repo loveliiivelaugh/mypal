@@ -12,10 +12,10 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { useHooks } from '../hooks';
-import { cap_first } from '../utilities/helpers'
-import { foodHistory } from '../utilities/constants'
-import foodRepoData from '../api/food_repo.data';
+import { useHooks } from '../../hooks';
+import { cap_first } from '../../utilities/helpers'
+import { foodHistory } from '../../utilities/constants'
+import foodRepoData from '../../api/food_repo.data';
 
 
 const FoodDrawer = (props) => {

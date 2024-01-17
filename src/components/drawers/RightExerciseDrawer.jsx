@@ -1,8 +1,8 @@
 
 import { useState } from 'react'
 import { InputLabel, TextField, List, ListItem, ListItemText } from '@mui/material'
-import BasicDatePicker from '../BasicDatePicker';
 
+import { BasicDatePicker } from '../forms';
 import { exercise_schema } from '../../db/schemas';
 import { FormContainer } from '../../hooks/useForms';
 

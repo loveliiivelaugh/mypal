@@ -5,8 +5,8 @@ import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 
 // Utilities
-import { useHooks } from '../hooks'
-import { supabase } from '../db'
+import { useHooks } from '../../hooks'
+import { supabase } from '../../db'
 
 
 export default function Login() {
