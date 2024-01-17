@@ -1,5 +1,5 @@
 // Packages
-import { Drawer } from '@mui/material'
+import { Box, Drawer, Link, Typography } from '@mui/material'
 
 // Components
 import { FormContainer } from '../../hooks/useForms';
@@ -18,7 +18,6 @@ import {
 } from '../../db/schemas';
 
 
-
 const Drawers = () => {
   // State / Hooks
   const { actions, drawers } = useHooks();
@@ -35,7 +34,7 @@ const Drawers = () => {
       right: (<FormContainer schema={exercise_schema} />),
     },
     food: {
-      bottom: (<FoodDrawer handleSelected={actions.handleSelected} />),
+      bottom: (<FoodDrawer handleSelected={actions.handleSelected} includeNutritionixAttribution={true} />),
       right: (<FormContainer schema={food_schema} />)
     },
     profile: {

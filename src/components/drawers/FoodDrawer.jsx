@@ -1,7 +1,7 @@
-import React from 'react'
+import { useState } from 'react'
 import {
   Autocomplete, Avatar, Chip, Stack, TextField,
-  Box, IconButton, Typography, Grid,
+  Box, IconButton, Typography, Grid, Link,
   InputAdornment, Tab, Tabs, CircularProgress, List,
   ListItem, ListItemText, ListItemButton,
 } from '@mui/material'
@@ -13,26 +13,30 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import { useHooks } from '../../hooks';
+import { useGetInstantQuery, getNutritionixItem } from '../../api';
 import { cap_first } from '../../utilities/helpers'
 import { foodHistory } from '../../utilities/constants'
-import foodRepoData from '../../api/food_repo.data';
+
 
 
 const FoodDrawer = (props) => {
   const hooks = useHooks();
-  const [ state, setState ] = React.useState({
-    search: "",
-    tab: 0,
-  });
+  const [ state, setState ] = useState({});
+
+  const nutritionix = useGetInstantQuery(state?.food, { skip: !state?.food });
+  console.log("nutritionix", nutritionix, state)
 
   const { actions } = hooks;
   
-  const handleChange = (event, newValue) => {
-    setState({ ...state, tab: newValue });
+  const handleChange = (event) => {
+    setState({ ...state, [event.target.id]: event.target.value });
   }
 
-  const handleSelectedFood = (food) => {
-    actions.handleSelected(food);
+  const handleSelectedFood = async (food) => {
+    console.log("handleSelectedFood", food)
+    const foodItem = await getNutritionixItem(food?.nix_item_id);
+    console.log("foodItem", foodItem)
+    actions.handleSelected(foodItem);
     actions.closeDrawers();
     actions.updateDrawers({
       active: "food",
@@ -54,28 +58,49 @@ const FoodDrawer = (props) => {
           <CheckIcon />
         </IconButton>
       </Box>
+      {props.includeNutritionixAttribution && (
+        <Box sx={{ justifyContent: "space-around", px: 4, mb: 1 }}>
+          <Typography variant="body1" component="p" gutterBottom>
+            Attribution - {" "}<a href="https://www.nutritionix.com/" target="_blank" rel="noreferrer" style={{color: "#fff"}}>https://www.nutritionix.com/</a>
+          </Typography>
+          <Typography variant="body1" component="p" gutterBottom>
+            Food and Nutrition Data sourced from Nutritionix.{"  "}
+            <Link href="https://www.nutritionix.com/business/api" target="_blank" sx={{ color: '#fff' }}>
+              Learn more about Nutritionix API
+            </Link>
+          </Typography>
+          <Typography variant="body1" component="p" gutterBottom>
+            "We have the largest branded food database in existence with over 931K grocery foods with barcodes and 190K restaurant foods. We're constantly updating our database with new foods and brands."
+          </Typography>
+        </Box>
+      )}
       <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
         <Autocomplete
           id="food"
-          options={foodRepoData?.data || []}
+          options={nutritionix?.data?.branded || []}
           fullWidth
-          onLoadedData={() => {}}
-          loading={hooks.food.isLoading}
+          onLoadedData={() => nutritionix?.data?.branded}
+          loading={nutritionix?.isLoading}
           sx={{ ml: 4 }}
-          getOptionLabel={(option) => option?.display_name_translations["en"]}
+          getOptionLabel={(option) => {
+            return option?.brand_name_item_name
+          }}
           renderOption={(props, option) => {
-            const image = option.images.find(({categories}) => categories.includes("Front"))?.thumb;
+            const image = option?.photo?.thumb;
             return (
               <Stack 
                 direction="row" 
                 spacing={1} 
                 p={1} 
-                sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)" } }} 
+                sx={{ 
+                  cursor: "pointer", 
+                  "&:hover": { backgroundColor: "rgba(33,33,33,0.1)" } 
+                }} 
                 onClick={() => handleSelectedFood(option)}
               >
                 <Avatar src={image} />
-                <Typography variant="h6">{option?.display_name_translations["en"]}</Typography>
-                <Chip size="small" label={option?.country} />
+                <Typography variant="h6" p={1}>{option?.brand_name_item_name}</Typography>
+                <Chip size="small" label={`${option?.nf_calories} cals`} p={1} />
               </Stack>
             )
           }}

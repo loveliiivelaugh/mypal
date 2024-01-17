@@ -1,6 +1,9 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import { supabase } from '../db';
+import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
+
+export { nutritionixApi, getNutritionixItem, useGetInstantQuery };
 
 // env variables
 const { 

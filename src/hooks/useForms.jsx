@@ -1,6 +1,6 @@
 // Packages
 import { 
-  Box, Grid, IconButton, InputLabel, ListItemText, Typography
+  Box, Grid, IconButton, InputLabel, Link, ListItemText, Typography
 } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -157,7 +157,11 @@ const Fields = ({ schema, form }) => {
 };
 
 
-export const FormContainer = ({ schema, children, formFooterElements }) => {
+export const FormContainer = ({ 
+  schema, 
+  children,
+  formFooterElements 
+}) => {
   // Hooks / State
   const { handleSubmit } = useSubmit()
   const hooks = useHooks()
@@ -180,8 +184,8 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
       // // Get muscle group image
     }
     // When selected is a meal
-    if (formik?.selected?.display_name_translations) 
-      selectedItemName = formik?.selected?.display_name_translations["en" || "it"]
+    if (formik?.selected?.food_name) 
+      selectedItemName = formik?.selected?.food_name
         || "Name not found";
   };
 

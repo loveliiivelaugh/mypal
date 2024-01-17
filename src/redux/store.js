@@ -6,7 +6,8 @@ import {
   exerciseApi,
   muscleGroupImageApi,
   foodApi, 
-  supabaseApi 
+  supabaseApi,
+  nutritionixApi,
 } from '../api'
 
 // Reducers
@@ -25,6 +26,7 @@ const store = configureStore({
     [foodApi.reducerPath]: foodApi.reducer,
     [supabaseApi.reducerPath]: supabaseApi.reducer,
     [muscleGroupImageApi.reducerPath]: muscleGroupImageApi.reducer,
+    [nutritionixApi.reducerPath]: nutritionixApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -33,7 +35,8 @@ const store = configureStore({
       .concat(exerciseApi.middleware)
       .concat(supabaseApi.middleware)
       .concat(foodApi.middleware)
-      .concat(muscleGroupImageApi.middleware),
+      .concat(muscleGroupImageApi.middleware)
+      .concat(nutritionixApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 
 })
