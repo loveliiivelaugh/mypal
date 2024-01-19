@@ -168,18 +168,19 @@ const FieldWrapper = ({ field, children }) => {
 }
 
 const Fields = ({ schema, form }) => {
+  console.log("Fields: ", schema, form)
   return generateFields(schema, form)
-    .map(field => {
-      return field && (
-        <Grid item xs={12} key={field.props.key}>
-        {/* <FieldWrapper field={field}>
-        </FieldWrapper> */}
-              <InputLabel htmlFor={field.props.id}>
-                {field.props.label}
-              </InputLabel>
-              {field}
-            </Grid>
-    )});
+    .map(field => (
+        <FieldWrapper field={field}>
+        {console.log("Inside of field wrapper: ", field)}
+          <Grid item xs={12} key={field.props.key}>
+            <InputLabel htmlFor={field.props.id}>
+              {field.props.label}
+            </InputLabel>
+            {field}
+          </Grid>
+        </FieldWrapper>
+    ));
 };
 
 
@@ -200,9 +201,10 @@ export const FormContainer = ({
   const getInitialValuesFromSelectedItem = (field) => {
     // Handle selected item for food and exercise forms
     const selected = hooks?.globalState?.exercise?.selected;
+    console.log("getInitialValuesFromSelectedItem: ", selected, field)
     // console.log("getInitialValuesFromSelectedItem: ", selected, field)
     const fieldMapping = mapFoodFieldNamesToSelectedKeys(field.column_name);
-    if (selected[fieldMapping]) return selected[fieldMapping];
+    if (selected && selected?.[fieldMapping]) return selected?.[fieldMapping];
     else return field.column_default || "";
   };
 

@@ -1,20 +1,22 @@
 // Packages
 import { useState } from 'react';
-import { Box, CssBaseline, Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
+import { AnimatePresence } from 'framer-motion';
 
 // Components
 import { Dashboard, LogFood, NewsFeed, Plans, Profile } from './components/pages';
 import { NavBar, BottomNavigation } from './components/layout';
 import { Drawers } from './components/drawers';
 
-// Styles
-import './App.css';
+// Utilities
+import { cms } from './utilities/cms';
 
 
 function App() {
   // State / Hooks
   const [tab, setTab] = useState(0);
   
+  // Render
   const renderTab = (tab) => ({
     0: <Dashboard />,
     1: <LogFood />,
@@ -23,19 +25,17 @@ function App() {
     4: <Profile />,
   }[tab]);
 
-  // Render
   return (
-    <Box sx={{ width: "100vw" }}>
-      <CssBaseline />
-      <NavBar heading="Open Fitness 💪" />
+    <Box>
+      <NavBar heading={cms.navbar.heading} />
+      <AnimatePresence>
       {/* Main */}
-      <header className="App-header">
         <Grid container spacing={2} p={4}>
           {renderTab(tab)}
         </Grid>
-      </header>
-      {/* Dynamic All Drawers */}
-      <Drawers />
+        {/* Dynamic All Drawers */}
+        <Drawers />
+      </AnimatePresence>
       <BottomNavigation />
     </Box>
   );

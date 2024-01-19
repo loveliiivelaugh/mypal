@@ -1,5 +1,6 @@
 // Packages
-import { Box, Drawer, Link, Typography } from '@mui/material'
+import { Drawer } from '@mui/material'
+import { motion } from 'framer-motion'
 
 // Components
 import { FormContainer } from '../../hooks/useForms';
@@ -53,6 +54,10 @@ const Drawers = () => {
         anchor={anchor}
         open={open}
         onClose={() => actions.closeDrawers()}
+        component={motion.div}
+        initial={{ opacity: 0.5 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         sx={{
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },

@@ -80,7 +80,7 @@ const mapFoodFieldNamesToSelectedKeys = (name) => ({
 })[name] || name;
 
 const generateFields = (schema, form) => {
-  // console.log("generateFields(): ", schema, form)
+  console.log("generateFields(): ", schema, form)
 
   let defaultValue;
   // Build array of field objects from schema
@@ -89,11 +89,13 @@ const generateFields = (schema, form) => {
       
       if ((field.column_name !== "id") && !field.hidden) {
 
-        defaultValue = (form.selected[
-          Object.keys(form.initialValues).includes("calories") 
-            ? mapFoodFieldNamesToSelectedKeys(field.column_name)
-            : field.column_default
-        ] || field.column_default);
+        if (form?.selected) {
+          defaultValue = (form.selected[
+            Object.keys(form.initialValues).includes("calories") 
+              ? mapFoodFieldNamesToSelectedKeys(field.column_name)
+              : field.column_default
+          ] || field.column_default);
+        }
         // defaultValue = form.selected[field.column_name] || field.column_default;
 
         if (field.column_name === "date") defaultValue = getCurrentDate();
