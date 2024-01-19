@@ -12,20 +12,38 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-// Hooks
+// Hooks / Services
 import { useHooks } from '../../hooks';
+import { useGetExerciseQuery, getMuscleGroupImage } from '../../api';
 
 // Utilities
-import { exerciseHistory, mock_exercises, tabs } from '../../utilities/constants'
+import { exerciseHistory, tabs } from '../../utilities/constants'
 import { cap_first } from '../../utilities/helpers'
 
 
 const BottomExerciseDrawer = (props) => {
   const hooks = useHooks();
-  const [state] = useState({});
-  const handleChange = (event) => props.form[event.target.id] = event.target.value;
+  const [state, setState] = useState({
+    exerciseName: "",
+    skip: true,
+  });
+  const { 
+    data, 
+    isLoading, 
+    isError 
+  } = useGetExerciseQuery(state.exerciseName, { skip: state.skip })
+  
+  const handleChange = (event) => {
+    setState({ ...state, [event.target.id]: event.target.value });
+  };
 
-  const handleSelectedExercise = (exercise) => {
+  const handleSelectedExercise = async (exercise) => {
+    const muscleGroupImage = await getMuscleGroupImage(exercise?.muscle);
+    console.log(
+      "handleSelectedExercise().muscleGroupImage: ", 
+      exercise, 
+      muscleGroupImage
+    );
     hooks.actions.handleSelected(exercise);
     hooks.actions.closeDrawers();
     hooks.actions.updateDrawers({
@@ -34,6 +52,14 @@ const BottomExerciseDrawer = (props) => {
       open: true,
     });
   };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setState({ ...state, skip: false })
+    // submit the search request and populate the autocomplete
+  };
+
+  if (isError) return hooks.actions.createAlert("error", "Error fetching exercises");
 
   return (
     <>
@@ -48,26 +74,31 @@ const BottomExerciseDrawer = (props) => {
           <CheckIcon />
         </IconButton>
       </Box>
-      <Box sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
         <Autocomplete
           id="exerciseName"
-          options={mock_exercises || []}
+          options={data || []}
           fullWidth
-          onLoadedData={() => {}}
-          loading={hooks?.exercise?.isLoading}
+          onLoadedData={data}
+          loading={isLoading}
+          autoComplete
           sx={{ ml: 4 }}
-          getOptionLabel={(option) => {
-            console.log("getOptionLabel: ", option, option?.name)
-            return option?.name
-          }}
+          getOptionLabel={(option) => option?.name}
           renderOption={(props, option) => {
-            console.log("renderOption: ", props, option)
-            // return option
             return (
-              <Stack direction="row" spacing={1} p={1} sx={{ cursor: "pointer", "&:hover": { backgroundColor: "rgba(33,33,33,0.1)"} }} onClick={() => handleSelectedExercise(option)}>
-                <>{option?.name}{` `}</>
-                <Chip size="small" label={option?.muscle} />
+              <Stack 
+                direction="row" 
+                spacing={1}
+                p={1} 
+                sx={{ 
+                  cursor: "pointer", 
+                  "&:hover": { backgroundColor: "rgba(33,33,33,0.1)" } 
+                }} 
+                onClick={() => handleSelectedExercise(option)}
+              >
+                <Typography variant="body1" p={0.5}>{option?.name}</Typography>
                 <Chip variant="outlined" size="small" label={option?.type} />
+                <Chip size="small" label={option?.muscle} />
               </Stack>
             )
           }}
@@ -84,7 +115,7 @@ const BottomExerciseDrawer = (props) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                      <IconButton  p={1} onClick={() => {}} sx={{ color: "#fff" }}>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>

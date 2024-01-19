@@ -1,7 +1,26 @@
 // Packages / Imports
-import { MenuItem, Select, TextField } from '@mui/material'
-import BasicDatePicker from '../components/BasicDatePicker';
+import { Box, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material'
+import AttachmentIcon from '@mui/icons-material/Attachment';
+import { BasicDatePicker } from '../components/forms';
+import { BasicTimePicker } from '../components/forms/BasicDatePicker';
 
+
+
+
+export const getCurrentDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day  = date.getDate();
+  return `${year}-${month}-${day}`;
+};
+
+export const getCurrentTime = () => {
+  const date = new Date();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  return `${hours}:${minutes}`;
+};
 
 // Utilities
 const cap_first = (str) => (typeof(str) ==="string") 
@@ -55,33 +74,47 @@ const formatDataTypes = (type) => ({
   "select": "select"
 }[type]) || "text";
 
+const mapFoodFieldNamesToSelectedKeys = (name) => ({
+  "name": "food_name",
+  "calories": "nf_calories",
+})[name] || name;
+
 const generateFields = (schema, form) => {
-  console.log("generateFields(): ", schema, form)
+  // console.log("generateFields(): ", schema, form)
 
-  // destructure name from form
   let defaultValue;
-  if (form?.selected) {
-    const { name, display_name_translations } = form?.selected;
-    if (name) defaultValue = name; // When selected is an exercise
-    if (display_name_translations) // When selected is a meal
-      defaultValue = display_name_translations["en" || "it"] || "Name not found";
-  };
-
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
-    .map((field) => ((field.column_name !== "id") && !field.hidden) 
-      && ({
-        label: cap_first(field.column_name).replace("_", " "),
-        type: formatDataTypes(field.data_type),
-        name: field.column_name,
-        defaultValue: defaultValue ? defaultValue : field.column_default,
-        helperText: `Enter your ${field.column_name}`,
-        required: false,
-        onChange: form.handleChange,
-        hidden: field.hidden || false,
-        ...(field.options && { options: field.options })
-      })
-  ).filter(field => field) // filter out undefined values
+    .map((field) => {
+      
+      if ((field.column_name !== "id") && !field.hidden) {
+
+        defaultValue = (form.selected[
+          Object.keys(form.initialValues).includes("calories") 
+            ? mapFoodFieldNamesToSelectedKeys(field.column_name)
+            : field.column_default
+        ] || field.column_default);
+        // defaultValue = form.selected[field.column_name] || field.column_default;
+
+        if (field.column_name === "date") defaultValue = getCurrentDate();
+        if (field.column_name === "time") defaultValue = getCurrentTime();
+
+        // form.values[field.column_name] = defaultValue;
+
+        return ({
+          label: cap_first(field.column_name).replace("_", " "),
+          type: formatDataTypes(field.data_type),
+          name: field.column_name,
+          defaultValue,
+          helperText: `Enter your ${field.column_name}`,
+          required: false,
+          onChange: form.handleChange,
+          hidden: field.hidden || false,
+          ...(field.options && { options: field.options })
+        })
+      } // end if statement
+
+    }).filter(field => field); // filter out undefined values
 
   // Build field elements from fields object
   return buildFieldElementsFromFieldsObject(fieldsObjectFromSchema, form);
@@ -102,6 +135,12 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       options = [] 
     } = field;
 
+    const formatDateAndTimeValues = (name) => ({
+      "date": new Date(formState[name]),
+      "time": new Date(formState[name]),
+    }[name] || formState[name])
+
+    // console.log("formatDateAndTime: ", formatDateAndTimeValues(name))
     // Define common properties for all fields
     const commonProperties = {
       key: name,
@@ -112,7 +151,8 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       label,
       helperText,
       defaultValue,
-      onChange: formState.handleChange,
+      // onChange: formState.handleChange,
+      onChange: formState.handleFormChange,
       sx: { hidden }
     };
 
@@ -128,13 +168,13 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       },
       Date: {
         ...commonProperties,
-        value: new Date(field.value).toLocaleDateString(),
-        placeholder: new Date().toLocaleDateString(),
+        // value: new Date(field.value).toLocaleDateString(),
+        // placeholder: new Date().toLocaleDateString(),
       },
       Time: {
         ...commonProperties,
-        value: new Date(field.value).toLocaleTimeString(),
-        placeholder: new Date().toLocaleTimeString(),
+        // value: new Date(field.value).toLocaleTimeString(),
+        // placeholder: new Date().toLocaleTimeString(),
       },
       Json: {
         ...commonProperties,
@@ -149,11 +189,24 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       text: <TextField {...FieldsProps.TextField} />,
       number: <TextField {...FieldsProps.TextField} />,
       date: <BasicDatePicker {...FieldsProps.Date} />,
-      time: <BasicDatePicker {...FieldsProps.Time} />,
+      time: <BasicTimePicker {...FieldsProps.Time} />,
       select: <SelectWrapper {...FieldsProps.Select} />,
       json: <TextField {...FieldsProps.Json} />,
+      attachment: <Attachment />,
     }[type])
   });
+
+const Attachment = () => (
+  <Box sx={{}}>
+    <Typography id="demo-simple-select-label" variant="body1">
+      Progress Photo
+    </Typography>
+    <IconButton p={1}>
+      <AttachmentIcon />
+      <attachment />
+    </IconButton>
+  </Box>
+);
 
 const SelectWrapper = (props) => (
   <Select {...props}>

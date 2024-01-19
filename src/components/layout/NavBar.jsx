@@ -1,7 +1,9 @@
 import React from 'react'
 import { AppBar, Avatar, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
-import Login from '../Login'
 import NotificationsIcon from '@mui/icons-material/Notifications';
+
+import Login from '../forms/Login'
+
 
 const NavBar = (props) => {
   return (
@@ -14,9 +16,7 @@ const NavBar = (props) => {
           </Typography>
         </Box>
         <Box sx={{ display: "flex"}}>
-          <IconButton>
-            <Login />
-          </IconButton>
+          <Login />
           <Tooltip title="Notifications">
             <IconButton sx={{ color: "#fff" }}>
               <NotificationsIcon />

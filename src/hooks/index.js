@@ -15,6 +15,7 @@ import {
   useResetPasswordMutation,
   useLoginWithOtpMutation,
   useGetCaloriesBurnedQuery,
+  useGetMuscleGroupImageQuery,
 } from '../api';
 
 // useResponsive hook -- used to determine the screen size
@@ -143,10 +144,16 @@ export const useHooks = () => {
   const [resetPassword, resetPasswordResult] = useResetPasswordMutation();
   const [loginWithOtp, loginWithOtpResult] = useLoginWithOtpMutation();
   const actions = useActions();
+
+  const selectedMuscle = globalState?.exercise?.selected?.muscle;
+  // TODO: Fix this API call to get the Muscle Group Image
+  // const muscleGroupImage = useGetMuscleGroupImageQuery(
+  //   { groups: selectedMuscle },
+  //   { skip: !selectedMuscle },
+  // );
   
   // Destructuring and formatting for ease of use throughout the app
   let user_id = auth?.data?.session?.user?.id;
-  console.log("Is user_id changing when auth changes? ", user_id)
   let user_email = auth?.data?.session?.user?.email;
   // Update this line to use a SQL query instead with the related tables ...
   // ... data: (user_id: exercises, foods, weight, profile)
@@ -158,8 +165,6 @@ export const useHooks = () => {
     ?.filter((item) => (
       (item.user_id === user_id) && (item.date === new Date().toISOString().slice(0, 10))
     ));
-
-  console.log("todaysCaloriesConsumed: ", todaysCaloriesConsumed)
 
   steps.todaysSteps = steps?.data 
     ? steps?.data.reduce((total, steps) => total + steps.value, 0)

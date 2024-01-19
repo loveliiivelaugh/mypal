@@ -10,7 +10,7 @@ import { store } from './redux';
 
 // Components
 import App from './App';
-import ErrorBoundary from './components/ErrorBoundar';
+import ErrorBoundary from './components/pages/ErrorBoundary';
 
 // Utitlities
 import reportWebVitals from './reportWebVitals';

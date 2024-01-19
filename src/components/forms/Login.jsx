@@ -1,12 +1,12 @@
 // Packages
 import { useState, useEffect } from 'react'
-import { Box, IconButton, Tooltip } from '@mui/material'
+import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 
 // Utilities
-import { useHooks } from '../hooks'
-import { supabase } from '../db'
+import { useHooks } from '../../hooks'
+import { supabase } from '../../db'
 
 
 export default function Login() {
@@ -42,8 +42,10 @@ export default function Login() {
     </Tooltip>
   )
   else return (
-    <Box sx={{ color: "#fff" }}>
-      {hooks.auth.email}
+    <Box sx={{ color: "#fff", display: "flex" }}>
+      <Typography variant="body1" component="p" gutterBottom p={1} mt={1}>
+        {hooks.auth.email}
+      </Typography>
       <Tooltip title="Logout">
         <IconButton onClick={() => hooks.actions.updateDrawers({ active: "auth", anchor: "right", open: true })} sx={{ color: "#fff" }}>
           <LogoutIcon />

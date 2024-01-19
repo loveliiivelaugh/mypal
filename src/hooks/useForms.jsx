@@ -1,10 +1,12 @@
 // Packages
+import { useEffect, useState } from 'react'
 import { 
-  Box, Grid, IconButton, InputLabel, ListItemText, Typography
+  Avatar,
+  Box, Grid, IconButton, InputLabel, Link, ListItemText, Typography
 } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { useFormik } from 'formik';
+import { useFormik, useFormikContext, useField, Formik } from 'formik';
 
 // Utitilities
 import { useHooks } from '.'
@@ -43,34 +45,36 @@ export const useSubmit = () => {
 
     console.log("Making db submission inside: ", form, selected)
 
+    if (active === "weight") {
+      console.log("handleSubmit() active === weight: ", selected, form)
+    }
+
     // Handle selected item for food form
-    if (selected?.nutrients) {
-      const { nutrients } = selected;
+    if (active === "food") {
+      const nutrients = Object.assign(
+        {},
+        ...Object
+          .keys(selected)
+          .filter(key => key.includes("nf_"))
+          .map(key => ({ [key.split("nf_")[1]]: selected[key] }))
+      )
       // Format food submit *TODO: move to separate function
       const calculate_calories = (calories) => {
         const servingSize = parseInt(form.serving_size);
         const numServings = parseInt(form.num_servings);
         const serving = (typeof(servingSize) === "number")
           ? servingSize
-          : 1;
+          : 0;
 
           // PEMDAS -- order of operations 🤓
         return ((calories * serving) * numServings);
       };
       
-      const formattedNutrients = Object.assign(
-        {}, 
-        ...Object
-          .keys(nutrients)
-          .map(nutrient => ({
-            [nutrient]: (nutrients[nutrient]?.per_hundred 
-              || nutrients[nutrient]?.per_portion), 
-            unit: nutrients[nutrient]?.unit 
-        })))
 
       form = {
-        calories: calculate_calories(nutrients?.energy_calories_kcal),
-        nutrients: formattedNutrients,
+        ...form,
+        calories: calculate_calories(nutrients?.calories),
+        nutrients,
         date: form.date || new Date().toLocaleDateString(),
         time: form.time || new Date().toLocaleTimeString(),
         meal: form.meal || "snack",
@@ -136,7 +140,7 @@ export const useSubmit = () => {
     // Handle errors
     if (error || response.error) actions.createAlert("error", response.error?.message)
     // Trigger alerts
-    else actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
+    if (!error) actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
   };
 
   
@@ -144,40 +148,92 @@ export const useSubmit = () => {
   return { handleSubmit };
 };
 
+const FieldWrapper = ({ field, children }) => {
+  const { 
+    values: { num_servings, serving_size },
+    touched,
+    setFieldValue,
+  }  = useFormikContext();
+  const [fieldProps, meta] = useField(field?.props);
+  // console.log("FieldWrapper: ", num_servings, serving_size, touched.num_servings, touched.serving_size, field.props.name)
+
+  // useEffect(() => {
+  //   console.log("FieldWrapper useEffect: ", field)
+  //   if (num_servings && serving_size) {
+  //     console.log("Recalculate calories: ", num_servings, serving_size)
+  //   }
+  // }, [num_servings, serving_size, touched.num_servings, touched.serving_size, field.props.name, setFieldValue])
+
+  return children;
+}
+
 const Fields = ({ schema, form }) => {
   return generateFields(schema, form)
-    .map(field => (
-      <Grid item xs={12} key={field.props.key}>
-        <InputLabel htmlFor={field.props.id}>
-          {field.props.label}
-        </InputLabel>
-        {field}
-      </Grid>
-    ));
+    .map(field => {
+      return field && (
+        <Grid item xs={12} key={field.props.key}>
+        {/* <FieldWrapper field={field}>
+        </FieldWrapper> */}
+              <InputLabel htmlFor={field.props.id}>
+                {field.props.label}
+              </InputLabel>
+              {field}
+            </Grid>
+    )});
 };
 
 
-export const FormContainer = ({ schema, children, formFooterElements }) => {
+export const FormContainer = ({ 
+  schema, 
+  children,
+  formFooterElements 
+}) => {
   // Hooks / State
   const { handleSubmit } = useSubmit()
   const hooks = useHooks()
+
+  const mapFoodFieldNamesToSelectedKeys = (name) => ({
+    "name": "food_name",
+    "calories": "nf_calories",
+  })[name] || name;
+
+  const getInitialValuesFromSelectedItem = (field) => {
+    // Handle selected item for food and exercise forms
+    const selected = hooks?.globalState?.exercise?.selected;
+    // console.log("getInitialValuesFromSelectedItem: ", selected, field)
+    const fieldMapping = mapFoodFieldNamesToSelectedKeys(field.column_name);
+    if (selected[fieldMapping]) return selected[fieldMapping];
+    else return field.column_default || "";
+  };
+
+  const initialValues = Object.assign(
+    {}, 
+    ...schema.map(field => !['id', 'created_at']
+      .includes(field) && ({ 
+        [field.column_name]: getInitialValuesFromSelectedItem(field)
+      }))
+      .filter(Boolean)
+  );
+
   const formik = useFormik({
-    initialValues: {},
+    initialValues,
     validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
-
   // Set current selection on form object to extract default values
   formik.selected = hooks?.globalState?.exercise?.selected;
-
+  
   // Extract Selected Item Name to display in form header
   let selectedItemName;
   if (formik?.selected) {
     // When selected is an exercise
-    if (formik?.selected?.name) selectedItemName = formik?.selected?.name;
+    if (formik?.selected?.name) {
+      selectedItemName = formik?.selected?.name;
+      // // Get muscle group image
+    }
     // When selected is a meal
-    if (formik?.selected?.display_name_translations) 
-      selectedItemName = formik?.selected?.display_name_translations["en" || "it"]
+    if (formik?.selected?.food_name) 
+      selectedItemName = formik?.selected?.food_name
         || "Name not found";
   };
 
@@ -190,32 +246,60 @@ export const FormContainer = ({ schema, children, formFooterElements }) => {
     else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
   };
 
-  return (
-    <Box 
-      component="form" 
-      onSubmit={formik.handleSubmit} 
-      sx={{ width: '100%', height: '100%', overflow: 'auto' }}
-    >
-      {/* Universal Drawer Header */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-        <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
-          <CloseIcon />
-        </IconButton>
-        <Typography variant="h6" component="p" gutterBottom>
-          {`Add ${cap_first(hooks.drawers.active)}`}
-        </Typography>
-        <IconButton sx={{ color: "#fff"}} type="submit">
-          <CheckIcon />
-        </IconButton>
-      </Box>
+  const handleFormChange = (e) => {
+    formik.handleChange(e);
+    // recalculate calories based on new values
+    if (["num_servings", "serving_size"].includes(e.target.name)) {
+      // console.log("recalculate calories servings changed: ", e.target.value, e.target.id, formik.values)
+      const values = formik.values;
+      
+      // if (!values.num_servings) formik.setFieldValue("num_servings", 0)
+      // else formik.setFieldValue("num_servings", parseInt(values.num_servings))
+      // if (!values.serving_size) formik.setFieldValue("serving_size", 0)
+      // else formik.setFieldValue("serving_size", parseInt(values.serving_size))
+      
+      const num_servings = parseInt(values?.num_servings);
+      const serving_size = parseInt(values?.serving_size);
+      const calories = parseInt(formik?.selected?.nf_calories);
+      const totalCalories = ((calories * serving_size) * num_servings)
+      // console.log("recalculate calories servings changed: total:: ::", totalCalories)
+      formik.setFieldValue("calories", typeof totalCalories === 'number' ? totalCalories : calories)
+    };
+  };
 
-      {/* Dynamic Form Section */}
-      <Grid container spacing={2} p={4}>
-        <ListItemText primary={selectedItemName} secondary={selectedItemName} />
-        <Fields schema={schema} form={formik} />
-      </Grid>
-      {children}
-      {formFooterElements}
-    </Box>
+  formik.handleFormChange = handleFormChange;
+
+  return (
+    <Formik {...formik}>
+      <Box 
+        component="form" 
+        onSubmit={formik.handleSubmit} 
+        sx={{ width: '100%', height: '100%', overflow: 'auto' }}
+      >
+        {/* Universal Drawer Header */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+          <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="h6" component="p" gutterBottom>
+            {`Add ${cap_first(hooks.drawers.active)}`}
+          </Typography>
+          <IconButton sx={{ color: "#fff"}} type="submit">
+            <CheckIcon />
+          </IconButton>
+        </Box>
+
+        {/* Dynamic Form Section */}
+        <Grid container spacing={2} p={4}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+            <Avatar src={formik?.selected?.photo?.thumb} />
+            <ListItemText primary={selectedItemName} secondary={selectedItemName} />
+          </Box>
+          <Fields schema={schema} form={formik} />
+        </Grid>
+        {children}
+        {formFooterElements}
+      </Box>
+    </Formik>
   );
 }

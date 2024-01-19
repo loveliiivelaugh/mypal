@@ -1,21 +1,21 @@
-# miPal
+# Open Fitness Trainer
 
 ## CI/CD
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/17584298-1ea6-4693-88ca-dcc04f60f1be/deploy-status)](https://app.netlify.com/sites/gleeful-kitten-d6d5f6/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/17584298-1ea6-4693-88ca-dcc04f60f1be/deploy-status)](https://app.netlify.com/sites/openfitness/deploys)
 
-[miPal development deployment](https://main--gleeful-kitten-d6d5f6.netlify.app/)
+[OpenFitness development deployment](https://openfitness.netlify.app/)
 
-* version control: [GitHub]()
-* continuous integration: [GitHub Actions]()
-* continuous deployment: [Netlify]()
-* project management: [GitHub Projects]()
-* issue tracking: [GitHub Issues]()
-* code review: [GitHub Pull Requests]()
+* Version Control: [GitHub](https://github.com/)
+* Continuous Integration: [GitHub Actions](https://github.com/loveliiivelaugh/mypal/actions)
+* Continuous Deployment: [Netlify](https://www.netlify.com/)
+* Project Management: [GitHub Projects](https://github.com/users/loveliiivelaugh/projects/1/views/1)
+* Issue Tracking: [GitHub Issues](https://github.com/loveliiivelaugh/mypal/issues)
+* Code Review: [GitHub Pull Requests](https://github.com/loveliiivelaugh/mypal/pulls)
 
 ## Description
 
-miPal is an open source fitness and nutrition tracking application. It allows users to create an account, log in, and track their daily nutrition and fitness goals. Users can also create and join groups to share their progress with others.
+Open Fitness is an open source fitness and nutrition tracking application. It allows users to create an account, log in, and track their daily nutrition and fitness goals. Users can also create and join groups to share their progress with others.
 
 ## Table of Contents
 
@@ -99,6 +99,23 @@ npm start
 
 ## Usage
 
+*App is not secure at the moment. Do not use real email or password.*
+
+For Demo purposes, you can use the following credentials to log in:
+  
+```code
+  email:
+  password:
+```
+
+## API's
+
+* [Supabase](https://supabase.io/) -- Database and Authentication
+
+* [RapidAPI](https://rapidapi.com/) -- Exercise data
+
+* [Nutritionix](https://www.nutritionix.com/) -- Nutrition data
+
 ## Documentation
 
 * [React](https://reactjs.org/) -- UI library
@@ -119,23 +136,21 @@ npm start
 
 * [Formik](https://formik.org/) -- Form management
 
-## License
-
-This project is licensed under the MIT license.
-
-## Contributors
-
-* [Me😎]('https://www.github.com/loveliiivelaugh')
-
-## Tests
-
 ## ToDo
 
-* [ ] Add Food data
+* [x] Add Food data
 
-* [ ] Add Exercise data
+* [x] Add Exercise data
 
-* [ ] Convert to PWA
+* [ ] Add Muscle Group Image during exercise selection
+
+* [x] Convert to PWA
+
+* [ ] Add offline functionality
+
+* [ ] Add push notifications
+
+* [ ] Add user settings
 
 * [ ] Convert to TypeScript
 
@@ -146,3 +161,20 @@ This project is licensed under the MIT license.
 * [ ] Add more animations
 
 * [ ] Add more user settings
+
+* [ ] Secure app
+
+* [ ] Encrypt user data
+
+* [ ] Move app database service from Supabase to Pocketbase
+(The goal being to make the app's user data stored on device and self-hosted)
+
+## License
+
+This project is licensed under the MIT license.
+
+## Contributors
+
+* [Me😎]('https://www.github.com/loveliiivelaugh')
+
+## Tests

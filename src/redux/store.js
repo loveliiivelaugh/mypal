@@ -2,7 +2,13 @@ import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
 
 // API
-import { exerciseApi, foodApi, supabaseApi } from '../api'
+import { 
+  exerciseApi,
+  muscleGroupImageApi,
+  foodApi, 
+  supabaseApi,
+  nutritionixApi,
+} from '../api'
 
 // Reducers
 import { alertSlice, authSlice, exerciseSlice } from './features'
@@ -19,6 +25,8 @@ const store = configureStore({
     [exerciseApi.reducerPath]: exerciseApi.reducer,
     [foodApi.reducerPath]: foodApi.reducer,
     [supabaseApi.reducerPath]: supabaseApi.reducer,
+    [muscleGroupImageApi.reducerPath]: muscleGroupImageApi.reducer,
+    [nutritionixApi.reducerPath]: nutritionixApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -26,7 +34,9 @@ const store = configureStore({
     getDefaultMiddleware({ serializableCheck: false })
       .concat(exerciseApi.middleware)
       .concat(supabaseApi.middleware)
-      .concat(foodApi.middleware),
+      .concat(foodApi.middleware)
+      .concat(muscleGroupImageApi.middleware)
+      .concat(nutritionixApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 
 })
