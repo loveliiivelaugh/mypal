@@ -39,13 +39,17 @@ export default function SimpleBottomNavigation(props) {
     });
   };
   
-  const handleFocus = () => hooks
-    .actions
-    .updateDrawers({
-      active: "food",
-      anchor: "bottom",
-      open: true,
-    });
+  const handleFocus = () => {
+    hooks
+      .actions
+      .updateDrawers({
+        active: "food",
+        anchor: "bottom",
+        open: true,
+      });
+    
+    document?.getElementById("food")?.focus();
+  }
 
   return (
     <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)' }}>

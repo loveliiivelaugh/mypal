@@ -2,6 +2,7 @@
 import { Box, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material'
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import { BasicDatePicker } from '../components/forms';
+import { BasicTimePicker } from '../components/forms/BasicDatePicker';
 
 
 
@@ -93,6 +94,7 @@ const generateFields = (schema, form) => {
             ? mapFoodFieldNamesToSelectedKeys(field.column_name)
             : field.column_default
         ] || field.column_default);
+        // defaultValue = form.selected[field.column_name] || field.column_default;
 
         if (field.column_name === "date") defaultValue = getCurrentDate();
         if (field.column_name === "time") defaultValue = getCurrentTime();
@@ -143,7 +145,7 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
     const commonProperties = {
       key: name,
       id: name,
-      // value: formState[name],
+      value: formState[name],
       name,
       type,
       label,
@@ -187,7 +189,7 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       text: <TextField {...FieldsProps.TextField} />,
       number: <TextField {...FieldsProps.TextField} />,
       date: <BasicDatePicker {...FieldsProps.Date} />,
-      time: <BasicDatePicker {...FieldsProps.Time} />,
+      time: <BasicTimePicker {...FieldsProps.Time} />,
       select: <SelectWrapper {...FieldsProps.Select} />,
       json: <TextField {...FieldsProps.Json} />,
       attachment: <Attachment />,

@@ -1,6 +1,6 @@
 // Packages
 import { useState } from 'react';
-import { CssBaseline, Grid } from '@mui/material';
+import { Box, CssBaseline, Grid } from '@mui/material';
 
 // Components
 import { Dashboard, LogFood, NewsFeed, Plans, Profile } from './components/pages';
@@ -25,7 +25,7 @@ function App() {
 
   // Render
   return (
-    <>
+    <Box sx={{ width: "100vw" }}>
       <CssBaseline />
       <NavBar heading="Open Fitness 💪" />
       {/* Main */}
@@ -37,7 +37,7 @@ function App() {
       {/* Dynamic All Drawers */}
       <Drawers />
       <BottomNavigation />
-    </>
+    </Box>
   );
 }
 

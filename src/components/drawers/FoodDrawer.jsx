@@ -80,6 +80,10 @@ const FoodDrawer = (props) => {
           fullWidth
           onLoadedData={() => nutritionix?.data?.branded}
           loading={nutritionix?.isLoading}
+          loadingText="Loading..."
+          noOptionsText="No options"
+          autoComplete
+          autoFocus
           sx={{ ml: 4, border: 0 }}
           getOptionLabel={(option) => {
             return option?.brand_name_item_name

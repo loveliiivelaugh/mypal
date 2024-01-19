@@ -6,7 +6,7 @@ import {
 } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { useFormik, useFormikContext, useField } from 'formik';
+import { useFormik, useFormikContext, useField, Formik } from 'formik';
 
 // Utitilities
 import { useHooks } from '.'
@@ -148,16 +148,37 @@ export const useSubmit = () => {
   return { handleSubmit };
 };
 
+const FieldWrapper = ({ field, children }) => {
+  const { 
+    values: { num_servings, serving_size },
+    touched,
+    setFieldValue,
+  }  = useFormikContext();
+  const [fieldProps, meta] = useField(field?.props);
+  // console.log("FieldWrapper: ", num_servings, serving_size, touched.num_servings, touched.serving_size, field.props.name)
+
+  // useEffect(() => {
+  //   console.log("FieldWrapper useEffect: ", field)
+  //   if (num_servings && serving_size) {
+  //     console.log("Recalculate calories: ", num_servings, serving_size)
+  //   }
+  // }, [num_servings, serving_size, touched.num_servings, touched.serving_size, field.props.name, setFieldValue])
+
+  return children;
+}
+
 const Fields = ({ schema, form }) => {
   return generateFields(schema, form)
     .map(field => {
-      return (
-      <Grid item xs={12} key={field.props.key}>
-        <InputLabel htmlFor={field.props.id}>
-          {field.props.label}
-        </InputLabel>
-        {field}
-      </Grid>
+      return field && (
+        <Grid item xs={12} key={field.props.key}>
+        {/* <FieldWrapper field={field}>
+        </FieldWrapper> */}
+              <InputLabel htmlFor={field.props.id}>
+                {field.props.label}
+              </InputLabel>
+              {field}
+            </Grid>
     )});
 };
 
@@ -176,10 +197,10 @@ export const FormContainer = ({
     "calories": "nf_calories",
   })[name] || name;
 
-  const getDefaultFromSelected = (field) => {
+  const getInitialValuesFromSelectedItem = (field) => {
     // Handle selected item for food and exercise forms
     const selected = hooks?.globalState?.exercise?.selected;
-    // console.log("getDefaultFromSelected: ", selected, field)
+    // console.log("getInitialValuesFromSelectedItem: ", selected, field)
     const fieldMapping = mapFoodFieldNamesToSelectedKeys(field.column_name);
     if (selected[fieldMapping]) return selected[fieldMapping];
     else return field.column_default || "";
@@ -187,9 +208,11 @@ export const FormContainer = ({
 
   const initialValues = Object.assign(
     {}, 
-    ...schema.map(field => !['id', 'created_at'].includes(field) && ({ 
-      [field.column_name]: getDefaultFromSelected(field)
-    })).filter(Boolean)
+    ...schema.map(field => !['id', 'created_at']
+      .includes(field) && ({ 
+        [field.column_name]: getInitialValuesFromSelectedItem(field)
+      }))
+      .filter(Boolean)
   );
 
   const formik = useFormik({
@@ -224,55 +247,59 @@ export const FormContainer = ({
   };
 
   const handleFormChange = (e) => {
-    console.log("HIJACKED Formik values changed: ", e, formik)
-    // formik.setValues({ ...formik.values, [e.target.id]: e.target.value });
+    formik.handleChange(e);
     // recalculate calories based on new values
     if (["num_servings", "serving_size"].includes(e.target.name)) {
-      console.log("recalculate calories servings changed: ", e.target.value, formik.values)
-      const { serving_size, num_servings } = formik.values;
-      const calories = formik?.selected?.nf_calories;
-      console.log("Need to know the values: ", calories, serving_size, num_servings, "total:" )
-      const totalCalories = ((parseInt(calories) * parseInt(serving_size)) * parseInt(num_servings || 1))
-      console.log("recalculate calories servings changed: ", totalCalories)
-      formik.setFieldValue("calories", totalCalories);
-      formik.handleChange({ target: { name: "calories", value: totalCalories }})
-    };  
-
-    formik.setFieldValue(e.target.name, e.target.value)
-    formik.handleChange(e);
+      // console.log("recalculate calories servings changed: ", e.target.value, e.target.id, formik.values)
+      const values = formik.values;
+      
+      // if (!values.num_servings) formik.setFieldValue("num_servings", 0)
+      // else formik.setFieldValue("num_servings", parseInt(values.num_servings))
+      // if (!values.serving_size) formik.setFieldValue("serving_size", 0)
+      // else formik.setFieldValue("serving_size", parseInt(values.serving_size))
+      
+      const num_servings = parseInt(values?.num_servings);
+      const serving_size = parseInt(values?.serving_size);
+      const calories = parseInt(formik?.selected?.nf_calories);
+      const totalCalories = ((calories * serving_size) * num_servings)
+      // console.log("recalculate calories servings changed: total:: ::", totalCalories)
+      formik.setFieldValue("calories", typeof totalCalories === 'number' ? totalCalories : calories)
+    };
   };
 
   formik.handleFormChange = handleFormChange;
 
   return (
-    <Box 
-      component="form" 
-      onSubmit={formik.handleSubmit} 
-      sx={{ width: '100%', height: '100%', overflow: 'auto' }}
-    >
-      {/* Universal Drawer Header */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-        <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
-          <CloseIcon />
-        </IconButton>
-        <Typography variant="h6" component="p" gutterBottom>
-          {`Add ${cap_first(hooks.drawers.active)}`}
-        </Typography>
-        <IconButton sx={{ color: "#fff"}} type="submit">
-          <CheckIcon />
-        </IconButton>
-      </Box>
-
-      {/* Dynamic Form Section */}
-      <Grid container spacing={2} p={4}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <Avatar src={formik?.selected?.photo?.thumb} />
-          <ListItemText primary={selectedItemName} secondary={selectedItemName} />
+    <Formik {...formik}>
+      <Box 
+        component="form" 
+        onSubmit={formik.handleSubmit} 
+        sx={{ width: '100%', height: '100%', overflow: 'auto' }}
+      >
+        {/* Universal Drawer Header */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+          <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="h6" component="p" gutterBottom>
+            {`Add ${cap_first(hooks.drawers.active)}`}
+          </Typography>
+          <IconButton sx={{ color: "#fff"}} type="submit">
+            <CheckIcon />
+          </IconButton>
         </Box>
-        <Fields schema={schema} form={formik} />
-      </Grid>
-      {children}
-      {formFooterElements}
-    </Box>
+
+        {/* Dynamic Form Section */}
+        <Grid container spacing={2} p={4}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+            <Avatar src={formik?.selected?.photo?.thumb} />
+            <ListItemText primary={selectedItemName} secondary={selectedItemName} />
+          </Box>
+          <Fields schema={schema} form={formik} />
+        </Grid>
+        {children}
+        {formFooterElements}
+      </Box>
+    </Formik>
   );
 }

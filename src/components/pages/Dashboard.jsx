@@ -1,5 +1,6 @@
 import React from 'react'
 import { 
+  Avatar,
   Box, Button, Card, Grid, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, IconButton, Stack,
   Typography, Badge, Tooltip
@@ -9,6 +10,10 @@ import SportsScoreIcon from '@mui/icons-material/SportsScore';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
+import FastfoodIcon from '@mui/icons-material/Fastfood';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HotelIcon from '@mui/icons-material/Hotel';
 import { Add } from '@mui/icons-material';
 
 import LineChart from '../charts/LineCharts';
@@ -17,11 +22,13 @@ import CustomShapeBarChart from '../charts/CustomShapeBar';
 
 // Services
 import { useHooks } from '../../hooks';
+import Carousel from '../layout/Carousel';
 
 
 const Dashboard = () => {
   // Hooks / State
   const hooks = useHooks();
+
   // Handlers
   const handleProfileClick = () => {
     hooks.actions.closeDrawers();
@@ -31,6 +38,7 @@ const Dashboard = () => {
       open: true,
     });
   };
+
   // Constants
   const mainKpis = [
     { heading: "Base Goal",
@@ -48,6 +56,39 @@ const Dashboard = () => {
       icon: <WhatshotIcon/>
     }
   ];
+
+  const discoverItems = [
+    {
+      heading: "Sleep",
+      icon: <HotelIcon />,
+      description: "Learn more about your sleep"
+    },
+    {
+      heading: "Recipes",
+      icon: <FastfoodIcon />,
+      description: "Learn new recipes"
+    },
+    {
+      heading: "Workouts",
+      icon: <FitnessCenterIcon />,
+      description: "Find training that fits"
+    },
+    {
+      heading: "Sync Up",
+      icon: <FitnessCenterIcon />,
+      description: "Learn more about your weight"
+    },
+    {
+      heading: "Friends",
+      icon: <FavoriteIcon />,
+      description: "Learn more about your heart rate"
+    },
+    {
+      heading: "Community",
+      icon: <FavoriteIcon />,
+      description: "Learn more about your blood pressure"
+    }
+  ]
 
   return (
     <>
@@ -151,55 +192,92 @@ const Dashboard = () => {
             </Card>
           </Grid>
 
-          {/* Weight Card */}
+          <Carousel slides={[
+            <Grid item xs={12} sm={12}>
+              <Card sx={{ minWidth: 275, p: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12} textAlign="left">
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Stack>
+                        <Typography variant="h5" component="p" gutterBottom>
+                          Weight
+                        </Typography>
+                        <Typography variant="body1" component="p" gutterBottom>
+                          Last 90 days
+                        </Typography>
+                      </Stack>
+                      <IconButton onClick={() => hooks.actions.updateDrawers({ active: "weight", anchor: "bottom", open: true})} sx={{ color: "#fff" }}>
+                        <Add />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
+                    <LineChart />
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>,
+            <Grid item xs={12} sm={12}>
+              <Card sx={{ minWidth: 275, p: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12} textAlign="left">
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Stack>
+                        <Typography variant="h5" component="p" gutterBottom>
+                          Steps
+                        </Typography>
+                        <Typography variant="body1" component="p" gutterBottom>
+                          Last 30 days
+                        </Typography>
+                      </Stack>
+                      <Button variant="text">iPhone</Button>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
+                    <CustomShapeBarChart />
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+          ]}
+        />
+
+          {/* Discover Section featuring 6 cards as links to different resources */}
           <Grid item xs={12} sm={12}>
-            <Card sx={{ minWidth: 275, p: 2 }}>
-              <Grid container spacing={2}>
+            <Card sx={{ p: 2 }}>
+              <Grid container rowSpacing={2} columnSpacing={2}>
                 <Grid item sm={12} textAlign="left">
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Stack>
-                      <Typography variant="h5" component="p" gutterBottom>
-                        Weight
-                      </Typography>
-                      <Typography variant="body1" component="p" gutterBottom>
-                        Last 90 days
-                      </Typography>
-                    </Stack>
-                    <IconButton onClick={() => hooks.actions.updateDrawers({ active: "weight", anchor: "bottom", open: true})} sx={{ color: "#fff" }}>
-                      <Add />
-                    </IconButton>
-                  </Box>
+                  <Typography variant="h5" component="p" gutterBottom>
+                    Discover
+                  </Typography>
                 </Grid>
-                <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                  <LineChart />
-                </Grid>
+                {discoverItems.map((item, index) => (
+                  <Grid key={index} item xs={12} sm={6} md={4}>
+                    <Card sx={{ p: 2 }}>
+                      <Grid container spacing={2}>
+                        <Grid item sm={12} textAlign="center">
+                          <Box sx={{ width: "100%", display: "flex", justifyContent: "space-around", py: 1 }}>
+                            <Avatar sx={{ background: "rgba(80, 170, 255, 0.8)" }}>
+                              <IconButton sx={{ color: "#fff" }}>
+                                {item.icon}
+                              </IconButton>
+                            </Avatar>
+                          </Box>
+                          <Typography variant="h5" component="p" gutterBottom>
+                            {item.heading}
+                          </Typography> 
+                          <Typography variant="body1" component="p" gutterBottom color="secondary" sx={{ color: "#bbb" }}>
+                            {item.description}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
             </Card>
           </Grid>
 
-          {/* Steps Card */}
-          <Grid item xs={12} sm={12}>
-            <Card sx={{ minWidth: 275, p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item sm={12} textAlign="left">
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Stack>
-                      <Typography variant="h5" component="p" gutterBottom>
-                        Steps
-                      </Typography>
-                      <Typography variant="body1" component="p" gutterBottom>
-                        Last 30 days
-                      </Typography>
-                    </Stack>
-                    <Button variant="text">iPhone</Button>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                  <CustomShapeBarChart />
-                </Grid>
-              </Grid>
-            </Card>
-          </Grid>
         </>
   )
 };
