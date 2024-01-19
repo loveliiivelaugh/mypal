@@ -22,9 +22,7 @@ import { foodHistory } from '../../utilities/constants'
 const FoodDrawer = (props) => {
   const hooks = useHooks();
   const [ state, setState ] = useState({});
-
   const nutritionix = useGetInstantQuery(state?.food, { skip: !state?.food });
-  console.log("nutritionix", nutritionix, state)
 
   const { actions } = hooks;
   
@@ -33,9 +31,7 @@ const FoodDrawer = (props) => {
   }
 
   const handleSelectedFood = async (food) => {
-    console.log("handleSelectedFood", food)
     const foodItem = await getNutritionixItem(food?.nix_item_id);
-    console.log("foodItem", foodItem)
     actions.handleSelected(foodItem);
     actions.closeDrawers();
     actions.updateDrawers({
@@ -61,16 +57,19 @@ const FoodDrawer = (props) => {
       {props.includeNutritionixAttribution && (
         <Box sx={{ justifyContent: "space-around", px: 4, mb: 1 }}>
           <Typography variant="body1" component="p" gutterBottom>
-            Attribution - {" "}<a href="https://www.nutritionix.com/" target="_blank" rel="noreferrer" style={{color: "#fff"}}>https://www.nutritionix.com/</a>
+            "We have the largest branded food database in existence with over 931K grocery foods with barcodes and 190K restaurant foods."
+          </Typography>
+          <Typography variant="body1" component="p" gutterBottom>
+            - Nutritionix
           </Typography>
           <Typography variant="body1" component="p" gutterBottom>
             Food and Nutrition Data sourced from Nutritionix.{"  "}
             <Link href="https://www.nutritionix.com/business/api" target="_blank" sx={{ color: '#fff' }}>
-              Learn more about Nutritionix API
+              Learn more about Nutritionix API @ {" "}
             </Link>
-          </Typography>
-          <Typography variant="body1" component="p" gutterBottom>
-            "We have the largest branded food database in existence with over 931K grocery foods with barcodes and 190K restaurant foods. We're constantly updating our database with new foods and brands."
+            <a href="https://www.nutritionix.com/" target="_blank" rel="noreferrer" style={{color: "#fff"}}>
+              nutritionix.com
+            </a>
           </Typography>
         </Box>
       )}
@@ -81,7 +80,7 @@ const FoodDrawer = (props) => {
           fullWidth
           onLoadedData={() => nutritionix?.data?.branded}
           loading={nutritionix?.isLoading}
-          sx={{ ml: 4 }}
+          sx={{ ml: 4, border: 0 }}
           getOptionLabel={(option) => {
             return option?.brand_name_item_name
           }}

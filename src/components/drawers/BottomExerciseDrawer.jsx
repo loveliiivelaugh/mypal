@@ -14,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 // Hooks / Services
 import { useHooks } from '../../hooks';
-import { useGetExerciseQuery, useGetMuscleGroupImageQuery } from '../../api';
+import { useGetExerciseQuery, getMuscleGroupImage } from '../../api';
 
 // Utilities
 import { exerciseHistory, tabs } from '../../utilities/constants'
@@ -37,7 +37,13 @@ const BottomExerciseDrawer = (props) => {
     setState({ ...state, [event.target.id]: event.target.value });
   };
 
-  const handleSelectedExercise = (exercise) => {
+  const handleSelectedExercise = async (exercise) => {
+    const muscleGroupImage = await getMuscleGroupImage(exercise?.muscle);
+    console.log(
+      "handleSelectedExercise().muscleGroupImage: ", 
+      exercise, 
+      muscleGroupImage
+    );
     hooks.actions.handleSelected(exercise);
     hooks.actions.closeDrawers();
     hooks.actions.updateDrawers({

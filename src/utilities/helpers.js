@@ -4,6 +4,23 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import { BasicDatePicker } from '../components/forms';
 
 
+
+
+export const getCurrentDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day  = date.getDate();
+  return `${year}-${month}-${day}`;
+};
+
+export const getCurrentTime = () => {
+  const date = new Date();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  return `${hours}:${minutes}`;
+};
+
 // Utilities
 const cap_first = (str) => (typeof(str) ==="string") 
   ? str.charAt(0).toUpperCase() + str.slice(1)
@@ -56,32 +73,31 @@ const formatDataTypes = (type) => ({
   "select": "select"
 }[type]) || "text";
 
+const mapFoodFieldNamesToSelectedKeys = (name) => ({
+  "name": "food_name",
+  "calories": "nf_calories",
+})[name] || name;
+
 const generateFields = (schema, form) => {
   // console.log("generateFields(): ", schema, form)
 
-  // destructure name from form
   let defaultValue;
-  if (form?.selected) {
-    const { name, display_name_translations } = form?.selected;
-    if (name) defaultValue = name; // When selected is an exercise
-    if (display_name_translations) // When selected is a meal
-      defaultValue = display_name_translations["en" || "it"] || "Name not found";
-  };
-
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
     .map((field) => {
       
       if ((field.column_name !== "id") && !field.hidden) {
 
-        defaultValue = (defaultValue && (field.column_name === "name")) 
-          ? defaultValue 
-          : field.column_default
+        defaultValue = (form.selected[
+          Object.keys(form.initialValues).includes("calories") 
+            ? mapFoodFieldNamesToSelectedKeys(field.column_name)
+            : field.column_default
+        ] || field.column_default);
 
-        // form.handleChange({ // dont know if we need this
-        //   target: { id: field.name, value: defaultValue } 
-        // });
-        form.values[field.column_name] = defaultValue;
+        if (field.column_name === "date") defaultValue = getCurrentDate();
+        if (field.column_name === "time") defaultValue = getCurrentTime();
+
+        // form.values[field.column_name] = defaultValue;
 
         return ({
           label: cap_first(field.column_name).replace("_", " "),
@@ -117,17 +133,24 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       options = [] 
     } = field;
 
+    const formatDateAndTimeValues = (name) => ({
+      "date": new Date(formState[name]),
+      "time": new Date(formState[name]),
+    }[name] || formState[name])
+
+    // console.log("formatDateAndTime: ", formatDateAndTimeValues(name))
     // Define common properties for all fields
     const commonProperties = {
       key: name,
       id: name,
-      value: formState[name],
+      // value: formState[name],
       name,
       type,
       label,
       helperText,
       defaultValue,
-      onChange: formState.handleChange,
+      // onChange: formState.handleChange,
+      onChange: formState.handleFormChange,
       sx: { hidden }
     };
 
@@ -143,13 +166,13 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       },
       Date: {
         ...commonProperties,
-        value: new Date(field.value).toLocaleDateString(),
-        placeholder: new Date().toLocaleDateString(),
+        // value: new Date(field.value).toLocaleDateString(),
+        // placeholder: new Date().toLocaleDateString(),
       },
       Time: {
         ...commonProperties,
-        value: new Date(field.value).toLocaleTimeString(),
-        placeholder: new Date().toLocaleTimeString(),
+        // value: new Date(field.value).toLocaleTimeString(),
+        // placeholder: new Date().toLocaleTimeString(),
       },
       Json: {
         ...commonProperties,

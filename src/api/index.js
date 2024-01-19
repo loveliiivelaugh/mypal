@@ -2,8 +2,14 @@
 import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import { supabase } from '../db';
 import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
+import { getMuscleGroupImage } from './exercise';
 
-export { nutritionixApi, getNutritionixItem, useGetInstantQuery };
+export { 
+  nutritionixApi, 
+  getNutritionixItem, 
+  useGetInstantQuery, 
+  getMuscleGroupImage
+};
 
 // env variables
 const { 

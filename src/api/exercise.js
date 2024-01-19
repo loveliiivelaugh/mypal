@@ -37,6 +37,18 @@ export const exerciseApi = createApi({
   }),
 });
 
+export const getMuscleGroupImage = async (muscleGroup) => {
+  const url = `https://${muscleGroupImageHost}/getImage?muscleGroups=${muscleGroup}`;
+  const headers = {
+    'X-RapidAPI-Key': key,
+    'X-RapidAPI-Host': muscleGroupImageHost,
+  }
+  const options = { method: 'GET', headers }
+  const response = await fetch(url, options);
+  const data = await response.json();
+  return data;
+};
+
 export const muscleGroupImageApi = createApi({
   reducerPath: 'muscleGroupImageApi',
   baseQuery: fetchBaseQuery({

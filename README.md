@@ -1,17 +1,17 @@
-# miPal
+# Open Fitness Trainer
 
 ## CI/CD
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/17584298-1ea6-4693-88ca-dcc04f60f1be/deploy-status)](https://app.netlify.com/sites/openfitness/deploys)
 
-[miPal development deployment](https://openfitness.netlify.app/)
+[OpenFitness development deployment](https://openfitness.netlify.app/)
 
-* version control: [GitHub](https://github.com/)
-* continuous integration: [GitHub Actions](https://github.com/loveliiivelaugh/mypal/actions)
-* continuous deployment: [Netlify](https://www.netlify.com/)
-* project management: [GitHub Projects](https://github.com/users/loveliiivelaugh/projects/1/views/1)
-* issue tracking: [GitHub Issues](https://github.com/loveliiivelaugh/mypal/issues)
-* code review: [GitHub Pull Requests](https://github.com/loveliiivelaugh/mypal/pulls)
+* Version Control: [GitHub](https://github.com/)
+* Continuous Integration: [GitHub Actions](https://github.com/loveliiivelaugh/mypal/actions)
+* Continuous Deployment: [Netlify](https://www.netlify.com/)
+* Project Management: [GitHub Projects](https://github.com/users/loveliiivelaugh/projects/1/views/1)
+* Issue Tracking: [GitHub Issues](https://github.com/loveliiivelaugh/mypal/issues)
+* Code Review: [GitHub Pull Requests](https://github.com/loveliiivelaugh/mypal/pulls)
 
 ## Description
 
@@ -108,6 +108,14 @@ For Demo purposes, you can use the following credentials to log in:
   password:
 ```
 
+## API's
+
+* [Supabase](https://supabase.io/) -- Database and Authentication
+
+* [RapidAPI](https://rapidapi.com/) -- Exercise data
+
+* [Nutritionix](https://www.nutritionix.com/) -- Nutrition data
+
 ## Documentation
 
 * [React](https://reactjs.org/) -- UI library
@@ -130,7 +138,7 @@ For Demo purposes, you can use the following credentials to log in:
 
 ## ToDo
 
-* [ ] Add Food data
+* [x] Add Food data
 
 * [x] Add Exercise data
 
@@ -157,6 +165,9 @@ For Demo purposes, you can use the following credentials to log in:
 * [ ] Secure app
 
 * [ ] Encrypt user data
+
+* [ ] Move app database service from Supabase to Pocketbase
+(The goal being to make the app's user data stored on device and self-hosted)
 
 ## License
 

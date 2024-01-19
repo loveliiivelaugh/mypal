@@ -1,12 +1,13 @@
 import { cap_first } from "../utilities/helpers";
 
+
 export const getCurrentDate = () => {
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day  = date.getDate();
   return `${year}-${month}-${day}`;
-}
+};
 
 export const profile_schema = [
   {
@@ -141,12 +142,12 @@ export const  food_schema = [
   {
     "column_name": "serving_size",
     "data_type": "integer",
-    "column_default": 0
+    "column_default": 1
   },
   {
     "column_name": "num_servings",
     "data_type": "integer",
-    "column_default": 0
+    "column_default": 1
   },
   {
     "column_name": "calories",
