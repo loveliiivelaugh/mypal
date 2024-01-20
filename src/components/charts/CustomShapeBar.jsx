@@ -58,7 +58,7 @@ const StepsBarChart = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey="steps" fill="#82ca9d" activeBar={<Rectangle fill="gold" stroke="purple" />} />
+        <Bar dataKey="steps" fill="rgba(80, 170, 255, 0.6)" activeBar={<Rectangle fill="gold" stroke="purple" />} />
       </BarChart>
     </ResponsiveContainer>
   );

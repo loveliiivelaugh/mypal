@@ -43,6 +43,9 @@ export const themeConfig = {
       secondary: {
         main: colors.grey["100"],
       },
+      tertiary: {
+        main: "rgba(80, 170, 255, 0.8)",
+      },
       background: {
         default: colors.grey["900"],
         paper: colors.grey["800"],

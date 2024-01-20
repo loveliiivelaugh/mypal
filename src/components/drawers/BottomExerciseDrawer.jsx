@@ -38,11 +38,11 @@ const BottomExerciseDrawer = (props) => {
   };
 
   const handleSelectedExercise = async (exercise) => {
-    const muscleGroupImage = await getMuscleGroupImage(exercise?.muscle);
+    // const muscleGroupImage = await getMuscleGroupImage(exercise?.muscle);
     console.log(
       "handleSelectedExercise().muscleGroupImage: ", 
       exercise, 
-      muscleGroupImage
+      // muscleGroupImage
     );
     hooks.actions.handleSelected(exercise);
     hooks.actions.closeDrawers();

@@ -13,7 +13,7 @@ import App from './App';
 import ErrorBoundary from './components/pages/ErrorBoundary';
 
 // Utitlities
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from './utilities/reportWebVitals';
 
 // Styles
 import './index.css';

@@ -74,32 +74,17 @@ const formatDataTypes = (type) => ({
   "select": "select"
 }[type]) || "text";
 
-const mapFoodFieldNamesToSelectedKeys = (name) => ({
-  "name": "food_name",
-  "calories": "nf_calories",
-})[name] || name;
-
 const generateFields = (schema, form) => {
-  // console.log("generateFields(): ", schema, form)
-
-  let defaultValue;
   // Build array of field objects from schema
   const fieldsObjectFromSchema = schema
     .map((field) => {
       
       if ((field.column_name !== "id") && !field.hidden) {
-
-        defaultValue = (form.selected[
-          Object.keys(form.initialValues).includes("calories") 
-            ? mapFoodFieldNamesToSelectedKeys(field.column_name)
-            : field.column_default
-        ] || field.column_default);
-        // defaultValue = form.selected[field.column_name] || field.column_default;
-
-        if (field.column_name === "date") defaultValue = getCurrentDate();
-        if (field.column_name === "time") defaultValue = getCurrentTime();
-
-        // form.values[field.column_name] = defaultValue;
+        
+        let defaultValue;
+        defaultValue = field.column_default;
+        // if (field.column_name === "date") defaultValue = getCurrentDate();
+        // if (field.column_name === "time") defaultValue = getCurrentTime();
 
         return ({
           label: cap_first(field.column_name).replace("_", " "),
@@ -131,16 +116,10 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       helperText, 
       defaultValue, 
       hidden, 
-      // if options doesnt have a value set it to an empty array
+      // if options doesnt have a value, set it to an empty array
       options = [] 
     } = field;
 
-    const formatDateAndTimeValues = (name) => ({
-      "date": new Date(formState[name]),
-      "time": new Date(formState[name]),
-    }[name] || formState[name])
-
-    // console.log("formatDateAndTime: ", formatDateAndTimeValues(name))
     // Define common properties for all fields
     const commonProperties = {
       key: name,

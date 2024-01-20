@@ -52,7 +52,7 @@ const Dashboard = () => {
     },
     { 
       heading: "Exercise",
-      value: 0,
+      value: hooks?.exercise?.todaysCaloriesBurned,
       icon: <WhatshotIcon/>
     }
   ];
@@ -99,44 +99,48 @@ const Dashboard = () => {
             </Typography>
           </Grid>
 
-          {/* Header Card -- Main Details */}
-          <Grid item xs={12} sm={12}>
-            <Card sx={{ minWidth: 275, p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item sm={12} textAlign="left">
-                  <Typography variant="h5" component="p" gutterBottom>
-                    Calories
-                  </Typography>
-                  <Typography variant="subtitle1" component="p" gutterBottom>
-                    Remaining = Goal - Food + Exercise
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <TwoLevelPieChart>
-                  <text x="50%" y="50%" textAnchor="middle" fill="#fff" dominantBaseline="middle">
-                    {hooks?.food?.goalCalories}<br/>
-                    <tspan fontSize="12" fill="#999">Remaining</tspan>
-                  </text>
-                  </TwoLevelPieChart>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Stack component={List} spacing={2}>
-                  {mainKpis.map((item, i) => (
-                    <ListItem key={item.heading}>
-                      <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText primary={item.heading} secondary={item.value} />
-                      <Tooltip title={`${item.heading} Help`} placement="top">
-                        <Badge badgeContent="?" color="primary" onClick={handleProfileClick} sx={{ cursor: "pointer" }} />
-                      </Tooltip>
-                    </ListItem>
-                  ))}
-                  </Stack>
-                </Grid>
+          <Carousel 
+            slides={[
+              // Header Card -- Main Details
+              <Grid item xs={12} sm={12} >
+                <Card sx={{ minWidth: 275, p: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item sm={12} textAlign="left">
+                      <Typography variant="h5" component="p" gutterBottom>
+                        Calories
+                      </Typography>
+                      <Typography variant="subtitle1" component="p" gutterBottom>
+                        Remaining = Goal - Food + Exercise
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={8}>
+                      <TwoLevelPieChart>
+                      <text x="50%" y="50%" textAnchor="middle" fill="#fff" dominantBaseline="middle">
+                        {hooks?.food?.goalCalories}<br/>
+                        <tspan fontSize="12" fill="#999">Remaining</tspan>
+                      </text>
+                      </TwoLevelPieChart>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Stack component={List} spacing={2}>
+                      {mainKpis.map((item, i) => (
+                        <ListItem key={item.heading}>
+                          <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
+                            {item.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={item.heading} secondary={item.value} />
+                          <Tooltip title={`${item.heading} Help`} placement="top">
+                            <Badge badgeContent="?" color="primary" onClick={handleProfileClick} sx={{ cursor: "pointer" }} />
+                          </Tooltip>
+                        </ListItem>
+                      ))}
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Card>
               </Grid>
-            </Card>
-          </Grid>
+            ]}
+          />
 
           <Grid item xs={12} sm={6}>
             {/* Steps Card */}
@@ -176,7 +180,7 @@ const Dashboard = () => {
                   </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                   {/* TODO: Need to research into how to calculate calories burned per exercise */}
-                    0 cal
+                    {hooks?.exercise?.todaysCaloriesBurned} cal
                   </Typography>
                 </Grid>
                 <Grid item sm={12} sx={{ textAlign: "left", display: "flex" }}>
@@ -192,55 +196,56 @@ const Dashboard = () => {
             </Card>
           </Grid>
 
-          <Carousel slides={[
-            <Grid item xs={12} sm={12}>
-              <Card sx={{ minWidth: 275, p: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item sm={12} textAlign="left">
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Stack>
-                        <Typography variant="h5" component="p" gutterBottom>
-                          Weight
-                        </Typography>
-                        <Typography variant="body1" component="p" gutterBottom>
-                          Last 90 days
-                        </Typography>
-                      </Stack>
-                      <IconButton onClick={() => hooks.actions.updateDrawers({ active: "weight", anchor: "bottom", open: true})} sx={{ color: "#fff" }}>
-                        <Add />
-                      </IconButton>
-                    </Box>
+          <Carousel 
+            slides={[
+              <Grid item xs={12} sm={12}>
+                <Card sx={{ minWidth: 275, p: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item sm={12} textAlign="left">
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Stack>
+                          <Typography variant="h5" component="p" gutterBottom>
+                            Weight
+                          </Typography>
+                          <Typography variant="body1" component="p" gutterBottom>
+                            Last 90 days
+                          </Typography>
+                        </Stack>
+                        <IconButton onClick={() => hooks.actions.updateDrawers({ active: "weight", anchor: "bottom", open: true})} sx={{ color: "#fff" }}>
+                          <Add />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
+                      <LineChart />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                    <LineChart />
+                </Card>
+              </Grid>,
+              <Grid item xs={12} sm={12}>
+                <Card sx={{ minWidth: 275, p: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item sm={12} textAlign="left">
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Stack>
+                          <Typography variant="h5" component="p" gutterBottom>
+                            Steps
+                          </Typography>
+                          <Typography variant="body1" component="p" gutterBottom>
+                            Last 30 days
+                          </Typography>
+                        </Stack>
+                        <Button variant="text">iPhone</Button>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
+                      <CustomShapeBarChart />
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Card>
-            </Grid>,
-            <Grid item xs={12} sm={12}>
-              <Card sx={{ minWidth: 275, p: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item sm={12} textAlign="left">
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Stack>
-                        <Typography variant="h5" component="p" gutterBottom>
-                          Steps
-                        </Typography>
-                        <Typography variant="body1" component="p" gutterBottom>
-                          Last 30 days
-                        </Typography>
-                      </Stack>
-                      <Button variant="text">iPhone</Button>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={12} sx={{ height: "400px" }}>
-                    <CustomShapeBarChart />
-                  </Grid>
-                </Grid>
-              </Card>
-            </Grid>
-          ]}
-        />
+                </Card>
+              </Grid>
+            ]}
+          />
 
           {/* Discover Section featuring 6 cards as links to different resources */}
           <Grid item xs={12} sm={12}>
