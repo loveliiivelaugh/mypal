@@ -83,7 +83,7 @@ export const useSubmit = () => {
     };
 
     // Handle selected item for exercise form
-    if (selected?.muscle) {
+    if (active === "exercise") {
       // Format exercise submit *TODO: move to separate function
       const formattedExercise = {
         date: form.date || new Date().toLocaleDateString(),
@@ -105,7 +105,23 @@ export const useSubmit = () => {
       // --- END Format exercise submit *TODO: move to separate function ---
     };
 
+    if (active === "weight") {
+      const { weight, date, time } = form;
+      form = {
+        weight,
+        date: date || new Date().toLocaleDateString(),
+        time: time || new Date().toLocaleTimeString(),
+      };
+    };
+
     console.log("Making db submission: ", form)
+    const removeDBValues = obj => Object.assign(
+      {},
+      ...Object.keys(obj)
+        .filter(key => !["id", "created_at"].includes(key))
+        .map(key => ({ [key]: obj[key] }))
+    );
+    form = removeDBValues(form);
     // Make request to database to save form data
     const [response, error] = await tryCatchHandler(
       // try
@@ -129,7 +145,7 @@ export const useSubmit = () => {
         hooks.actions.handleSelected(null);
 
         // Handle Drawers accordingly
-        if (active !== "profile" || !selected) actions.closeDrawers();
+        if (["profile", "weight"].includes(active)) actions.closeDrawers();
         else actions.updateDrawers({ 
           ...drawers, 
           anchor: "bottom"
@@ -184,6 +200,12 @@ const Fields = ({ schema, form }) => {
 };
 
 
+const mapFoodFieldNamesToSelectedKeys = (name) => ({
+  "name": "food_name",
+  "calories": "nf_calories",
+})[name] || name;
+
+
 export const FormContainer = ({ 
   schema, 
   children,
@@ -192,30 +214,58 @@ export const FormContainer = ({
   // Hooks / State
   const { handleSubmit } = useSubmit()
   const hooks = useHooks()
-
-  const mapFoodFieldNamesToSelectedKeys = (name) => ({
-    "name": "food_name",
-    "calories": "nf_calories",
-  })[name] || name;
+// Handle selected item for food and exercise forms
+  const selected = hooks?.globalState?.exercise?.selected;
 
   const getInitialValuesFromSelectedItem = (field) => {
-    // Handle selected item for food and exercise forms
-    const selected = hooks?.globalState?.exercise?.selected;
-    console.log("getInitialValuesFromSelectedItem: ", selected, field)
-    // console.log("getInitialValuesFromSelectedItem: ", selected, field)
+
     const fieldMapping = mapFoodFieldNamesToSelectedKeys(field.column_name);
-    if (selected && selected?.[fieldMapping]) return selected?.[fieldMapping];
-    else return field.column_default || "";
+    // This can be refactored to be more dynamic
+    // Have to update default value on the schema as well
+    if (selected && selected?.[field.column_name]) {
+      field.column_default = selected?.[field.column_name];
+      schema
+        .find(({ column_name }) => column_name === field.column_name)
+        .column_default = selected?.[field.column_name];
+    }
+    else if (selected && selected?.[fieldMapping]) {
+      field.column_default = selected?.[fieldMapping];
+      schema
+        .find(({ column_name }) => column_name === field.column_name)
+        .column_default = selected?.[fieldMapping];
+    }
+    else if (field.column_name === "date") {
+      field.column_default = new Date().toLocaleDateString();
+      schema
+        .find(({ column_name }) => column_name === field.column_name)
+        .column_default = new Date().toLocaleDateString();
+    }
+    else if (field.column_name === "time") {
+      field.column_default = new Date().toLocaleTimeString();
+      schema
+        .find(({ column_name }) => column_name === field.column_name)
+        .column_default = new Date().toLocaleTimeString();
+    }
+    else if (field.column_name === "user_id") {
+      field.column_default = hooks?.user_id;
+      schema
+        .find(({ column_name }) => column_name === field.column_name)
+        .column_default = hooks?.user_id;
+    }
+
+    return field.column_default || ""; 
   };
 
   const initialValues = Object.assign(
     {}, 
-    ...schema.map(field => !['id', 'created_at']
+    ...schema.map(field => !['id', 'created_at', 'user_id']
       .includes(field) && ({ 
         [field.column_name]: getInitialValuesFromSelectedItem(field)
       }))
       .filter(Boolean)
   );
+
+  console.log("Initial Values: ", initialValues)
 
   const formik = useFormik({
     initialValues,
@@ -223,19 +273,19 @@ export const FormContainer = ({
     onSubmit: handleSubmit,
   });
   // Set current selection on form object to extract default values
-  formik.selected = hooks?.globalState?.exercise?.selected;
+  formik.selected = selected;
   
   // Extract Selected Item Name to display in form header
   let selectedItemName;
-  if (formik?.selected) {
+  if (selected) {
     // When selected is an exercise
-    if (formik?.selected?.name) {
-      selectedItemName = formik?.selected?.name;
+    if (selected?.name) {
+      selectedItemName = selected?.name;
       // // Get muscle group image
     }
     // When selected is a meal
-    if (formik?.selected?.food_name) 
-      selectedItemName = formik?.selected?.food_name
+    if (selected?.food_name) 
+      selectedItemName = selected?.food_name
         || "Name not found";
   };
 
@@ -243,8 +293,8 @@ export const FormContainer = ({
 
   const closeRightDrawer = () => {
     hooks.actions.handleSelected(null);
-    hooks.actions.closeDrawers();
-    if (hooks.drawers.active === "profile") hooks.actions.closeDrawers();
+    if (["profile", "weight"].includes(hooks.drawers.active)) 
+      hooks.actions.closeDrawers();
     else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
   };
 

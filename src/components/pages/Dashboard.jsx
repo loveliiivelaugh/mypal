@@ -52,7 +52,7 @@ const Dashboard = () => {
     },
     { 
       heading: "Exercise",
-      value: 0,
+      value: hooks?.exercise?.todaysCaloriesBurned,
       icon: <WhatshotIcon/>
     }
   ];
@@ -180,7 +180,7 @@ const Dashboard = () => {
                   </IconButton>
                   <Typography variant="body1" component="p" gutterBottom>
                   {/* TODO: Need to research into how to calculate calories burned per exercise */}
-                    0 cal
+                    {hooks?.exercise?.todaysCaloriesBurned} cal
                   </Typography>
                 </Grid>
                 <Grid item sm={12} sx={{ textAlign: "left", display: "flex" }}>

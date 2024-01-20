@@ -166,6 +166,11 @@ export const useHooks = () => {
       (item.user_id === user_id) && (item.date === new Date().toISOString().slice(0, 10))
     ));
 
+  let todaysCaloriesBurned = exercise?.data
+    ?.filter((item) => (
+      (item.user_id === user_id) && (item.date === new Date().toISOString().slice(0, 10))
+    ));
+
   steps.todaysSteps = steps?.data 
     ? steps?.data.reduce((total, steps) => total + steps.value, 0)
     : 0;
@@ -176,9 +181,20 @@ export const useHooks = () => {
     return totalCalories;
   };
 
+  // Calculate the total calories consumed for the day
+  const calculateTotalCaloriesBurned = (exerciseArray = []) => {
+    // Use the reduce function to sum up the 'calories' property of each object
+    const totalCaloriesBurned = exerciseArray.reduce((total, exercise) => total + exercise.calories_burned, 0);
+    return totalCaloriesBurned;
+  };
+
   food.todaysCaloriesConsumed = calculateTotalCalories(todaysCaloriesConsumed);
+  exercise.todaysCaloriesBurned = calculateTotalCaloriesBurned(todaysCaloriesBurned);
+  
   // Remaining calories for the day = Goal (TDEE) - calories consumed + calories burned (exercise)
-  food.goalCalories = (current_profile?.tdee - food.todaysCaloriesConsumed);
+  food.goalCalories = ((current_profile?.tdee - food.todaysCaloriesConsumed)
+    + exercise.todaysCaloriesBurned
+  ).toFixed(0);
 
   // Authentication Methods
   const methods = { login, logout, signup, resetPassword, loginWithOtp };
