@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { Box, Grid } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { AnimatePresence, motion } from 'framer-motion'
-
-// import './Carousel.css'
+import { AnimatePresence, motion } from 'framer-motion';
 
 
 const Carousel = ({ slides }) => {
@@ -88,7 +86,7 @@ const Carousel = ({ slides }) => {
           initial={direction === "right" ? "hiddenRight" : "hiddenLeft"}
           animate="visible"
           exit="exit"
-          style={{ margin: "16px 16px" }}
+          sx={{ margin: "16px 16px" }}
         >
           {slides[currentIndex]}
         </Grid>

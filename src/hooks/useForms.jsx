@@ -153,10 +153,14 @@ export const useSubmit = () => {
         
       })
 
-    // Handle errors
-    if (error || response.error) actions.createAlert("error", response.error?.message)
+    console.log("FORM SUBMIT response: ", response, error)
     // Trigger alerts
-    if (!error) actions.createAlert("success", `Successfully added ${cap_first(active)} ${form?.name}`);
+    if (!error) actions.createAlert(
+      "success", 
+      `Successfully added ${cap_first(active)} ${form?.name}`
+    )
+    // Handle errors
+    else actions.createAlert("error", response.error?.message)
   };
 
   

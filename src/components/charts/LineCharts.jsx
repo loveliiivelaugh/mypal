@@ -1,6 +1,7 @@
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { useHooks } from '../../hooks';
 
 const dataPoint = {
   date: '',
@@ -16,12 +17,17 @@ const dates = new Array(20)
   }));
 
 const Example = (props) => {
+  const hooks = useHooks()
+  const weightData = hooks.weight?.data
+    ?.filter((item) => item.user_id === hooks.user_id);
+
+  // console.log("In Line Charts: ", weightData)
     return (
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={500}
           height={300}
-          data={dates}
+          data={weightData}
           margin={{
             top: 5,
             right: 30,

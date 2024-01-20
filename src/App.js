@@ -10,11 +10,13 @@ import { Drawers } from './components/drawers';
 
 // Utilities
 import { cms } from './utilities/cms';
+import LandingPage from './components/pages/Landing';
 
 
 function App() {
   // State / Hooks
   const [tab, setTab] = useState(0);
+  const [landingPage, setLandingPage] = useState(true);
   
   // Render
   const renderTab = (tab) => ({
@@ -25,7 +27,10 @@ function App() {
     4: <Profile />,
   }[tab]);
 
-  return (
+  // return <LandingPage />
+  return landingPage
+  ? <LandingPage setLandingPage={setLandingPage} />
+  : (
     <Box>
       <NavBar heading={cms.navbar.heading} />
       <AnimatePresence>
