@@ -44,7 +44,7 @@ export const themeConfig = {
         main: colors.grey["100"],
       },
       tertiary: {
-        main: "rgba(80, 170, 255, 0.8)",
+        main: "rgba(80, 170, 255, 0.8)", // #50AAFF hex conversion
       },
       background: {
         default: colors.grey["900"],

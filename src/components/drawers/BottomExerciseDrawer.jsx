@@ -4,7 +4,7 @@ import {
   Autocomplete, Box, Button, Grid,
   InputAdornment, IconButton, Typography,
   Chip, TextField, Tab, Tabs, Stack,
-  List, ListItem, ListItemText, ListItemButton,
+  Link, List, ListItem, ListItemText, ListItemButton,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
@@ -73,6 +73,17 @@ const BottomExerciseDrawer = (props) => {
         <IconButton sx={{ color: "#fff"}} type="submit">
           <CheckIcon />
         </IconButton>
+      </Box>
+      <Box px={4} py={2}>
+        <Typography>
+          Exercise Data Sourced from
+        </Typography>
+        <Link variant="text" color="#fff" href="https://www.api-ninjas.com/api/exercises" target="_blank">
+          API Ninjas Exercise API
+        </Link>
+        <Typography>
+          The Exercises API provides access to a comprehensive list of thousands of exercises targeting every major muscle group.
+        </Typography>
       </Box>
       <Box component="form" onSubmit={handleSubmit} sx={{ width: "90%", display: "flex", justifyContent:"space-around" }}>
         <Autocomplete
