@@ -1,6 +1,19 @@
 export const cms = {
   navbar: {
-    heading: "Open Fitness 💪",
+    heading: "Open Fitness",
+  },
+  landing: {
+    heading: "Open Fitness",
+    subheading: "Your Fitness Journey Starts Here",
+    body: [
+      "Experience a new way to track your fitness goals and stay healthy.",
+      `Open Fitness is a progressive web app (PWA) that can be installed on your device and be used offline. It is built using web technologies and is open source to allow for users to take advantage of it's features while still maintaining control over personal data. `
+    ],
+    cta: "Get Started",
+    cta2: "Learn More",
+    cta3: "Continue to App",
+    cta4: "Install Now",
+    cta5: "Open Fitness on GitHub",
   },
   tdee_help: {
     title: "Total Daily Energy Expenditure Calculator",
