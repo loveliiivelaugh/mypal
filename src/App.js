@@ -1,5 +1,5 @@
 // Packages
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
 
@@ -17,6 +17,21 @@ function App() {
   // State / Hooks
   const [tab, setTab] = useState(0);
   const [landingPage, setLandingPage] = useState(true);
+
+  useEffect(() => {
+    window.addEventListener("beforeinstallprompt", async (event) => {
+      event.preventDefault();
+  
+      const relatedApps = await navigator.getInstalledRelatedApps();
+  
+      // Search for a specific installed platform-specific app
+      const psApp = relatedApps.find((app) => app.id === "com.example.myapp");
+  
+      console.log("Platform-specific app installed:", psApp, event);
+      window.installPrompt = event;
+    });
+
+  }, []);
   
   // Render
   const renderTab = (tab) => ({
@@ -28,21 +43,25 @@ function App() {
   }[tab]);
 
   // return <LandingPage />
-  return landingPage
-  ? <LandingPage setLandingPage={setLandingPage} />
-  : (
-    <Box>
-      <NavBar heading={cms.navbar.heading} />
-      <AnimatePresence>
-      {/* Main */}
-        <Grid container spacing={2} p={4}>
-          {renderTab(tab)}
-        </Grid>
-        {/* Dynamic All Drawers */}
-        <Drawers />
-      </AnimatePresence>
-      <BottomNavigation />
-    </Box>
+  return (
+    <>
+      {landingPage
+        ? <LandingPage setLandingPage={setLandingPage} />
+        : (
+          <Box>
+            <NavBar heading={cms.navbar.heading} />
+            <AnimatePresence>
+            {/* Main */}
+              <Grid container spacing={2} p={4}>
+                {renderTab(tab)}
+              </Grid>
+            </AnimatePresence>
+            <BottomNavigation />
+          </Box>
+      )}
+      {/* Dynamic All Drawers */}
+      <Drawers />
+    </>
   );
 }
 
