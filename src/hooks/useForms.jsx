@@ -157,7 +157,7 @@ export const useSubmit = () => {
     // Trigger alerts
     if (!error) actions.createAlert(
       "success", 
-      `Successfully added ${cap_first(active)} ${form?.name}`
+      `Successfully added ${cap_first(active)} ${form?.name || ""}`
     )
     // Handle errors
     else actions.createAlert("error", response.error?.message)
@@ -352,6 +352,7 @@ export const FormContainer = ({
             <ListItemText primary={selectedItemName} secondary={selectedItemName} />
           </Box>
           <Fields schema={schema} form={formik} />
+          {/* <img src={hooks.exercise?.selected?.muscleGroupImage} alt="highlighted muscle group" /> */}
         </Grid>
         {children}
         {formFooterElements}

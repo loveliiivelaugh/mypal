@@ -79,14 +79,13 @@ const Carousel = ({ slides }) => {
     <Box>
       <AnimatePresence>
         <Grid 
-          container 
           component={motion.div}
           key={currentIndex}
           variants={slideVariants}
           initial={direction === "right" ? "hiddenRight" : "hiddenLeft"}
           animate="visible"
           exit="exit"
-          sx={{ margin: "16px 16px" }}
+          sx={{ margin: "16px", gap: 2 }}
         >
           {slides[currentIndex]}
         </Grid>

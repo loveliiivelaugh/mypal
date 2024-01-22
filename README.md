@@ -23,6 +23,12 @@ Open Fitness is an open source fitness and nutrition tracking application. It al
 
 * [Usage](#usage)
 
+* [API's](#apis)
+
+* [Bonus API's](#bonus-apis)
+
+* [Documentation](#documentation)
+
 * [License](#license)
 
 * [Contributors](#contributors)
@@ -37,7 +43,7 @@ Open Fitness is an open source fitness and nutrition tracking application. It al
 
 ```json
 "dependencies": {
-     "@emotion/react": "^11.11.3",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.15.2",
@@ -115,6 +121,36 @@ For Demo purposes, you can use the following credentials to log in:
 * [RapidAPI](https://rapidapi.com/) -- Exercise data
 
 * [Nutritionix](https://www.nutritionix.com/) -- Nutrition data
+
+## Bonus API's
+
+* [Apple Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios) -- Personal data
+
+Apple Shortcuts are used to automate the process of adding personal/private data to the app to include that data within the health tracking efforts.
+
+* [Steps Shortcut](#steps-shortcut)
+
+* [Heart Rate Shortcut](#heart-rate-shortcut)
+
+* [Sleep Shortcut](#sleep-shortcut)
+
+* [Water Shortcut](#water-shortcut)
+
+### Steps Shortcut
+
+This shortcut will add the number of steps you have taken today to the app.
+
+### Heart Rate Shortcut
+
+This shortcut will add the number of steps you have taken today to the app.
+
+### Sleep Shortcut
+
+This shortcut will add the number of steps you have taken today to the app.
+
+### Water Shortcut
+
+This shortcut will add the number of steps you have taken today to the app.
 
 ## Documentation
 

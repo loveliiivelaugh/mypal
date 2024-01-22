@@ -257,25 +257,21 @@ const Dashboard = () => {
                   </Typography>
                 </Grid>
                 {discoverItems.map((item, index) => (
-                  <Grid key={index} item xs={12} sm={6} md={4}>
-                    <Card sx={{ p: 2 }}>
-                      <Grid container spacing={2}>
-                        <Grid item sm={12} textAlign="center">
-                          <Box sx={{ width: "100%", display: "flex", justifyContent: "space-around", py: 1 }}>
-                            <Avatar sx={{ background: "rgba(80, 170, 255, 0.8)" }}>
-                              <IconButton sx={{ color: "#fff" }}>
-                                {item.icon}
-                              </IconButton>
-                            </Avatar>
-                          </Box>
-                          <Typography variant="h5" component="p" gutterBottom>
-                            {item.heading}
-                          </Typography> 
-                          <Typography variant="body1" component="p" gutterBottom color="secondary" sx={{ color: "#bbb" }}>
-                            {item.description}
-                          </Typography>
-                        </Grid>
-                      </Grid>
+                  <Grid key={index} item xs={12} sm={6} md={4} sx={{ display: "flex", justifyContent: "center"  }}>
+                    <Card sx={{ p: 2, width: '100%', textAlign: "center" }}>
+                      <Box sx={{ width: "100%", display: "flex", justifyContent: "space-around", py: 1 }}>
+                        <Avatar sx={{ background: "rgba(80, 170, 255, 0.8)" }}>
+                          <IconButton sx={{ color: "#fff" }}>
+                            {item.icon}
+                          </IconButton>
+                        </Avatar>
+                      </Box>
+                      <Typography variant="h5" component="p" gutterBottom>
+                        {item.heading}
+                      </Typography> 
+                      <Typography variant="body1" component="p" gutterBottom color="secondary" sx={{ color: "#bbb" }}>
+                        {item.description}
+                      </Typography>
                     </Card>
                   </Grid>
                 ))}

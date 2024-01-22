@@ -39,7 +39,8 @@ export default function SimpleBottomNavigation(props) {
     });
   };
   
-  const handleFocus = () => {
+  const handleFocus = (e) => {
+    console.log(e.target.id)
     hooks
       .actions
       .updateDrawers({
@@ -70,14 +71,14 @@ export default function SimpleBottomNavigation(props) {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                      <IconButton p={1} type="submit" sx={{ color: "#fff" }}>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton p={1} onClick={() => {}} sx={{ color: "#fff" }}>
+                      <IconButton id="qr-scan-button" p={1} onClick={() => {}} sx={{ color: "#fff" }}>
                         <QrCodeScannerIcon />
                       </IconButton>
                     </InputAdornment>

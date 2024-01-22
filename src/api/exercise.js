@@ -43,10 +43,12 @@ export const getMuscleGroupImage = async (muscleGroup) => {
     'X-RapidAPI-Key': key,
     'X-RapidAPI-Host': muscleGroupImageHost,
   }
-  const options = { method: 'GET', headers }
+  const options = { headers, responseType: "arraybuffer" }
   const response = await fetch(url, options);
-  const data = await response.json();
-  return data;
+  const imageFile = new Blob([response.data]);
+  const imageUrl = URL.createObjectURL(imageFile);
+  console.log('data', imageUrl);
+  return imageUrl || null;
 };
 
 export const muscleGroupImageApi = createApi({
