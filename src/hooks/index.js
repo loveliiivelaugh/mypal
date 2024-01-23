@@ -186,6 +186,17 @@ export const useHooks = () => {
     return totalCaloriesBurned;
   };
 
+  food.todaysFood = {
+    totalCarbs: food?.data?.reduce((total, food) => total + food.nutrients?.total_carbohydrate, 0),
+    totalFat: food?.data?.reduce((total, food) => total + food.nutrients?.total_fat, 0),
+    totalProtein: food?.data?.reduce((total, food) => total + food.nutrients?.protein, 0),
+    nutrientTotals: Object
+      .keys(food?.data?.[0]?.nutrients || {})
+      .map((key) => ({
+        name: key,
+        value: food?.data?.reduce((total, food) => total + food.nutrients[key], 0),
+      })),
+  };
   food.todaysCaloriesConsumed = calculateTotalCalories(todaysCaloriesConsumed);
   exercise.todaysCaloriesBurned = calculateTotalCaloriesBurned(todaysCaloriesBurned);
   

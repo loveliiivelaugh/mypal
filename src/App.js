@@ -1,6 +1,6 @@
 // Packages
 import { Fragment, useEffect, useState } from 'react';
-import { Box, Grid } from '@mui/material';
+import { Box, Button, Grid } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
 
 // Components
@@ -17,6 +17,7 @@ function App() {
   // State / Hooks
   const [tab, setTab] = useState(0);
   const [landingPage, setLandingPage] = useState(true);
+  const [view, setView] = useState(".")
 
   useEffect(() => {
     let _xDown, _yDown;
@@ -86,34 +87,54 @@ function App() {
   
   // Render
   const renderTab = (tab) => ({
-    0: <Dashboard />,
+    0: <Dashboard setView={setView} />,
     1: <LogFood />,
     2: <NewsFeed />,
     3: <Plans />,
     4: <Profile />,
   }[tab]);
 
-  // return <LandingPage />
-  return (
-    <div id="app">
-      {(landingPage)
-        ? <LandingPage setLandingPage={setLandingPage} />
-        : (
-          <Box>
-            <NavBar heading={cms.navbar.heading} />
-            <AnimatePresence>
-            {/* Main */}
-              <Grid container spacing={2} p={4}>
-                {renderTab(tab)}
-              </Grid>
-            </AnimatePresence>
-            <BottomNavigation />
-          </Box>
-      )}
-      {/* Dynamic All Drawers */}
-      <Drawers />
-    </div>
-  );
+  return ({
+    ".": (
+      <div id="app">
+        {(landingPage)
+          ? <LandingPage setLandingPage={setLandingPage} />
+          : (
+            <Box>
+              <NavBar heading={cms.navbar.heading} />
+              <AnimatePresence>
+              {/* Main */}
+                <Grid container spacing={2} p={4}>
+                  {renderTab(tab)}
+                </Grid>
+              </AnimatePresence>
+              <BottomNavigation />
+            </Box>
+        )}
+        {/* Dynamic All Drawers */}
+        <Drawers />
+      </div>
+    ),
+    sleep: (
+      <div>
+          <h1>Sleep View</h1>
+          <Button onClick={() => setView(".")}>Go Back</Button>
+      </div>
+    ),
+    recipes: (
+      <div>
+        <h1>Recipes View</h1>
+        <Button onClick={() => setView(".")}>Go Back</Button>
+      </div>
+      
+    ),
+    workouts: (
+      <div>
+        <h1>Workouts View</h1>
+        <Button onClick={() => setView(".")}>Go Back</Button>
+      </div>
+    )
+  }[view]);
 }
 
 export default App;

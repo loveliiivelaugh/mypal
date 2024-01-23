@@ -163,13 +163,23 @@ const supabaseApi = createApi({
 
         return [data, error];
         // return params;
-      }
+      },
+      transformResponse: (response, meta, arg) => {
+        console.log("inside transformResponse(): ", response)
+        // dbApi.add('exercises_library', Array.isArray(response) ? response : [response])
+        return response;
+      },
     }),
     // GET all items/rows from a table
     getAll: builder.query({
       queryFn: async (table) => await supabase
         .from(table)
         .select(),
+      transformResponse: (response, meta, arg) => {
+        console.log("inside transformResponse(): ", response, meta)
+        // dbApi.add('exercises_library', Array.isArray(response) ? response : [response])
+        return response;
+      },
     }),
     // GET the current user session
     getSession: builder.query({

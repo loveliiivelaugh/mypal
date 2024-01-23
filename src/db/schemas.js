@@ -23,6 +23,21 @@ export const profile_schema = [
     "hidden": true
   },
   {
+    "column_name": "gender",
+    "data_type": "select",
+    "column_default": "male",
+    "options": [
+      {
+        "label": "Male",
+        "value": "male"
+      },
+      {
+        "label": "Female",
+        "value": "female"
+      },
+    ]
+  },
+  {
     "column_name": "age",
     "data_type": "integer",
     "column_default": 21

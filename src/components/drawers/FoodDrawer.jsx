@@ -23,8 +23,6 @@ const FoodDrawer = (props) => {
   const hooks = useHooks();
   const [ state, setState ] = useState({});
   const nutritionix = useGetInstantQuery(state?.food, { skip: !state?.food });
-
-  const { actions } = hooks;
   
   const handleChange = (event) => {
     setState({ ...state, [event.target.id]: event.target.value });
@@ -32,9 +30,9 @@ const FoodDrawer = (props) => {
 
   const handleSelectedFood = async (food) => {
     const foodItem = await getNutritionixItem(food?.nix_item_id);
-    actions.handleSelected(foodItem);
-    actions.closeDrawers();
-    actions.updateDrawers({
+    hooks.actions.handleSelected(foodItem);
+    hooks.actions.closeDrawers();
+    hooks.actions.updateDrawers({
       active: "food",
       anchor: "right",
       open: true,

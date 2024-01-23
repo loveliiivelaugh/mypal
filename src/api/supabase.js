@@ -20,7 +20,8 @@ const supabaseApi = createApi({
 
         return [data, error];
         // return params;
-      }
+      },
+      
     }),
     // GET all items/rows from a table
     getAll: builder.query({

@@ -8,6 +8,8 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
+import MenuIcon from '@mui/icons-material/Menu';
 
 // Services
 import { useHooks } from '../../hooks';
@@ -18,7 +20,8 @@ const items = {
   "Log Food": <FavoriteIcon />,
   "NewsFeed": <LocationOnIcon />,
   "Plans": <RestoreIcon />,
-  "More": <FavoriteIcon />
+  "AI": <FaceRetouchingNaturalIcon />,
+  "More": <MenuIcon />,
 };
 
 export default function SimpleBottomNavigation(props) {

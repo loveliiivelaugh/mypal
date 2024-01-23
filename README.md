@@ -172,6 +172,14 @@ This shortcut will add the number of steps you have taken today to the app.
 
 * [Formik](https://formik.org/) -- Form management
 
+* [Yup]() -- Validations
+
+* [React Spring]() -- Animation
+
+* [Pop Motion]() -- Animation
+
+* [React Webcam]() -- Webcam
+
 ## ToDo
 
 * [x] Add Food data

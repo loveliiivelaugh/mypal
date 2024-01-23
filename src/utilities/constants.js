@@ -1,3 +1,54 @@
+import FastfoodIcon from '@mui/icons-material/Fastfood';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import HotelIcon from '@mui/icons-material/Hotel';
+
+
+// Constants `/pages/Dashboard.jsx`
+export const drawerAction = {
+  active: null,
+  anchor: "right",
+  open: true,
+};
+
+export const discoverItems = [
+  {
+    heading: "Sleep",
+    icon: <HotelIcon />,
+    description: "Learn more about your sleep",
+  },
+  {
+    heading: "Recipes",
+    icon: <FastfoodIcon />,
+    description: "Learn new recipes",
+  },
+  {
+    heading: "Workouts",
+    icon: <FitnessCenterIcon />,
+    description: "Find training that fits",
+  },
+  // Social Features will be added later
+  // {
+  //   heading: "Sync Up",
+  //   icon: <FitnessCenterIcon />,
+  //   description: "Learn more about your weight"
+  // },
+  // {
+  //   heading: "Friends",
+  //   icon: <FavoriteIcon />,
+  //   description: "Learn more about your heart rate"
+  // },
+  // {
+  //   heading: "Community",
+  //   icon: <FavoriteIcon />,
+  //   description: "Learn more about your blood pressure"
+  // }
+];
+
+export const legendOptions = {
+  direction: 'row',
+  position: { vertical: 'bottom', horizontal: 'left' },
+  padding: 0,
+};
 
 // Constants
 const muscles = [
@@ -33,80 +84,6 @@ const tabs = [
 ];
 
 
-// Array of fields to render for profile table
-let fields = [
-  {
-    label: "Age",
-    type: "number",
-    name: "age",
-    defaultValue: 21,
-    helperText: "Enter your age"
-  },
-  {
-    label: "Height",
-    type: "text",
-    name: "height",
-    defaultValue: "5'10",
-    helperText: "Enter your height"
-  },
-  {
-    label: "Weight",
-    type: "number",
-    name: "weight",
-    defaultValue: 150,
-    helperText: "Enter your weight"
-  },
-  {
-    label: "Exercise",
-    type: "select",
-    name: "exercise",
-    defaultValue: 1.55, 
-    helperText: "Enter your exercise",
-    options: [
-      {
-        label: "Sedentary",
-        value: 1.2
-      },
-      {
-        label: "Lightly Active",
-        value: 1.375
-      },
-      {
-        label: "Moderately Active",
-        value: 1.55
-      },
-      {
-        label: "Very Active",
-        value: 1.725
-      },
-      {
-        label: "Extremely Active",
-        value: 1.9
-      }
-    ]
-  },
-  {
-    label: "Goal",
-    type: "select",
-    name: "goal",
-    defaultValue: 0,
-    helperText: "Enter your goal",
-    options: [
-      {
-        label: "Lose Weight",
-        value: -500
-      },
-      {
-        label: "Maintain Weight",
-        value: 0
-      },
-      {
-        label: "Gain Weight",
-        value: 500
-      },
-    ]
-  },
-]
 
 // dummy data
 const exerciseHistory = {

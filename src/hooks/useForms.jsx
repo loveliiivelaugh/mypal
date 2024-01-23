@@ -295,13 +295,6 @@ export const FormContainer = ({
 
   formik.selectedItemName = selectedItemName;
 
-  const closeRightDrawer = () => {
-    hooks.actions.handleSelected(null);
-    if (["profile", "weight"].includes(hooks.drawers.active)) 
-      hooks.actions.closeDrawers();
-    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
-  };
-
   const handleFormChange = (e) => {
     formik.handleChange(e);
     // recalculate calories based on new values
@@ -332,19 +325,7 @@ export const FormContainer = ({
         onSubmit={formik.handleSubmit} 
         sx={{ width: '100%', height: '100%', overflow: 'auto' }}
       >
-        {/* Universal Drawer Header */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-          <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" component="p" gutterBottom>
-            {`Add ${cap_first(hooks.drawers.active)}`}
-          </Typography>
-          <IconButton sx={{ color: "#fff"}} type="submit">
-            <CheckIcon />
-          </IconButton>
-        </Box>
-
+        <DrawerHeader />
         {/* Dynamic Form Section */}
         <Grid container spacing={2} p={4}>
           <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
@@ -359,4 +340,29 @@ export const FormContainer = ({
       </Box>
     </Formik>
   );
+}
+
+export const DrawerHeader = ({ children }) => {
+  const hooks = useHooks();
+
+  const closeRightDrawer = () => {
+    hooks.actions.handleSelected(null);
+    if (["profile", "weight"].includes(hooks.drawers.active)) 
+      hooks.actions.closeDrawers();
+    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+  };
+
+  return (
+    <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+      <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
+        <CloseIcon />
+      </IconButton>
+      <Typography variant="h6" component="p" gutterBottom>
+        {`Add ${cap_first(hooks.drawers.active)}`}
+      </Typography>
+      <IconButton sx={{ color: "#fff"}} type="submit">
+        <CheckIcon />
+      </IconButton>
+    </Box>
+  )
 }
