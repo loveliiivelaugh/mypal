@@ -188,11 +188,11 @@ const FieldWrapper = ({ field, children }) => {
 }
 
 const Fields = ({ schema, form }) => {
-  console.log("Fields: ", schema, form)
+  // console.log("Fields: ", schema, form)
   return generateFields(schema, form)
     .map(field => (
         <FieldWrapper field={field}>
-        {console.log("Inside of field wrapper: ", field)}
+        {/* {console.log("Inside of field wrapper: ", field)} */}
           <Grid item xs={12} key={field.props.key}>
             <InputLabel htmlFor={field.props.id}>
               {field.props.label}
@@ -269,7 +269,7 @@ export const FormContainer = ({
       .filter(Boolean)
   );
 
-  console.log("Initial Values: ", initialValues)
+  // console.log("Initial Values: ", initialValues)
 
   const formik = useFormik({
     initialValues,

@@ -2,10 +2,13 @@
 import { SwipeableDrawer } from '@mui/material'
 import { motion } from 'framer-motion'
 
+import { PieChart } from '@mui/x-charts';
+import { Typography } from '@mui/material';
+
 // Components
 import { DrawerHeader, FormContainer } from '../../hooks/useForms';
 import { AuthForm, TdeeCalculator } from '../forms';
-import { BottomExerciseDrawer, FoodDrawer, InstallDrawer } from '.';
+import { BottomExerciseDrawer, FoodDrawer, InstallDrawer, RecipesDrawer } from '.';
 import { DateToggler } from '../forms/DateToggler';
 
 // Hooks
@@ -18,8 +21,6 @@ import {
   profile_schema,
   weight_schema,
 } from '../../db/schemas';
-import { PieChart } from '@mui/x-charts';
-import { Typography } from '@mui/material';
 
 
 
@@ -60,7 +61,7 @@ const Drawers = () => {
         <>
           <DrawerHeader />
           <DateToggler />
-          {console.log("sleep:", sleep.data)}
+          {/* {console.log("sleep:", sleep.data)} */}
           <PieChart
             series={[
               {
@@ -84,12 +85,7 @@ const Drawers = () => {
       )
     },
     recipes: {
-      right: (
-        <>
-          <DrawerHeader />
-          Recipes Drawer
-        </>
-      )
+      right: (<RecipesDrawer />),
     },
     workouts: {
       right: (

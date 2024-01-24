@@ -4,6 +4,7 @@ import FoodDrawer from "./FoodDrawer";
 import RightExerciseDrawer from "./RightExerciseDrawer";
 import RightFoodDrawer from "./RightFoodDrawer";
 import InstallDrawer from "./InstallDrawer";
+import RecipesDrawer from "./RecipesDrawer";
 
 export { 
   Drawers,
@@ -12,4 +13,5 @@ export {
   RightExerciseDrawer,
   RightFoodDrawer,
   InstallDrawer,
+  RecipesDrawer,
 }

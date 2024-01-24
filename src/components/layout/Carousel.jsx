@@ -5,24 +5,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { wrap } from "popmotion";
 
 const variants = {
-  enter: (direction) => {
-    return {
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    };
-  },
+  // enter: (direction) => {
+  //   return {
+  //     x: direction > 0 ? 1000 : -1000,
+  //     opacity: 0
+  //   };
+  // },
   center: {
     zIndex: 1,
     x: 0,
     opacity: 1
   },
-  exit: (direction) => {
-    return {
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    };
-  }
+  // exit: (direction) => {
+  //   return {
+  //     zIndex: 0,
+  //     x: direction < 0 ? 1000 : -1000,
+  //     opacity: 0
+  //   };
+  // }
 };
 
 const slidersVariants = {
@@ -56,45 +56,38 @@ const Carousel = ({ slides }) => {
     setPage([page + newDirection, newDirection]);
   };
 
-  // console.log("Carousel updates: ", page, direction)
+  const slideOptions = {
+    variants,
+    custom: direction,
+    key: page,
+    initial: "enter",
+    animate: "center",
+    exit: "exit",
+    transition: {
+      x: { type: "spring", stiffness: 200, damping: 20 },
+      opacity: { duration: 0.2 },
+    },
+    drag: "x",
+    dragConstraints: { left: 0, right: 0 },
+    dragElastic: 1,
+    onDragEnd: (e, { offset, velocity }) => {
+      const swipe = swipePower(offset.x, velocity.x);
+
+      if (swipe < -swipeConfidenceThreshold) {
+        paginate(1);
+      } else if (swipe > swipeConfidenceThreshold) {
+        paginate(-1);
+      }
+    },
+    sx: { minHeight: 400, my: 2 }
+  };
 
   return (
-    <Box>
+    <Box sx={{  justifyContent: "center", mt: 2, width: "100vw" }}>
       <AnimatePresence initial={false} custom={direction}>
-        <Grid
-          // container 
-          item
-          xs={12}
-          component={motion.div}
-          key={page}
-          variants={variants}
-          custom={direction}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            x: { type: "spring", stiffness: 200, damping: 20 },
-            opacity: { duration: 0.2 },
-          }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
-          whileTap={{ cursor: "grabbing" }}
-          onDragEnd={(e, { offset, velocity }) => {
-            const swipe = swipePower(offset.x, velocity.x);
-
-            if (swipe < -swipeConfidenceThreshold) {
-              paginate(1);
-            } else if (swipe > swipeConfidenceThreshold) {
-              paginate(-1);
-            }
-          }}
-          sx={{ margin: "16px 16px" }}
-        >
-          {slides[imageIndex]}
-        </Grid>
+        {slides[imageIndex](slideOptions)}
       </AnimatePresence>
-      <Box className="slide_direction" sx={{ display: "flex", justifyContent: "center" }}>
+      <Box className="slide_direction" sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
         <motion.div
           variants={slidersVariants}
           whileHover="hover"
