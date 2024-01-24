@@ -3,6 +3,15 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import HotelIcon from '@mui/icons-material/Hotel';
 
 
+
+
+export const defaultGridItemProps = {
+  item: true,
+  xs: 12,
+  sm: 6,
+  md: 4,
+}
+
 // Constants `/pages/Dashboard.jsx`
 export const drawerAction = {
   active: null,

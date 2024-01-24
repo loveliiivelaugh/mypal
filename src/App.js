@@ -1,16 +1,16 @@
 // Packages
-import { Fragment, useEffect, useState } from 'react';
-import { Box, Button, Grid } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Grid } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
 
 // Components
+import LandingPage from './components/pages/Landing';
 import { Dashboard, LogFood, NewsFeed, Plans, Profile } from './components/pages';
 import { NavBar, BottomNavigation } from './components/layout';
 import { Drawers } from './components/drawers';
 
 // Utilities
 import { cms } from './utilities/cms';
-import LandingPage from './components/pages/Landing';
 
 
 function App() {

@@ -8,14 +8,6 @@ const {
   REACT_APP_RAPID_API_CALORIES_BURNED: calsBurnedHost,
 } = process.env;
 
-const url = 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random';
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Key': 'ac72153c36mshd1814c8f1af20f3p1518fbjsnabee85184908',
-		'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
-	}
-};
 
 const headers = {
   'X-RapidAPI-Key': key,
@@ -25,7 +17,10 @@ const headers = {
 // Free Meal Database API
 const theMealDb = {
   categories: `https://www.themealdb.com/api/json/v1/1/categories.php`,
-}
+  random: "https://www.themealdb.com/api/json/v1/1/random.php",
+  all_ingredients: `https://www.themealdb.com/api/json/v1/1/list.php?i=list`,
+  all_areas: `https://www.themealdb.com/api/json/v1/1/list.php?a=list`,
+};
 
 export const foodApi = createApi({
   reducerPath: 'foodApi',
@@ -42,17 +37,51 @@ export const foodApi = createApi({
       getFood: builder.query({
         query: (params) => `/complexSearch?query=${params.query}`,
       }),
+      getRandomFood: builder.query({
+        queryFn: async () => {
+          const data = await Promise
+            .all(new Array(10)
+              .fill("")
+              .map((_) => fetch(theMealDb.random)
+                .then(res => res.json())
+                .then(data => data.meals[0])))
+
+          // console.log("getRandomFood: ", data)
+          return { data }
+        }
+      }),
+
       getCategories: builder.query({
-        queryFn: async () => await fetch(theMealDb.categories)
-          .then(res => res.json())
-          .then(data => {
-            console.log("getCategories: ", data?.categories)
-            return data?.categories
-          })
-          // .catch(error => ({data: null, error})),
-        // transformResponse: (response, meta, arg) => {
-        //   return response.categories;
-        // }
+        queryFn: async () => {
+          const data = await fetch(theMealDb.categories)
+            .then(res => res.json())
+            .then(data => data?.categories)
+
+          // console.log("getCategories: ", data)
+          return { data }
+        }
+      }),
+
+      getIngredientsList: builder.query({
+        queryFn: async () => {
+          const data = await fetch(theMealDb.all_ingredients)
+            .then(res => res.json())
+            .then(data => data?.meals)
+
+          // console.log("getIngredientsList: ", data)
+          return { data }
+        }
+      }),
+
+      getAreasList: builder.query({
+        queryFn: async () => {
+          const data = await fetch(theMealDb.all_areas)
+            .then(res => res.json())
+            .then(data => data?.meals)
+
+          // console.log("getAreasList: ", data)
+          return { data }
+        }
       })
   }),
 });
@@ -112,6 +141,12 @@ export const foodSearchApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetFoodQuery, useGetCategoriesQuery } = foodApi;
+export const { 
+  useGetFoodQuery, 
+  useGetRandomFoodQuery, 
+  useGetCategoriesQuery,
+  useGetIngredientsListQuery,
+  useGetAreasListQuery
+} = foodApi;
 export const { useGetFoodSearchQuery } = foodSearchApi;
 export const { useGetCaloriesBurnedQuery } = calsBurnedApi;

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Grid } from '@mui/material';
+import { Box } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { wrap } from "popmotion";
@@ -87,11 +87,10 @@ const Carousel = ({ slides }) => {
       <AnimatePresence initial={false} custom={direction}>
         {slides[imageIndex](slideOptions)}
       </AnimatePresence>
-      <Box className="slide_direction" sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
         <motion.div
           variants={slidersVariants}
           whileHover="hover"
-          className="left"
           onClick={() => paginate(-1)}
         >
           <FiberManualRecordIcon />
@@ -99,7 +98,6 @@ const Carousel = ({ slides }) => {
         <motion.div
           variants={slidersVariants}
           whileHover="hover"
-          className="right"
           onClick={() => paginate(1)}
         >
           <FiberManualRecordIcon />

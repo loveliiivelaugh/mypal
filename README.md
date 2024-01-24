@@ -1,4 +1,4 @@
-# Open Fitness Trainer
+# Open Fitness Trainer 
 
 ## CI/CD
 
@@ -101,6 +101,15 @@ REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```code
 npm start
+```
+
+## Docker
+
+```code
+git clone https://github.com/loveliiivelaugh/mypal.git
+cd mypal
+docker build -t openfitness .
+docker run -it --rm -p 80:80 --env-file .env openfitness
 ```
 
 ## Usage

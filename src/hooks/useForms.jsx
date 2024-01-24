@@ -114,7 +114,6 @@ export const useSubmit = () => {
       };
     };
 
-    console.log("Making db submission: ", form)
     const removeDBValues = obj => Object.assign(
       {},
       ...Object.keys(obj)
@@ -122,6 +121,7 @@ export const useSubmit = () => {
         .map(key => ({ [key]: obj[key] }))
     );
     form = removeDBValues(form);
+
     // Make request to database to save form data
     const [response, error] = await tryCatchHandler(
       // try
@@ -132,15 +132,6 @@ export const useSubmit = () => {
       }, 
       // finally
       () => {
-        // Refecth data -- pretty sure there is an option to refetch on mutation
-        // TODO: look into refetch on mutation and refactor to remove this
-        ({
-          food: () => hooks.food.refetch(),
-          exercise: () => hooks.exercise.refetch(),
-          weight: () => hooks.weight.refetch(),
-          profile: () => hooks.profile.refetch(),
-        }[active])();
-
         // Clear selected item
         hooks.actions.handleSelected(null);
 
@@ -150,7 +141,6 @@ export const useSubmit = () => {
           ...drawers, 
           anchor: "bottom"
         });
-        
       })
 
     console.log("FORM SUBMIT response: ", response, error)
@@ -347,9 +337,9 @@ export const DrawerHeader = ({ children }) => {
 
   const closeRightDrawer = () => {
     hooks.actions.handleSelected(null);
-    if (["profile", "weight"].includes(hooks.drawers.active)) 
-      hooks.actions.closeDrawers();
-    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+    if (["exercise", "food"].includes(hooks.drawers.active)) 
+      hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" })
+    else hooks.actions.closeDrawers();
   };
 
   return (

@@ -2,20 +2,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // Providers
-import { AlertsProvider } from './contexts/alerts.context';
 import { ThemeProvider } from './theme';
 import { store } from './redux';
 
 // Components
 import App from './App';
 import ErrorBoundary from './components/pages/ErrorBoundary';
+import { Alerts } from './components/layout';
 
 // Utitlities
 import reportWebVitals from './utilities/reportWebVitals';
 
-// Styles
+// Global Styles
 import './index.css';
 
 
@@ -24,11 +26,12 @@ root.render(
   <React.StrictMode>
     <ReduxProvider store={store}>
       <ThemeProvider>
-        <AlertsProvider>
-          <ErrorBoundary>
+        <ErrorBoundary>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <App />
-          </ErrorBoundary>
-        </AlertsProvider>
+            <Alerts />
+          </LocalizationProvider>
+        </ErrorBoundary>
       </ThemeProvider>
     </ReduxProvider>
   </React.StrictMode>
