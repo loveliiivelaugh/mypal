@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import { supabase } from '../db';
 import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
-import { getMuscleGroupImage } from './exercise';
+import { getMuscleGroupImage, exercisedbApi, useGetExercisesQuery } from './exercise';
 import { 
   foodApi,
   useGetFoodQuery, 
@@ -23,6 +23,9 @@ export {
   useGetRandomFoodQuery, // Query handler to get random food recipes
   useGetIngredientsListQuery, // Query handler to get list of ingredients
   useGetAreasListQuery, // Query handler to get list of food areas
+  // Exercise Endpoints
+  exercisedbApi,
+  useGetExercisesQuery,
 };
 
 // env variables
