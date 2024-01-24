@@ -3,12 +3,20 @@ import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query
 import { supabase } from '../db';
 import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
 import { getMuscleGroupImage } from './exercise';
+import { 
+  useGetCategoriesQuery, 
+  useGetFoodQuery, 
+  foodApi 
+} from './food';
 
 export { 
-  nutritionixApi, 
-  getNutritionixItem, 
-  useGetInstantQuery, 
-  getMuscleGroupImage
+  nutritionixApi, // Specifically contains Nutritionix Endpoints
+  foodApi, // Food Endpoints around Recipes
+  getNutritionixItem, // to GET an item from a search
+  getMuscleGroupImage, // to GET an image for a muscle group
+  useGetInstantQuery, // Query handler to handle instant food search for consumption tracking
+  useGetCategoriesQuery, // Query handler to get food categories available for searching
+  useGetFoodQuery, // Query handler to get food recipes
 };
 
 // env variables
@@ -70,28 +78,9 @@ export const muscleGroupImageApi = createApi({
 export const { useGetMuscleGroupImageQuery } = muscleGroupImageApi;
 
 
-export const foodApi = createApi({
-  reducerPath: 'foodApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `https://${foodHost}/recipes`,
-    prepareHeaders(headers) {
-      headers.set('X-RapidAPI-Key', key)
-      headers.set('X-RapidAPI-Host', foodHost)
-      return headers
-    },
-  }),
-  tagTypes: ['Food'],
-  endpoints: (builder) => ({
-      getFood: builder.query({
-        query: (params) => `/complexSearch?query=${params.query}`,
-      }),
-  }),
-});
-
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const { useGetExerciseQuery } = exerciseApi;
-export const { useGetFoodQuery } = foodApi;
 
 export const getCaloriesBurned = async ({exercise, weight, duration}) => {
   const url = `https://${calsBurnedHost}/v1/caloriesburned?` +
@@ -163,13 +152,23 @@ const supabaseApi = createApi({
 
         return [data, error];
         // return params;
-      }
+      },
+      transformResponse: (response, meta, arg) => {
+        console.log("inside transformResponse(): ", response)
+        // dbApi.add('exercises_library', Array.isArray(response) ? response : [response])
+        return response;
+      },
     }),
     // GET all items/rows from a table
     getAll: builder.query({
       queryFn: async (table) => await supabase
         .from(table)
         .select(),
+      transformResponse: (response, meta, arg) => {
+        console.log("inside transformResponse(): ", response, meta)
+        // dbApi.add('exercises_library', Array.isArray(response) ? response : [response])
+        return response;
+      },
     }),
     // GET the current user session
     getSession: builder.query({

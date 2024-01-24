@@ -2,101 +2,97 @@ import { useState } from 'react'
 import { Box, Grid } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { AnimatePresence, motion } from 'framer-motion';
+import { wrap } from "popmotion";
 
+const variants = {
+  // enter: (direction) => {
+  //   return {
+  //     x: direction > 0 ? 1000 : -1000,
+  //     opacity: 0
+  //   };
+  // },
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1
+  },
+  // exit: (direction) => {
+  //   return {
+  //     zIndex: 0,
+  //     x: direction < 0 ? 1000 : -1000,
+  //     opacity: 0
+  //   };
+  // }
+};
+
+const slidersVariants = {
+  hover: {
+    scale: 1.2,
+    color: "rgba(80, 170, 255, 0.8)",
+  },
+}; 
+
+/**
+ * Experimenting with distilling swipe offset and velocity into a single variable, so the
+ * less distance a user has swiped, the more velocity they need to register as a swipe.
+ * Should accomodate longer swipes and short flicks without having binary checks on
+ * just distance thresholds and velocity > 0.
+ */
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset, velocity) => {
+  return Math.abs(offset) * velocity;
+};
 
 const Carousel = ({ slides }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState('left');
+  const [[page, direction], setPage] = useState([0, 0]);
 
-  const handleNext = () => {
-    setDirection("right");
-    setCurrentIndex((prevIndex) =>
-      prevIndex + 1 === slides.length ? 0 : prevIndex + 1
-    );
-  };
-  const handlePrevious = () => {
-    setDirection("left");
-    setCurrentIndex((prevIndex) =>
-      prevIndex - 1 < 0 ? slides.length - 1 : prevIndex - 1
-    );
-  };
-  const handleDotClick = (index) => {
-    setDirection(index > currentIndex ? "right" : "left");
-    setCurrentIndex(index);
+  // We only have 3 images, but we paginate them absolutely (ie 1, 2, 3, 4, 5...) and
+  // then wrap that within 0-2 to find our image ID in the array below. By passing an
+  // absolute page index as the `motion` component's `key` prop, `AnimatePresence` will
+  // detect it as an entirely new image. So you can infinitely paginate as few as 1 images.
+  const imageIndex = wrap(0, slides.length, page);
+
+  const paginate = (newDirection) => {
+    setPage([page + newDirection, newDirection]);
   };
 
-  // Constants
-  const slideVariants = {
-    hiddenRight: {
-      x: "100%",
-      opacity: 0,
+  const slideOptions = {
+    variants,
+    custom: direction,
+    key: page,
+    initial: "enter",
+    animate: "center",
+    exit: "exit",
+    transition: {
+      x: { type: "spring", stiffness: 200, damping: 20 },
+      opacity: { duration: 0.2 },
     },
-    hiddenLeft: {
-      x: "-100%",
-      opacity: 0,
-    },
-    visible: {
-      x: "0",
-      opacity: 1,
-      transition: {
-        duration: 0.75,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      x: direction === "right" ? "100%" : "-100%",
-      // x: "100%",
-      transition: {
-        duration: 0.5,
-      },
-    },
-  };
+    drag: "x",
+    dragConstraints: { left: 0, right: 0 },
+    dragElastic: 1,
+    onDragEnd: (e, { offset, velocity }) => {
+      const swipe = swipePower(offset.x, velocity.x);
 
-  const slidersVariants = {
-    hover: {
-      scale: 1.2,
-      color: "rgba(80, 170, 255, 0.8)",
+      if (swipe < -swipeConfidenceThreshold) {
+        paginate(1);
+      } else if (swipe > swipeConfidenceThreshold) {
+        paginate(-1);
+      }
     },
-  }; 
-
-  const dotsVariants = {
-    initial: {
-      y: 0,
-    },
-    animate: {
-      y: 0,
-      scale: 1.3,
-      transition: { type: "spring", stiffness: 1000, damping: "10" },
-    },
-    hover: {
-      scale: 1.1,
-      transition: { duration: 0.2 },
-    },
+    sx: { minHeight: 400, my: 2 }
   };
 
   return (
-    <Box>
-      <AnimatePresence>
-        <Grid 
-          container 
-          component={motion.div}
-          key={currentIndex}
-          variants={slideVariants}
-          initial={direction === "right" ? "hiddenRight" : "hiddenLeft"}
-          animate="visible"
-          exit="exit"
-          sx={{ margin: "16px 16px" }}
-        >
-          {slides[currentIndex]}
-        </Grid>
+    <Box sx={{  justifyContent: "center", mt: 2, width: "100vw" }}>
+      <AnimatePresence initial={false} custom={direction}>
+        {slides[imageIndex](slideOptions)}
       </AnimatePresence>
-      <Box className="slide_direction" sx={{ display: "flex", justifyContent: "center" }}>
+      <Box className="slide_direction" sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
         <motion.div
           variants={slidersVariants}
           whileHover="hover"
           className="left"
-          onClick={handlePrevious}
+          onClick={() => paginate(-1)}
         >
           <FiberManualRecordIcon />
         </motion.div>
@@ -104,26 +100,10 @@ const Carousel = ({ slides }) => {
           variants={slidersVariants}
           whileHover="hover"
           className="right"
-          onClick={handleNext}
+          onClick={() => paginate(1)}
         >
           <FiberManualRecordIcon />
         </motion.div>
-      </Box>
-      <Box className="indicator">
-        {slides.map((_, index) => (
-          <motion.div
-            key={index}
-            // className={`dot ${currentIndex === index ? "active" : ""}`}
-            onClick={() => handleDotClick(index)}
-            initial="initial"
-            animate={currentIndex === index ? "animate" : ""}
-            whileHover="hover"
-            variants={dotsVariants}
-          >
-          {/* {!currentIndex ? "Steps" : "Weight"} */}
-            {/* {currentIndex === index ? <FiberManualRecordIcon /> : null} */}
-          </motion.div>
-        ))}
       </Box>
     </Box>
   )

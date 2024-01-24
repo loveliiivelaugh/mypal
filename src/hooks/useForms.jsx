@@ -157,7 +157,7 @@ export const useSubmit = () => {
     // Trigger alerts
     if (!error) actions.createAlert(
       "success", 
-      `Successfully added ${cap_first(active)} ${form?.name}`
+      `Successfully added ${cap_first(active)} ${form?.name || ""}`
     )
     // Handle errors
     else actions.createAlert("error", response.error?.message)
@@ -188,11 +188,11 @@ const FieldWrapper = ({ field, children }) => {
 }
 
 const Fields = ({ schema, form }) => {
-  console.log("Fields: ", schema, form)
+  // console.log("Fields: ", schema, form)
   return generateFields(schema, form)
     .map(field => (
         <FieldWrapper field={field}>
-        {console.log("Inside of field wrapper: ", field)}
+        {/* {console.log("Inside of field wrapper: ", field)} */}
           <Grid item xs={12} key={field.props.key}>
             <InputLabel htmlFor={field.props.id}>
               {field.props.label}
@@ -269,7 +269,7 @@ export const FormContainer = ({
       .filter(Boolean)
   );
 
-  console.log("Initial Values: ", initialValues)
+  // console.log("Initial Values: ", initialValues)
 
   const formik = useFormik({
     initialValues,
@@ -294,13 +294,6 @@ export const FormContainer = ({
   };
 
   formik.selectedItemName = selectedItemName;
-
-  const closeRightDrawer = () => {
-    hooks.actions.handleSelected(null);
-    if (["profile", "weight"].includes(hooks.drawers.active)) 
-      hooks.actions.closeDrawers();
-    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
-  };
 
   const handleFormChange = (e) => {
     formik.handleChange(e);
@@ -332,19 +325,7 @@ export const FormContainer = ({
         onSubmit={formik.handleSubmit} 
         sx={{ width: '100%', height: '100%', overflow: 'auto' }}
       >
-        {/* Universal Drawer Header */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
-          <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" component="p" gutterBottom>
-            {`Add ${cap_first(hooks.drawers.active)}`}
-          </Typography>
-          <IconButton sx={{ color: "#fff"}} type="submit">
-            <CheckIcon />
-          </IconButton>
-        </Box>
-
+        <DrawerHeader />
         {/* Dynamic Form Section */}
         <Grid container spacing={2} p={4}>
           <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
@@ -352,10 +333,36 @@ export const FormContainer = ({
             <ListItemText primary={selectedItemName} secondary={selectedItemName} />
           </Box>
           <Fields schema={schema} form={formik} />
+          {/* <img src={hooks.exercise?.selected?.muscleGroupImage} alt="highlighted muscle group" /> */}
         </Grid>
         {children}
         {formFooterElements}
       </Box>
     </Formik>
   );
+}
+
+export const DrawerHeader = ({ children }) => {
+  const hooks = useHooks();
+
+  const closeRightDrawer = () => {
+    hooks.actions.handleSelected(null);
+    if (["profile", "weight"].includes(hooks.drawers.active)) 
+      hooks.actions.closeDrawers();
+    else hooks.actions.updateDrawers({ ...hooks.drawers, anchor: "bottom" });
+  };
+
+  return (
+    <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, py: 2 }}>
+      <IconButton sx={{ color: "#fff"}} onClick={closeRightDrawer}>
+        <CloseIcon />
+      </IconButton>
+      <Typography variant="h6" component="p" gutterBottom>
+        {`Add ${cap_first(hooks.drawers.active)}`}
+      </Typography>
+      <IconButton sx={{ color: "#fff"}} type="submit">
+        <CheckIcon />
+      </IconButton>
+    </Box>
+  )
 }

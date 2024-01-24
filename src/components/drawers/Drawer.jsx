@@ -1,13 +1,15 @@
 // Packages
-import { Drawer } from '@mui/material'
+import { SwipeableDrawer } from '@mui/material'
 import { motion } from 'framer-motion'
-import { Button, Box, Typography } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+
+import { PieChart } from '@mui/x-charts';
+import { Typography } from '@mui/material';
 
 // Components
-import { FormContainer } from '../../hooks/useForms';
+import { DrawerHeader, FormContainer } from '../../hooks/useForms';
 import { AuthForm, TdeeCalculator } from '../forms';
-import { BottomExerciseDrawer, FoodDrawer } from '.'
+import { BottomExerciseDrawer, FoodDrawer, InstallDrawer, RecipesDrawer } from '.';
+import { DateToggler } from '../forms/DateToggler';
 
 // Hooks
 import { useHooks } from '../../hooks';
@@ -16,92 +18,22 @@ import { useHooks } from '../../hooks';
 import {
   exercise_schema,
   food_schema,
+  profile_schema,
   weight_schema,
-  // profile_schema,
 } from '../../db/schemas';
-import { useEffect } from 'react';
 
-
-const Install = () => {
-
-  // Install Prompt
-  let {installPrompt} = window;
-  
-  // window.addEventListener("beforeinstallprompt", async (event) => {
-  //   event.preventDefault();
-
-  //   const relatedApps = await navigator.getInstalledRelatedApps();
-
-  //   // Search for a specific installed platform-specific app
-  //   const psApp = relatedApps.find((app) => app.id === "com.example.myapp");
-
-  //   console.log("Platform-specific app installed:", psApp, event);
-  //   installPrompt = event;
-  //   installButton.removeAttribute("hidden");
-  // });
-
-  // installButton.addEventListener("click", async () => {
-  //   if (!installPrompt) {
-  //     return;
-  //   }
-  //   const result = await installPrompt.prompt();
-  //   console.log(`Install prompt was: ${result.outcome}`);
-  //   disableInAppInstallPrompt();
-  // });
-  
-  // function disableInAppInstallPrompt() {
-  //   installPrompt = null;
-  //   installButton.setAttribute("hidden", "");
-  // }
-
-  // window.addEventListener("appinstalled", () => {
-  //   disableInAppInstallPrompt();
-  // });
-
-  useEffect(() => {
-    const installButton = document.querySelector("#install");
-    console.log("Install component: ", installButton)
-    if (installButton) {
-      console.log("Install button: ", installButton, window)
-      installButton.addEventListener("click", async () => {
-        if (!installPrompt) {
-          console.log("No install prompt")
-          return;
-        }
-        const result = await window.installPrompt.prompt();
-        console.log(`Install prompt was: ${result.outcome}`);
-        // disableInAppInstallPrompt();
-      });
-    }
-  }, [installPrompt])
-  
-  return (
-    <Box sx={{ textAlign: "center", p: 4 }}>
-      <Typography variant="h3">Install Open Fitness</Typography>
-      <Typography>
-        Install this app on your home screen for quick and easy access when you're on the go.
-      </Typography>
-      <Typography>
-        Just tap <strong>Share</strong> then <strong>Add to Home Screen</strong>.
-      </Typography>
-      <Button id="install" sx={{ color: "#fff" }}>
-        Install <DownloadIcon />
-      </Button>
-    </Box>
-  )
-}
 
 
 const Drawers = () => {
   // State / Hooks
-  const { actions, drawers } = useHooks();
+  const { actions, drawers, food, sleep } = useHooks();
   const { active, anchor, open } = drawers;
   
   // render content based on active drawer
   const content = {
     weight: {
       bottom: (<FormContainer schema={weight_schema} />),
-      right: (<>bottom weight</>),
+      // right: (<>bottom weight</>),
     },
     exercise: {
       bottom: (<BottomExerciseDrawer handleSelected={actions.handleSelected} />),
@@ -112,36 +44,76 @@ const Drawers = () => {
       right: (<FormContainer schema={food_schema} />)
     },
     profile: {
-      bottom: (<>profile bottom</>),
+      // bottom: (<>profile bottom</>),
       right: (<TdeeCalculator />),
+      top: (<FormContainer schema={profile_schema} />),
     },
     auth: {
-      bottom: (<>auth bottom</>),
+      // bottom: (<>auth bottom</>),
       right: (<AuthForm />),
     },
     install: {
-      bottom: (<Install />),
-      right: (<>install right</>),
+      bottom: (<InstallDrawer />),
+      // right: (<>install right</>),
     },
+    sleep: {
+      right: (
+        <>
+          <DrawerHeader />
+          <DateToggler />
+          {/* {console.log("sleep:", sleep.data)} */}
+          <PieChart
+            series={[
+              {
+                data: [
+                  { id: 0, value: food.todaysFood.totalFat, label: 'Awake' },
+                  { id: 1, value: food.todaysFood.totalProtein, label: 'REM' },
+                  { id: 2, value: food.todaysFood.totalCarbs, label: 'Core' },
+                  { id: 3, value: food.todaysFood.totalCarbs, label: 'Deep' },
+                ],
+                innerRadius: 90,
+                outerRadius: 120,
+              },
+            ]}
+            height={340}
+            width={500}
+          />
+          <Typography>
+            Sleep Data provided by bio peripherals via Apple Shortcuts. Learn more about it on our blog. Or visit our website.
+          </Typography>
+        </>
+      )
+    },
+    recipes: {
+      right: (<RecipesDrawer />),
+    },
+    workouts: {
+      right: (
+        <>
+          <DrawerHeader />
+          Workouts Drawer
+        </>
+      )
+    }
   };
   
   // render
   return (
-    <Drawer
-        anchor={anchor}
-        open={open}
-        onClose={() => actions.closeDrawers()}
-        component={motion.div}
-        initial={{ opacity: 0.5 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        sx={{
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
-        }}
-      >
-        {(active && anchor) && content[active][anchor]}
-      </Drawer>
+    <SwipeableDrawer
+      anchor={anchor}
+      open={open}
+      onClose={() => actions.closeDrawers()}
+      component={motion.div}
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      sx={{
+        flexShrink: 0,
+        [`& .MuiDrawer-paper`]: { boxSizing: 'border-box' },
+      }}
+    >
+      {(active && anchor) && content[active][anchor]}
+    </SwipeableDrawer>
   )
 }
 

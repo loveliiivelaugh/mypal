@@ -8,11 +8,24 @@ const {
   REACT_APP_RAPID_API_CALORIES_BURNED: calsBurnedHost,
 } = process.env;
 
+const url = 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random';
+const options = {
+	method: 'GET',
+	headers: {
+		'X-RapidAPI-Key': 'ac72153c36mshd1814c8f1af20f3p1518fbjsnabee85184908',
+		'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
+	}
+};
 
 const headers = {
   'X-RapidAPI-Key': key,
   'X-RapidAPI-Host': foodHost,
 };
+
+// Free Meal Database API
+const theMealDb = {
+  categories: `https://www.themealdb.com/api/json/v1/1/categories.php`,
+}
 
 export const foodApi = createApi({
   reducerPath: 'foodApi',
@@ -29,8 +42,21 @@ export const foodApi = createApi({
       getFood: builder.query({
         query: (params) => `/complexSearch?query=${params.query}`,
       }),
+      getCategories: builder.query({
+        queryFn: async () => await fetch(theMealDb.categories)
+          .then(res => res.json())
+          .then(data => {
+            console.log("getCategories: ", data?.categories)
+            return data?.categories
+          })
+          // .catch(error => ({data: null, error})),
+        // transformResponse: (response, meta, arg) => {
+        //   return response.categories;
+        // }
+      })
   }),
 });
+
 
 export const getCaloriesBurned = async ({exercise, weight, duration}) => {
   const url = `https://${calsBurnedHost}/v1/caloriesburned?` +
@@ -86,6 +112,6 @@ export const foodSearchApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetFoodQuery } = foodApi;
+export const { useGetFoodQuery, useGetCategoriesQuery } = foodApi;
 export const { useGetFoodSearchQuery } = foodSearchApi;
 export const { useGetCaloriesBurnedQuery } = calsBurnedApi;

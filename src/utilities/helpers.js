@@ -61,6 +61,18 @@ const calculators = {
   },
   caloriesRemaining: ({ tdee, caloriesConsumed = 0, caloriesBurned = 0 }) => 
     parseInt(tdee - caloriesConsumed + caloriesBurned),
+  getFat: (data) => {
+    console.log("get FAT: ", data)
+    return 15
+  },
+  getCarbohydrates: (data) => {
+    console.log("get CARBS: ", data)
+    return 45
+  },
+  getProtein: (data) => {
+    console.log("get PROTEIN: ", data)
+    return 40
+  }
 };
 
 // Format data types from postgres to mui textfield types

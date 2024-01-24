@@ -15,6 +15,46 @@ export const cms = {
     cta4: "Install Now",
     cta5: "Open Fitness on GitHub",
   },
+  dashboard: {
+    cards: {
+      macros: {
+        heading: "Macros",
+        subheading: "Your daily calorie requirements broken down by Macro Nutrients",
+        body: [
+          `Macronutrients are essential nutrients that our bodies need in large 
+          quantities to provide energy, maintain body structure, and perform various
+          functions. They include carbohydrates, proteins, and fats.`,
+          `1. **Carbohydrates:** Carbohydrates are the primary source of energy for 
+          the human body. They come from foods like grains (rice, pasta, bread), 
+          sugars, fruits, vegetables, and legumes. The body breaks down 
+          carbohydrates into glucose, which is used as fuel for cells.`,
+          `2. **Proteins:** Proteins are essential nutrients that are necessary for 
+          the growth, repair, and maintenance of body tissues. They come from foods 
+          like meat, fish, eggs, dairy products, beans, and nuts. The body uses 
+          proteins to build and repair body tissues, including muscles, bones, skin,
+          and hair.`,
+          `3. **Fats:** Fats are an important source of energy and help the body 
+          absorb certain nutrients. They come from foods like oils, butter, meat, 
+          dairy products, nuts, seeds, and avocados. The body uses fats to provide 
+          energy when carbohydrates are not available, and they also play a crucial 
+          role in maintaining healthy skin, hair, and organs.`,
+          `Macronutrients are essential for good health because they provide the 
+          necessary energy and nutrients for the body to function optimally. A 
+          balanced diet that includes adequate amounts of carbohydrates, proteins, 
+          and fats can help maintain a healthy weight, support muscle growth, 
+          improve cognitive function, and reduce the risk of chronic diseases like 
+          diabetes, heart disease, and certain types of cancer.`,
+          `It is important to note that not all foods containing macronutrients are 
+          created equal. Processed and high-calorie foods, especially those with 
+          added sugars, saturated fats, and refined carbohydrates, can contribute to
+          poor health outcomes if consumed in excess. Focusing on whole, 
+          nutrient-dense foods from all food groups is key to a healthy diet and 
+          optimal health.`,
+        ],
+        body_source: "AI powered by Mistral 7B",
+      }
+    }
+  },
   tdee_help: {
     title: "Total Daily Energy Expenditure Calculator",
     body: [

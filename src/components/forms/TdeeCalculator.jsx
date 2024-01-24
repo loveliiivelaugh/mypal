@@ -1,25 +1,25 @@
-import { useEffect } from 'react'
 // Packages
-import { Grid, Toolbar, Typography } from '@mui/material'
-// Components
-import { FormContainer } from '../../hooks/useForms'
-// Hooks
-import { useHooks } from '../../hooks'
+import { IconButton, Grid, Typography } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+
 // Utilities
-import { profile_schema } from '../../db/schemas'
 import { cms } from '../../utilities/cms'
+import { useHooks } from '../../hooks'
 
 
-const TdeeCalculator = () => {
-  const { actions, profile } = useHooks();
-  // When opening this form, set the selected to the current profile if there is one.
-  useEffect(() => {
-    console.log("Current profile: ", profile.current_profile)
-    actions.handleSelected(profile.current_profile)
-  }, [actions, profile.current_profile])
+const TdeeHelp = () => {
+  const hooks = useHooks();
   return (
     <Grid container p={4}>
-      <Grid item xs={12}>
+      <Grid item xs={12} mb={4}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          {cms.tdee_help.heading}
+        </Typography>
+        <IconButton variant="text" onClick={() => hooks.actions.closeDrawers()} sx={{ color: "#fff" }}>
+          <CloseIcon />
+        </IconButton>
+      </Grid>
+      <Grid item xs={12} textAlign="center">
         <Typography variant="h4" component="h1" gutterBottom>
           {cms.tdee_help.title}
         </Typography>
@@ -32,12 +32,10 @@ const TdeeCalculator = () => {
             </Typography>
         ))}
       </Grid>
-      <Toolbar />
-      <FormContainer schema={profile_schema} />
     </Grid>
   )
 }
 
-TdeeCalculator.propTypes = {}
+TdeeHelp.propTypes = {}
 
-export default TdeeCalculator
+export default TdeeHelp

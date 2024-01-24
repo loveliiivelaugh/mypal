@@ -137,6 +137,7 @@ export const useHooks = () => {
   const exercise = useGetAllQuery("exercise");
   const steps = useGetAllQuery("steps");
   const profile = useGetAllQuery("profile");
+  const sleep = useGetAllQuery("sleep");
   const [addToDb, addToDbResult] = useAddMutation();
   const [login, loginResult] = useLoginMutation();
   const [logout, logoutResult] = useLogoutMutation();
@@ -145,12 +146,9 @@ export const useHooks = () => {
   const [loginWithOtp, loginWithOtpResult] = useLoginWithOtpMutation();
   const actions = useActions();
 
-  const selectedMuscle = globalState?.exercise?.selected?.muscle;
-  // TODO: Fix this API call to get the Muscle Group Image
-  // const muscleGroupImage = useGetMuscleGroupImageQuery(
-  //   { groups: selectedMuscle },
-  //   { skip: !selectedMuscle },
-  // );
+  // TODO: Move as much of this logic as possible to the backend (SQL queries) or ...
+  // ... to the Redux store (slices) and their respective queries
+
   
   // Destructuring and formatting for ease of use throughout the app
   let user_id = auth?.data?.session?.user?.id;
@@ -188,6 +186,17 @@ export const useHooks = () => {
     return totalCaloriesBurned;
   };
 
+  food.todaysFood = {
+    totalCarbs: food?.data?.reduce((total, food) => total + food.nutrients?.total_carbohydrate, 0),
+    totalFat: food?.data?.reduce((total, food) => total + food.nutrients?.total_fat, 0),
+    totalProtein: food?.data?.reduce((total, food) => total + food.nutrients?.protein, 0),
+    nutrientTotals: Object
+      .keys(food?.data?.[0]?.nutrients || {})
+      .map((key) => ({
+        name: key,
+        value: food?.data?.reduce((total, food) => total + food.nutrients[key], 0),
+      })),
+  };
   food.todaysCaloriesConsumed = calculateTotalCalories(todaysCaloriesConsumed);
   exercise.todaysCaloriesBurned = calculateTotalCaloriesBurned(todaysCaloriesBurned);
   
@@ -201,6 +210,8 @@ export const useHooks = () => {
   auth.methods = methods;
   auth.email = user_email;
 
+  // console.log("useHooks", sleep)
+
   return {
     user_id,
     auth, 
@@ -210,7 +221,8 @@ export const useHooks = () => {
     weight, 
     exercise,
     steps,
-    food, 
+    food,
+    sleep,
     actions,
     db: dbApi,
     drawers,
