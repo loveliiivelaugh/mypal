@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import {
-  Box, BottomNavigation, BottomNavigationAction, Grid, IconButton, InputAdornment, TextField, Autocomplete
+  Box, BottomNavigation, BottomNavigationAction, Grid, 
+  IconButton, InputAdornment, TextField, Autocomplete
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -18,7 +18,6 @@ import { useHooks } from '../../hooks';
 const items = {
   "Dashboard": <RestoreIcon />, 
   "Log Food": <FavoriteIcon />,
-  "NewsFeed": <LocationOnIcon />,
   "Plans": <RestoreIcon />,
   "AI": <FaceRetouchingNaturalIcon />,
   "More": <MenuIcon />,

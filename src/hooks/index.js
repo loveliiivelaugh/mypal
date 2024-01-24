@@ -130,21 +130,26 @@ export const useAuth = () => {
 export const useHooks = () => {
   // Hooks / Initial Queries / Redux
   const responsive = useResponsive();
+  const actions = useActions();
   const globalState = useSelector(state => state);
   const auth = useGetSessionQuery();
-  const food = useGetAllQuery("food");
-  const weight = useGetAllQuery("weight");
-  const exercise = useGetAllQuery("exercise");
-  const steps = useGetAllQuery("steps");
-  const profile = useGetAllQuery("profile");
-  const sleep = useGetAllQuery("sleep");
+  // console.log(globalState);
+  const queryOptions = {
+    refetchOnMountOrArgChange: true,
+  };
+  const food = useGetAllQuery("food", queryOptions);
+  const weight = useGetAllQuery("weight", queryOptions);
+  const exercise = useGetAllQuery("exercise", queryOptions);
+  const steps = useGetAllQuery("steps", queryOptions);
+  const profile = useGetAllQuery("profile", queryOptions);
+  const sleep = useGetAllQuery("sleep", queryOptions);
+
   const [addToDb, addToDbResult] = useAddMutation();
   const [login, loginResult] = useLoginMutation();
   const [logout, logoutResult] = useLogoutMutation();
   const [signup, signupResult] = useSignupMutation();
   const [resetPassword, resetPasswordResult] = useResetPasswordMutation();
   const [loginWithOtp, loginWithOtpResult] = useLoginWithOtpMutation();
-  const actions = useActions();
 
   // TODO: Move as much of this logic as possible to the backend (SQL queries) or ...
   // ... to the Redux store (slices) and their respective queries

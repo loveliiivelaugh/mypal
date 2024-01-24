@@ -3,10 +3,7 @@ import { IconButton, Toolbar } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { DateField } from '@mui/x-date-pickers/DateField';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 
 export const DateToggler = () => {
@@ -17,18 +14,15 @@ export const DateToggler = () => {
     }
     return (
         <Toolbar sx={{ display: "flex", justifyContent: "space-betweeen", width: '100%' }}>
-            <IconButton onClick={() => handleNextPrevDay("prev")}>
+            <IconButton onClick={() => handleNextPrevDay("prev")} sx={{ color: "#fff" }}>
                 <NavigateBeforeIcon />
             </IconButton>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['DateField']}>
-                <DateField
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                />
-                </DemoContainer>
-            </LocalizationProvider>
-            <IconButton onClick={() => handleNextPrevDay("next")}>
+            <DateField
+                value={value}
+                onChange={(newValue) => setValue(newValue)}
+                fullWidth
+            />
+            <IconButton onClick={() => handleNextPrevDay("next")} sx={{ color: "#fff" }}>
                 <NavigateNextIcon />
             </IconButton>
         </Toolbar>

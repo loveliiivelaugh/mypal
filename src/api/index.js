@@ -4,9 +4,12 @@ import { supabase } from '../db';
 import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
 import { getMuscleGroupImage } from './exercise';
 import { 
-  useGetCategoriesQuery, 
+  foodApi,
   useGetFoodQuery, 
-  foodApi 
+  useGetRandomFoodQuery,
+  useGetCategoriesQuery, 
+  useGetIngredientsListQuery,
+  useGetAreasListQuery
 } from './food';
 
 export { 
@@ -17,6 +20,9 @@ export {
   useGetInstantQuery, // Query handler to handle instant food search for consumption tracking
   useGetCategoriesQuery, // Query handler to get food categories available for searching
   useGetFoodQuery, // Query handler to get food recipes
+  useGetRandomFoodQuery, // Query handler to get random food recipes
+  useGetIngredientsListQuery, // Query handler to get list of ingredients
+  useGetAreasListQuery, // Query handler to get list of food areas
 };
 
 // env variables

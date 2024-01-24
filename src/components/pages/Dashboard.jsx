@@ -64,14 +64,14 @@ const Dashboard = (props) => {
     });
   };
 
-  // ?? In Progress
-  // // add drawer actions to discoverItems
-  // discoverItems.forEach((item) => {
-  //   item.action = () => hooks.actions.updateDrawers({
-  //     ...drawerAction,
-  //     active: item.heading.toLowerCase(),
-  //   })
-  // })
+  // ?? In Progress ...
+  // ... add drawer actions to discoverItems
+  discoverItems.forEach((item) => {
+    item.action = () => hooks.actions.updateDrawers({
+      ...drawerAction,
+      active: item.heading.toLowerCase(),
+    })
+  })
   
 
   return (
