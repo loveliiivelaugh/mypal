@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import { supabase } from '../db';
 import { nutritionixApi, getNutritionixItem, useGetInstantQuery } from './nutritionix';
-import { getMuscleGroupImage } from './exercise';
+import { getMuscleGroupImage, exercisedbApi, useGetExercisesQuery } from './exercise';
 import { 
   foodApi,
   useGetFoodQuery, 
@@ -23,10 +23,14 @@ export {
   useGetRandomFoodQuery, // Query handler to get random food recipes
   useGetIngredientsListQuery, // Query handler to get list of ingredients
   useGetAreasListQuery, // Query handler to get list of food areas
+  // Exercise Endpoints
+  exercisedbApi,
+  useGetExercisesQuery,
 };
 
 // env variables
 const { 
+  REACT_APP_AI_URL: uri, 
   REACT_APP_RAPID_API_KEY: key, 
   REACT_APP_RAPID_API_EXERCISE_HOST_2: host,
   REACT_APP_RAPID_API_FOOD_HOST: foodHost,
@@ -38,6 +42,37 @@ const headers = {
   'X-RapidAPI-Key': key,
   'X-RapidAPI-Host': host,
 };
+
+export const aiApi = createApi({
+  reducerPath: 'aiApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: ``
+  }),
+  tagTypes: ['AI', 'chat', 'help', 'trainer'],
+  endpoints: (builder) => ({
+    sendChat: builder.mutation({
+      queryFn: async (payload) => {
+        const url = uri + `/api/openai/completion`;
+        console.log("Inside Ai API: ", payload, url)
+        
+        return await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log("sendChat: ", data)
+          return { data };
+        })
+      }
+    })
+  })
+})
+
+export const { useSendChatMutation } = aiApi;
 
 // Define a service using a base URL and expected endpoints
 export const exerciseApi = createApi({

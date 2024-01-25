@@ -50,6 +50,8 @@ const RecipesDrawer = () => {
         renderInput={(params) => <TextField {...params} label="Search Recipes" />}
       />
 
+      {/* Search Results */}
+
       {/* Latest */}
       <Grid container my={2} rowSpacing={2} columnSpacing={2}>
         <Grid xs={12}>

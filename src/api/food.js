@@ -40,7 +40,7 @@ export const foodApi = createApi({
       getRandomFood: builder.query({
         queryFn: async () => {
           const data = await Promise
-            .all(new Array(10)
+            .all(new Array(9)
               .fill("")
               .map((_) => fetch(theMealDb.random)
                 .then(res => res.json())

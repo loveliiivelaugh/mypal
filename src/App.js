@@ -84,10 +84,12 @@ function App() {
 
   }, []);
   
+  const tabProps = { tab, setTab };
+
   // Render
   const renderTab = (tab) => ({
     0: <Dashboard />,
-    1: <LogFood />,
+    1: <LogFood {...tabProps} />,
     2: <NewsFeed />,
     3: <Plans />,
     4: <Profile />,
@@ -106,7 +108,7 @@ function App() {
                 {renderTab(tab)}
               </Grid>
             </AnimatePresence>
-            <BottomNavigation />
+            <BottomNavigation {...tabProps} />
           </Box>
       )}
       {/* Dynamic All Drawers */}

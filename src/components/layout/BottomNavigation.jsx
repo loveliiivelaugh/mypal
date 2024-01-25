@@ -54,6 +54,18 @@ export default function SimpleBottomNavigation(props) {
     document?.getElementById("food")?.focus();
   }
 
+  const handleNavChange  = (event, newValue) => {
+    console.log("handleNavChange: ", newValue)
+    if (newValue === 3) hooks
+      .actions
+      .updateDrawers({
+        active: "ai",
+        anchor: "bottom",
+        open: true,
+      });
+    else props.setTab(newValue);
+  }
+
   return (
     <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)' }}>
       <Grid item xs={12} sm={12} p={2}>
@@ -93,8 +105,8 @@ export default function SimpleBottomNavigation(props) {
       </Grid>
       <BottomNavigation
         showLabels
-        // value={props.tab}
-        // onChange={(event, newValue) => props.setTab(newValue)}
+        value={props.tab}
+        onChange={handleNavChange}
         sx={{ backgroundColor: 'rgba(80, 170, 255, 1)', color: '#fff' }}
       >
       {Object

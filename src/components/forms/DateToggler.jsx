@@ -6,7 +6,7 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import dayjs from 'dayjs';
 
 
-export const DateToggler = () => {
+const DateToggler = () => {
     const [value, setValue] = useState(dayjs(new Date()));
     const handleNextPrevDay = (direction) => {
         if (direction === "next") setValue(dayjs(value).add(1, 'day'));
@@ -28,3 +28,5 @@ export const DateToggler = () => {
         </Toolbar>
     )
 }
+
+export default DateToggler;

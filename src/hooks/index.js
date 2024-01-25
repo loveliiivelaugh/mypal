@@ -16,6 +16,7 @@ import {
   useLoginWithOtpMutation,
   useGetCaloriesBurnedQuery,
   useGetMuscleGroupImageQuery,
+  useSendChatMutation,
 } from '../api';
 
 // useResponsive hook -- used to determine the screen size
@@ -144,7 +145,12 @@ export const useHooks = () => {
   const profile = useGetAllQuery("profile", queryOptions);
   const sleep = useGetAllQuery("sleep", queryOptions);
 
+  // Mutations
+  // Open Source LLM -- Llama2, Mistral, CodeLlama, Dolphin Phi
+  const [sendChat, chatResult] = useSendChatMutation();
+  // Supabase -- DB
   const [addToDb, addToDbResult] = useAddMutation();
+  // Supabase -- Auth
   const [login, loginResult] = useLoginMutation();
   const [logout, logoutResult] = useLogoutMutation();
   const [signup, signupResult] = useSignupMutation();
@@ -212,6 +218,7 @@ export const useHooks = () => {
 
   // Authentication Methods
   const methods = { login, logout, signup, resetPassword, loginWithOtp };
+  const ai = { sendChat, chatResult };
   auth.methods = methods;
   auth.email = user_email;
 
@@ -231,5 +238,6 @@ export const useHooks = () => {
     actions,
     db: dbApi,
     drawers,
+    ai,
   };
 }
