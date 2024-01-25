@@ -4,6 +4,8 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { wrap } from "popmotion";
 
+
+// TODO: Figure out how to get this to be a smooth transition
 const variants = {
   // enter: (direction) => {
   //   return {

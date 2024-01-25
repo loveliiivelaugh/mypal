@@ -1,7 +1,6 @@
 // Packages
-import { SwipeableDrawer } from '@mui/material'
+import { Box, SwipeableDrawer, TextField } from '@mui/material'
 import { motion } from 'framer-motion'
-
 // Components
 import { FormContainer } from '../../hooks/useForms';
 import { AuthForm, TdeeCalculator } from '../forms';
@@ -11,7 +10,8 @@ import {
   InstallDrawer, 
   RecipesDrawer, 
   SleepDrawer, 
-  WorkoutsDrawer
+  WorkoutsDrawer,
+  AiChatDrawer
 } from '.';
 
 // Hooks
@@ -26,12 +26,12 @@ import {
 } from '../../db/schemas';
 
 
-
 const Drawers = () => {
   // State / Hooks
   const { actions, drawers } = useHooks();
   const { active, anchor, open } = drawers;
   
+  console.log("drawers: ");
   // render content based on active drawer
   const content = {
     weight: {
@@ -65,6 +65,9 @@ const Drawers = () => {
     workouts: {
       right: (<WorkoutsDrawer />),
       // bottom: (<SingleWorkoutDrawer />),
+    },
+    ai: {
+      bottom: (<AiChatDrawer />),
     }
   };
   

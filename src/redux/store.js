@@ -9,6 +9,7 @@ import {
   supabaseApi,
   nutritionixApi,
   exercisedbApi,
+  aiApi,
 } from '../api'
 
 // Reducers
@@ -20,7 +21,6 @@ const store = configureStore({
     exercise: exerciseSlice,
     alerts: alertSlice,
     auth: authSlice,
-    // food: foodSlice,
 
     // Add the generated reducer as a specific top-level slice
     [exerciseApi.reducerPath]: exerciseApi.reducer,
@@ -29,6 +29,7 @@ const store = configureStore({
     [muscleGroupImageApi.reducerPath]: muscleGroupImageApi.reducer,
     [nutritionixApi.reducerPath]: nutritionixApi.reducer,
     [exercisedbApi.reducerPath]: exercisedbApi.reducer,
+    [aiApi.reducerPath]: aiApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -39,7 +40,8 @@ const store = configureStore({
       .concat(foodApi.middleware)
       .concat(muscleGroupImageApi.middleware)
       .concat(nutritionixApi.middleware)
-      .concat(exercisedbApi.middleware),
+      .concat(exercisedbApi.middleware)
+      .concat(aiApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 
 })

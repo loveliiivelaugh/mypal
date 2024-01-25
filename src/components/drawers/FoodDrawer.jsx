@@ -46,7 +46,7 @@ const FoodDrawer = (props) => {
           <CloseIcon />
         </IconButton>
         <Typography variant="h6" component="p" gutterBottom>
-          {`Add ${cap_first(hooks.drawers.active)}`}
+          {hooks.drawers?.title || `Add ${cap_first(hooks.drawers.active)}`}
         </Typography>
         <IconButton sx={{ color: "#fff"}} type="submit">
           <CheckIcon />

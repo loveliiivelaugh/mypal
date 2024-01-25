@@ -26,7 +26,6 @@ import {
   discoverItems,
   legendOptions
 } from '../../utilities/constants';
-import { ResponsiveChartContainer } from '@mui/x-charts';
 
 
 const Dashboard = (props) => {
