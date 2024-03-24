@@ -319,7 +319,7 @@ export const FormContainer = ({
         {/* Dynamic Form Section */}
         <Grid container spacing={2} p={4}>
           <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-            <Avatar src={formik?.selected?.photo?.thumb} />
+            {formik?.selected?.photo?.thumb && <Avatar src={formik?.selected?.photo?.thumb} /> }
             <ListItemText primary={selectedItemName} secondary={selectedItemName} />
           </Box>
           <Fields schema={schema} form={formik} />

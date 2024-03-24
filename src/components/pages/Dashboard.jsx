@@ -26,6 +26,7 @@ import {
   discoverItems,
   legendOptions
 } from '../../utilities/constants';
+import dayjs from 'dayjs';
 
 
 const Dashboard = (props) => {
@@ -35,19 +36,20 @@ const Dashboard = (props) => {
   const stepsGoal = 10000; // Move this to a user setting
   const todaysSteps = hooks.steps?.todaysSteps;
   const stepsToGoalRatio = steps => (steps / stepsGoal);
+  console.log("Hooks: ", hooks)
 
   const mainKpis = [
-    { heading: "Base Goal",
-      value: hooks?.profile?.current_profile?.tdee,
+    { heading: "Daily Caloric Goal",
+      value: hooks?.profile?.data?.[0].tdee,
       icon: <SportsScoreIcon/>
     },
     {
-      heading: "Food",
+      heading: "Calories Consumed (Food)",
       value: hooks?.food?.todaysCaloriesConsumed,
       icon: <RestaurantIcon/>
     },
     { 
-      heading: "Exercise",
+      heading: "Calories Burned (Exercise)",
       value: hooks?.exercise?.todaysCaloriesBurned,
       icon: <WhatshotIcon/>
     }
@@ -78,7 +80,7 @@ const Dashboard = (props) => {
       {/* Page Header */}
       <Grid item xs={12} sm={12}>
         <Typography variant="h4" component="h4" gutterBottom>
-          Today
+          Today, {dayjs().format('dddd, MMMM D, YYYY, h:mm A')}
         </Typography>
       </Grid>
 
@@ -92,15 +94,19 @@ const Dashboard = (props) => {
             sx={{ minWidth: 275, p: 2, ...props.sx }}
             fullWidth
           >
-            <Grid container >
-              <Grid item xs={12} md={8}>
+            <Grid container>
+              <Grid item sm={12}>
                 <Typography variant="h5" component="p" gutterBottom>
-                  Calories
+                  Calories Overview
                 </Typography>
+              </Grid>
+              <Grid item sm={12}>
                 <Typography variant="subtitle1" component="p" gutterBottom>
                   Remaining = Goal - Food + Exercise
                 </Typography>
-                <Box display="flex" justifyContent="center" alignItems="center" p={2}>
+              </Grid>
+              <Grid item xs={12} md={8} order={2}>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: -10, pl: "25%" }}>
                   <PieChart
                     series={[
                       {
@@ -142,9 +148,9 @@ const Dashboard = (props) => {
                   </PieChart>
                 </Box>
               </Grid>
-              <Grid item xs={12} md={4} pt={2} pr={2}>
-                <Toolbar />
-                <Stack component={List} spacing={2} mt={6}>
+              <Grid item xs={12} md={4} pt={2} pr={2} order={1}>
+                {/* <Toolbar /> */}
+                <Stack component={List} spacing={2}>
                   {mainKpis.map((item, i) => (
                     <ListItem key={item.heading}>
                       <ListItemIcon sx={{ color: {0: '#fff', 1: '#1af', 2: '#fc0'}[i] }}>
@@ -372,7 +378,100 @@ const Dashboard = (props) => {
         ]}
       />
 
-      {/* Discover Section featuring 6 cards as links to different resources */}
+      {/* Sleep TODO: In Development */}
+      <Carousel 
+        slides={[
+          (props) => (
+            <Card
+              component={motion.div}
+              {...props}
+              sx={{
+                minWidth: 275, 
+                p: 2,
+                ...props.sx
+              }}
+            >
+              <Grid item sm={12}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", }}>
+                  <Stack>
+                    <Typography variant="h5" component="p" gutterBottom>
+                      Sleep
+                    </Typography>
+                    <Typography variant="body1" component="p" gutterBottom>
+                      Last 90 days
+                    </Typography>
+                  </Stack>
+                  <IconButton 
+                    onClick={() => hooks.actions.updateDrawers({ 
+                      active: "weight", 
+                      anchor: "bottom", 
+                      open: true
+                    })} 
+                    sx={{ color: "#fff" }}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+
+                  <LineChart
+                    xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+                    series={[
+                      {
+                        data: [2, 5.5, 2, 8.5, 1.5, 5],
+                      },
+                    ]}
+                    // width={500}
+                    height={300}
+                    slotProps={{
+                      legend: legendOptions
+                    }}
+                  />
+              </Grid>
+            </Card>
+          ),
+          (props) => (
+            <Card 
+              component={motion.div} 
+              {...props} 
+              sx={{ 
+                minWidth: 275, 
+                p: 2,
+                ...props.sx
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Stack>
+                  <Typography variant="h5" component="p" gutterBottom>
+                    Sleep Quality
+                  </Typography>
+                  <Typography variant="body1" component="p" gutterBottom>
+                    Last 30 days
+                  </Typography>
+                </Stack>
+                <Button variant="text">iPhone</Button>
+              </Box>
+              <BarChart
+                // width={1000}
+                height={300}
+                series={
+                  hooks.steps?.data
+                    .map((step, i) => Number.isInteger(step.value) && ({
+                      id: `step-${i}`,
+                      data: [step.value],
+                      label: step.startDate
+                    })).filter(Boolean)
+                }
+                xAxis={[{ data: hooks.steps?.data.map(step => step.startDate), scaleType: 'band' }]}
+                slotProps={{
+                  legend: legendOptions
+                }}
+              />
+            </Card>
+          ),
+        ]}
+      />
+
+      {/* Discover Section featuring 6 cards as links to different resources
       <Grid item xs={12} sm={12}>
         <Card sx={{ p: 2 }}>
           <Grid container rowSpacing={2} columnSpacing={2}>
@@ -402,7 +501,7 @@ const Dashboard = (props) => {
             ))}
           </Grid>
         </Card>
-      </Grid>
+      </Grid> */}
 
     </>
   )

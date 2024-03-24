@@ -45,14 +45,13 @@ const headers = {
 
 export const aiApi = createApi({
   reducerPath: 'aiApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: ``
-  }),
+  baseQuery: fetchBaseQuery({ baseUrl: `` }),
   tagTypes: ['AI', 'chat', 'help', 'trainer'],
   endpoints: (builder) => ({
     sendChat: builder.mutation({
       queryFn: async (payload) => {
-        const url = uri + `/api/openai/completion`;
+        // const url = uri + `/api/openai/completion`;
+        const url = uri + `/api/llms/chat`;
         console.log("Inside Ai API: ", payload, url)
         
         return await fetch(url, {
@@ -60,7 +59,7 @@ export const aiApi = createApi({
             'Content-Type': 'application/json',
           },
           method: 'POST',
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ prompt: payload})
         })
         .then(res => res.json())
         .then(data => {

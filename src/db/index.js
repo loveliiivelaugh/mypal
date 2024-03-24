@@ -1,5 +1,5 @@
 // Database connection
-
+// TODO: Currently migrating DB from Supabase to SQLite3 in order to support on device storage
 // Packages
 import { createClient } from '@supabase/supabase-js'
 
