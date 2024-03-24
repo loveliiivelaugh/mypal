@@ -3,6 +3,7 @@ import { IconButton, Typography, Container, Grid, Link, Toolbar } from '@mui/mat
 import DownloadIcon from '@mui/icons-material/Download';
 import { useHooks } from '../../hooks';
 import { cms } from '../../utilities/cms';
+import { AuthForm } from '../forms';
 
 const LandingPage = ({ setLandingPage }) => {
   const hooks = useHooks();
@@ -17,8 +18,20 @@ const LandingPage = ({ setLandingPage }) => {
     });
   };
 
+  const handleLoginClick = () => {
+    console.log("login clicked", true);
+    hooks.actions.updateDrawers({
+      active: "auth",
+      anchor: "right",
+      open: true
+    });
+    // Need a way to pass this callback to the authenticated event
+    // () => setLandingPage(false)
+  };
+
   return (
     <Grid container spacing={3} justifyContent="center" alignItems="center">
+      {/* <AuthForm /> */}
       <Grid item xs={12} md={12} sx={{ minHeight: '20vh', background: "rgba(80, 170, 255, 0.8)", width: "100vw" }}>
         {/* Image or Video Section */}
         {/* <img src="fitness-app-image.jpg" alt="Fitness App" style={{ width: '100%' }} /> */}
@@ -46,7 +59,7 @@ const LandingPage = ({ setLandingPage }) => {
           <IconButton variant="contained" color="primary" onClick={handleInstallClick} sx={{ color: "#fff", "&:hover": { color: "#ccc" } }}>
             {cms.landing.cta4} <DownloadIcon />
           </IconButton>
-          <IconButton variant="contained" color="primary" onClick={() => setLandingPage(false)} sx={{ color: "#fff", "&:hover": { color: "#ccc" } }}>
+          <IconButton variant="contained" color="primary" onClick={handleLoginClick} sx={{ color: "#fff", "&:hover": { color: "#ccc" } }}>
           {cms.landing.cta3}
           </IconButton>
         </Container>

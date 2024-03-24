@@ -4,7 +4,10 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import {
   Box, BottomNavigation, BottomNavigationAction, Grid, 
-  IconButton, InputAdornment, TextField, Autocomplete
+  IconButton, InputAdornment, TextField, Autocomplete, Button, List
+} from '@mui/material';
+import { 
+  Avatar, ListItem, ListItemIcon, Typography
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -15,10 +18,21 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useHooks } from '../../hooks';
 
 
+const themeColors = [
+  'rgba(80, 170, 255, 1)',
+  'rgba(255, 130, 170, 1)',
+  'rgba(255, 255, 170, 1)',
+  'rgba(170, 255, 130, 1)',
+  'rgba(170, 255, 255, 1)',
+  'rgba(170, 130, 255, 1)',
+]
+
 const items = {
   "Dashboard": <RestoreIcon />, 
-  "Log Food": <FavoriteIcon />,
+  "Log Weight": <FavoriteIcon />,
   "Plans": <RestoreIcon />,
+  // "Log Food": <FavoriteIcon />,
+  // "Plans": <RestoreIcon />,
   "AI": <FaceRetouchingNaturalIcon />,
   "More": <MenuIcon />,
 };
@@ -27,6 +41,12 @@ export default function SimpleBottomNavigation(props) {
   // State / Hooks
   const hooks = useHooks();
   const [state, setState] = useState({});
+  const [themeOption, setThemeOption] = useState(0);
+
+  const handleThemeChange = (event) => {
+    setThemeOption(prev => prev >= themeColors.length ? 0 : prev + 1);
+  };
+
   // Handlers
   const handleChange = (event) => {
     // if input type is text field
@@ -63,11 +83,18 @@ export default function SimpleBottomNavigation(props) {
         anchor: "bottom",
         open: true,
       });
+    else if (newValue === 1) hooks
+      .actions
+      .updateDrawers({
+        active: "weight",
+        anchor: "bottom",
+        open: true,
+      });
     else props.setTab(newValue);
   }
 
   return (
-    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: 'rgba(80, 170, 255, 1)' }}>
+    <Box sx={{ width: "100%", position: 'sticky', bottom: 0, backgroundColor: themeColors[themeOption] }}>
       <Grid item xs={12} sm={12} p={2}>
         <Box component="form" onClick={handleFocus}> 
           <Autocomplete
@@ -96,18 +123,38 @@ export default function SimpleBottomNavigation(props) {
                         <QrCodeScannerIcon />
                       </IconButton>
                     </InputAdornment>
-                  )
+                  ),
+                  sx:{
+                    borderRadius: 8,
+                    // borderColor: "#fff"
+                    // backgroundColor: "rgba(33,33,33,0.8)"
+                  }
                 }}
               />
             )}
           />
         </Box>
+        <Button onClick={handleThemeChange}>
+          Toggle Theme
+        </Button>
+        {/* <List>
+          {themeColors.map(theme => (
+            <ListItem key={theme}>
+              <ListItemIcon>
+                <circle style={{ background: theme, width: 10, height: 10, borderRadius: 50 }} />
+                <Typography variant="body1">
+                  {theme}
+                </Typography>
+              </ListItemIcon>
+            </ListItem>
+          ))}
+        </List> */}
       </Grid>
       <BottomNavigation
         showLabels
         value={props.tab}
         onChange={handleNavChange}
-        sx={{ backgroundColor: 'rgba(80, 170, 255, 1)', color: '#fff' }}
+        sx={{ backgroundColor: themeColors[themeOption], color: '#fff' }}
       >
       {Object
         .keys(items)

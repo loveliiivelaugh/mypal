@@ -142,6 +142,7 @@ const buildFieldElementsFromFieldsObject = (fieldsObject, formState) => fieldsOb
       label,
       helperText,
       defaultValue,
+      fullWidth: true,
       // onChange: formState.handleChange,
       onChange: formState.handleFormChange,
       sx: { hidden }

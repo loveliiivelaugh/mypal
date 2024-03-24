@@ -1,6 +1,7 @@
 // Packages
-import { Box, SwipeableDrawer, TextField } from '@mui/material'
+import { SwipeableDrawer } from '@mui/material'
 import { motion } from 'framer-motion'
+
 // Components
 import { FormContainer } from '../../hooks/useForms';
 import { AuthForm, TdeeCalculator } from '../forms';
@@ -31,7 +32,6 @@ const Drawers = () => {
   const { actions, drawers } = useHooks();
   const { active, anchor, open } = drawers;
   
-  console.log("drawers: ");
   // render content based on active drawer
   const content = {
     weight: {

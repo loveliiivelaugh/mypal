@@ -84,6 +84,7 @@ export const useActions = () => {
     updateDrawers: (payload) => dispatch(alerts.updateDrawers(payload)),
     closeDrawers: () => dispatch(alerts.closeDrawers()),
     handleSelected: (payload) => dispatch(exercise.handleSelected(payload)),
+    setLandingPage: (payload) => dispatch(alerts.setLandingPage(payload)),
   }
 };
 

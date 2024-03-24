@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { supabaseApi } from '../../../api'
 
 export const alertSlice = createSlice({
+  // TODO: Need to update this to be system
   name: 'alerts',
   initialState: {
     type: null,
@@ -10,7 +11,12 @@ export const alertSlice = createSlice({
       active: null,
       anchor: "bottom",
       open: false,
-    }
+    },
+    alert: {
+      type: null,
+      message: null,
+    },
+    landingPage: true,
   },
   reducers: {
     createAlert: (state, action) => {
@@ -32,13 +38,18 @@ export const alertSlice = createSlice({
       state.drawers.active = null;
       state.drawers.open = false;
       state.drawers.anchor = "bottom";
-    }
+    },
+
+    setLandingPage: (state, action) => {
+      state.landingPage = action.payload;
+    },
+
   },
 
   extraReducers: (builder) => {
     builder
       .addMatcher(supabaseApi.endpoints.signup.matchFulfilled, (state, action) => {
-        console.log("inside signup.matchFulfilled: redux: ", state, action)
+        console.log("inside signup.matchFulfilled: redux: Is it this one?", state, action)
       })
       .addMatcher(supabaseApi.endpoints.login.matchFulfilled, (state, action) => {
         console.log("inside login.matchFulfilled: redux: ",alertSlice, alertSlice.getInitialState(), builder, state, action)
@@ -46,6 +57,8 @@ export const alertSlice = createSlice({
           message: "Successfully logged in!",
           type: "success",
         }) 
+
+        alertSlice.setLandingPage(true)
       })
       .addMatcher(supabaseApi.endpoints.logout.matchFulfilled, (state, action) => {
         console.log("inside logout.matchFulfilled: redux: ",alertSlice, alertSlice.getInitialState(), builder, state, action)
@@ -70,6 +83,7 @@ export const {
   removeAlert,
   updateDrawers,
   closeDrawers,
+  setLandingPage,
 } = alertSlice.actions
 
 

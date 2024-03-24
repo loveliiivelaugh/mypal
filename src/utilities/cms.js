@@ -18,8 +18,8 @@ export const cms = {
   dashboard: {
     cards: {
       macros: {
-        heading: "Macros",
-        subheading: "Your daily calorie requirements broken down by Macro Nutrients",
+        heading: "Macronutrients 101",
+        subheading: "The body's daily caloric needs broken down by Macronutrients",
         body: [
           `Macronutrients are essential nutrients that our bodies need in large 
           quantities to provide energy, maintain body structure, and perform various

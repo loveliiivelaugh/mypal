@@ -10,10 +10,13 @@ import { NavBar, BottomNavigation } from './components/layout';
 import { Drawers } from './components/drawers';
 
 // Utilities
+import { useHooks } from './hooks';
 import { cms } from './utilities/cms';
 
 
 function App() {
+  const hooks = useHooks();
+  console.log("App: ", hooks)
   // State / Hooks
   const [tab, setTab] = useState(0);
   const [landingPage, setLandingPage] = useState(true);
@@ -89,16 +92,16 @@ function App() {
   // Render
   const renderTab = (tab) => ({
     0: <Dashboard />,
-    1: <LogFood {...tabProps} />,
+    // converted to open add weight drawer // 1: <LogFood {...tabProps} />,
     2: <NewsFeed />,
-    3: <Plans />,
-    4: <Profile />,
+    // 3: ,
+    4: <Profile {...tabProps} />,
   }[tab]);
 
   return (
     <div id="app">
-      {(landingPage)
-        ? <LandingPage setLandingPage={setLandingPage} />
+      {(hooks?.globalState?.alerts?.landingPage)
+        ? <LandingPage setLandingPage={hooks?.actions.setLandingPage} />
         : (
           <Box>
             <NavBar heading={cms.navbar.heading} />
