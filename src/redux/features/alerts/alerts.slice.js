@@ -16,11 +16,11 @@ export const alertSlice = createSlice({
       type: null,
       message: null,
     },
-    landingPage: true,
+    landingPage: false,
   },
   reducers: {
     createAlert: (state, action) => {
-      console.log("inside createAlert: redux: ", state, action)
+      // console.log("inside createAlert: redux: ", state, action)
       const { type, message } = action.payload
       state.type = type
       state.message = message
@@ -50,19 +50,16 @@ export const alertSlice = createSlice({
     builder
       .addMatcher(supabaseApi.endpoints.signup.matchFulfilled, (state, action) => {
         console.log("inside signup.matchFulfilled: redux: Is it this one?", state, action)
+
+        setLandingPage(false);
       })
       .addMatcher(supabaseApi.endpoints.login.matchFulfilled, (state, action) => {
-        console.log("inside login.matchFulfilled: redux: ",alertSlice, alertSlice.getInitialState(), builder, state, action)
-        createAlert(alertSlice.getInitialState(), {
-          message: "Successfully logged in!",
-          type: "success",
-        }) 
-
-        alertSlice.setLandingPage(true)
+        console.log("inside login.matchFulfilled: redux: ", action)
       })
       .addMatcher(supabaseApi.endpoints.logout.matchFulfilled, (state, action) => {
-        console.log("inside logout.matchFulfilled: redux: ",alertSlice, alertSlice.getInitialState(), builder, state, action)
-        createAlert(alertSlice.getInitialState(), {
+        console.log("inside logout.matchFulfilled: redux: ", action)
+
+        createAlert({
           message: "Successfully logged out!",
           type: "success",
         })

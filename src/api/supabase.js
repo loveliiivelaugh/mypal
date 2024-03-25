@@ -64,11 +64,18 @@ const supabaseApi = createApi({
         .signUp(payload),
     }),
 
-    login: builder.mutation({
-      queryFn: async (payload) => await supabase
-        .auth
-        .signInWithPassword(payload),
-    }),
+    // login: builder.mutation({
+    //   queryFn: async (payload) => {
+    //     console.log("inside login.payload: ", payload)
+    //     const response = await supabase
+    //       .auth
+    //       .signInWithPassword(payload)
+
+    //     console.log("inside login.response: ", response)
+    //     return response;
+    //   },
+      
+    // }),
 
     logout: builder.mutation({
       queryFn: async () => await supabase

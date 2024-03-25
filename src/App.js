@@ -16,10 +16,9 @@ import { cms } from './utilities/cms';
 
 function App() {
   const hooks = useHooks();
-  console.log("App: ", hooks)
+  // console.log("App: ", hooks)
   // State / Hooks
   const [tab, setTab] = useState(0);
-  const [landingPage, setLandingPage] = useState(true);
 
   useEffect(() => {
     let _xDown, _yDown;
