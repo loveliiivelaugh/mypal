@@ -16,6 +16,7 @@ import { useHooks } from '../../hooks';
 import { tryCatchHandler } from '../../utilities/helpers';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useLoginMutation } from '../../api';
 
 
 function Copyright(props) {
@@ -33,6 +34,7 @@ function Copyright(props) {
 
 export default function SignIn() {
   const hooks = useHooks();
+  const [login, loginResponse] = useLoginMutation();
   const [authType, setAuthType] = useState(hooks.user_id ? "logout" : "login")
   const [state, setState] = useState({});
 
@@ -40,7 +42,7 @@ export default function SignIn() {
     ...state, 
     [event.target.name]: event.target.value 
   });
-  console.log("Auth Form: ", hooks)
+  // console.log("Auth Form: ", hooks)
 
   const toggleAuth = (auth) => {
     hooks.actions.closeDrawers();
@@ -69,15 +71,17 @@ export default function SignIn() {
     tryCatchHandler(
       // try
       () => ({
-        login: hooks.auth.methods.login(state),
-        logout: hooks.auth.methods.logout(),
-        signup: hooks.auth.methods.signup(state),
-      }[authType]),
+        login: () => hooks.auth.methods.login(state),
+        logout: () => hooks.auth.methods.logout(),
+        signup: () => hooks.auth.methods.signup(state),
+      }[authType])(),
       // finally
       () => {
         hooks.actions.closeDrawers();
         hooks.auth.refetch();
         hooks.actions.createAlert("success", `${formattedAuthType} successful!`);
+        console.log('handleSubmit.finally: ', hooks)
+        if (hooks?.user_id) hooks.actions.setLandingPage(false);
       }
     )
   };
